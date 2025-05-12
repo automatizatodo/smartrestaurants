@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu as MenuIcon, X as XIcon, Wine } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/context/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector'; // Import the LanguageSelector
 
 const navItemKeys = [
   { labelKey: 'common:nav.ourMenu', href: '#menu' },
@@ -33,7 +34,7 @@ export default function Header() {
   }, []);
 
   const NavLinks = ({ inSheet = false }: { inSheet?: boolean }) => (
-    <nav className={`flex ${inSheet ? 'flex-col space-y-4' : 'space-x-6 items-center'}`}>
+    <nav className={`flex ${inSheet ? 'flex-col space-y-4 items-start' : 'space-x-6 items-center'}`}>
       {navItemKeys.map((item) => (
         <Link
           key={item.labelKey}
@@ -52,11 +53,16 @@ export default function Header() {
          </Link>
       )}
        {inSheet && (
+        <>
          <Link href="#booking" passHref>
             <Button variant="default" size="lg" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setIsSheetOpen(false)}>
                 {t('common:button.bookNow')}
             </Button>
          </Link>
+         <div className="pt-4 w-full">
+            <LanguageSelector />
+         </div>
+        </>
       )}
     </nav>
   );
@@ -71,29 +77,34 @@ export default function Header() {
           </Link>
 
           {isMobile ? (
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MenuIcon className="h-6 w-6" />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background p-6">
-                <div className="flex justify-between items-center mb-8">
-                    <Link href="/" className="flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
-                        <Wine className="h-7 w-7 text-primary" />
-                        <span className="text-xl font-serif font-bold text-foreground">{restaurantName}</span>
-                    </Link>
-                    <Button variant="ghost" size="icon" onClick={() => setIsSheetOpen(false)}>
-                        <XIcon className="h-6 w-6" />
-                        <span className="sr-only">Close menu</span>
-                    </Button>
-                </div>
-                <NavLinks inSheet={true} />
-              </SheetContent>
-            </Sheet>
+            <div className="flex items-center">
+              <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MenuIcon className="h-6 w-6" />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background p-6">
+                  <div className="flex justify-between items-center mb-8">
+                      <Link href="/" className="flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
+                          <Wine className="h-7 w-7 text-primary" />
+                          <span className="text-xl font-serif font-bold text-foreground">{restaurantName}</span>
+                      </Link>
+                      <Button variant="ghost" size="icon" onClick={() => setIsSheetOpen(false)}>
+                          <XIcon className="h-6 w-6" />
+                          <span className="sr-only">Close menu</span>
+                      </Button>
+                  </div>
+                  <NavLinks inSheet={true} />
+                </SheetContent>
+              </Sheet>
+            </div>
           ) : (
-            <NavLinks />
+            <div className="flex items-center space-x-4">
+              <NavLinks />
+              <LanguageSelector />
+            </div>
           )}
         </div>
       </div>

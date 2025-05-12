@@ -18,5 +18,12 @@
   "footer.followUsDescription": "Mantente al día con nuestras últimas creaciones y eventos.",
   "footer.copyright": "© {year} {restaurantName}. Todos los derechos reservados. Diseñado con pasión.",
   "form.error.generic": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.",
-  "form.error.invalidInput": "Entrada inválida. Por favor, revisa tus datos."
+  "form.error.invalidInput": "Entrada inválida. Por favor, revisa tus datos.",
+  "languageSelector.label": "Seleccionar idioma",
+  "languageSelector.selectPlaceholder": "Idioma",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "goToTestimonial": "Ir al testimonio {number}",
+  "guestSingular": "comensal",
+  "guestsPlural": "comensales"
 }

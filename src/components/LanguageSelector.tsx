@@ -1,0 +1,46 @@
+
+"use client";
+
+import { useLanguage } from '@/context/LanguageContext';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Globe } from 'lucide-react';
+
+export default function LanguageSelector() {
+  const { language, setLanguage, t } = useLanguage();
+
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Español' },
+  ];
+
+  const handleLanguageChange = (value: string) => {
+    setLanguage(value as 'en' | 'es');
+  };
+
+  return (
+    <div className="flex items-center space-x-2">
+      <Select value={language} onValueChange={handleLanguageChange}>
+        <SelectTrigger 
+          className="w-auto bg-transparent border-none hover:bg-accent/50 focus:ring-0 focus:ring-offset-0"
+          aria-label={t('common:languageSelector.label')}
+        >
+          <Globe className="h-5 w-5 text-foreground/80" />
+          <SelectValue placeholder={t('common:languageSelector.selectPlaceholder')} />
+        </SelectTrigger>
+        <SelectContent align="end" className="min-w-[120px]">
+          {languages.map((lang) => (
+            <SelectItem key={lang.code} value={lang.code}>
+              {lang.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}

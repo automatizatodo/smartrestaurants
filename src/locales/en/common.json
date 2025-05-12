@@ -18,5 +18,12 @@
   "footer.followUsDescription": "Stay updated with our latest creations and events.",
   "footer.copyright": "© {year} {restaurantName}. All rights reserved. Designed with passion.",
   "form.error.generic": "An unexpected error occurred. Please try again later.",
-  "form.error.invalidInput": "Invalid input. Please check your details."
+  "form.error.invalidInput": "Invalid input. Please check your details.",
+  "languageSelector.label": "Select language",
+  "languageSelector.selectPlaceholder": "Language",
+  "previous": "Previous",
+  "next": "Next",
+  "goToTestimonial": "Go to testimonial {number}",
+  "guestSingular": "guest",
+  "guestsPlural": "guests"
 }
