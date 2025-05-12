@@ -6,7 +6,9 @@
   "nav.aiSommelier": "AI Sommelier",
   "nav.bookTable": "Book a Table",
   "nav.testimonials": "Testimonials",
+  "nav.fullMenu": "Full Menu",
   "button.bookNow": "Book Now",
+  "button.viewFullMenu": "View Full Menu",
   "footer.quickLinks": "Quick Links",
   "footer.home": "Home",
   "footer.menu": "Menu",
@@ -25,5 +27,8 @@
   "next": "Next",
   "goToTestimonial": "Go to testimonial {number}",
   "guestSingular": "guest",
-  "guestsPlural": "guests"
+  "guestsPlural": "guests",
+  "page.menu.title": "Our Exquisite Menu",
+  "page.menu.description": "Explore the full range of culinary delights offered at {restaurantName}. Each dish crafted with passion and artistry.",
+  "allCategories": "All"
 }

@@ -1,5 +1,10 @@
 
 {
+  "category.appetizer": "Entrantes",
+  "category.mainCourse": "Platos Principales",
+  "category.dessert": "Postres",
+  "category.luxury": "Selección de Lujo",
+
   "item1.name": "Risotto Milanese al Azafrán",
   "item1.description": "Cremoso arroz Arborio infusionado con azafrán, parmesano y un toque de vino blanco, coronado con pan de oro.",
   "item2.name": "Vieiras Selladas con Trufa",
@@ -11,5 +16,9 @@
   "item5.name": "Tiramisú Deconstruido",
   "item5.description": "Una interpretación artística del postre italiano clásico, con bizcochos de soletilla empapados en espresso, crema de mascarpone y polvo de cacao.",
   "item6.name": "Sundae Opulencia Dorada",
-  "item6.description": "Helado de vainilla de Tahití, vainilla de Madagascar, pan de oro comestible de 23k y raro chocolate Amedei Porcelana."
+  "item6.description": "Helado de vainilla de Tahití, vainilla de Madagascar, pan de oro comestible de 23k y raro chocolate Amedei Porcelana.",
+  "item7.name": "Burrata Caprese",
+  "item7.description": "Queso Burrata fresco servido con tomates reliquia, pesto de albahaca y un glaseado balsámico.",
+  "item8.name": "Crème Brûlée Clásica",
+  "item8.description": "Base rica de crema pastelera cubierta con una capa de azúcar caramelizado endurecido."
 }

@@ -1,5 +1,10 @@
 
 {
+  "category.appetizer": "Appetizers",
+  "category.mainCourse": "Main Courses",
+  "category.dessert": "Desserts",
+  "category.luxury": "Luxury Selection",
+
   "item1.name": "Saffron Risotto Milanese",
   "item1.description": "Creamy Arborio rice infused with saffron, Parmesan, and a hint of white wine, topped with gold leaf.",
   "item2.name": "Seared Scallops with Truffle",
@@ -11,5 +16,9 @@
   "item5.name": "Deconstructed Tiramisu",
   "item5.description": "An artistic take on the classic Italian dessert, with espresso-soaked ladyfingers, mascarpone cream, and cocoa dust.",
   "item6.name": "Golden Opulence Sundae",
-  "item6.description": "Tahitian vanilla bean ice cream, Madagascar vanilla, 23k edible gold leaf, and rare Amedei Porcelana chocolate."
+  "item6.description": "Tahitian vanilla bean ice cream, Madagascar vanilla, 23k edible gold leaf, and rare Amedei Porcelana chocolate.",
+  "item7.name": "Burrata Caprese",
+  "item7.description": "Fresh Burrata cheese served with heirloom tomatoes, basil pesto, and a balsamic glaze.",
+  "item8.name": "Classic Crème Brûlée",
+  "item8.description": "Rich custard base topped with a layer of hardened caramelized sugar."
 }

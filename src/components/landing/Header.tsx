@@ -11,10 +11,11 @@ import { useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector'; // Import the LanguageSelector
 
 const navItemKeys = [
-  { labelKey: 'common:nav.ourMenu', href: '#menu' },
-  { labelKey: 'common:nav.aiSommelier', href: '#ai-sommelier' },
-  { labelKey: 'common:nav.bookTable', href: '#booking' },
-  { labelKey: 'common:nav.testimonials', href: '#testimonials' },
+  { labelKey: 'common:nav.ourMenu', href: '/#menu' }, // Link to section on home page
+  { labelKey: 'common:nav.fullMenu', href: '/menu' }, // Link to the new menu page
+  { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' },
+  { labelKey: 'common:nav.bookTable', href: '/#booking' },
+  { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
 ];
 
 export default function Header() {
@@ -46,7 +47,7 @@ export default function Header() {
         </Link>
       ))}
       {!inSheet && (
-         <Link href="#booking" passHref>
+         <Link href="/#booking" passHref>
             <Button variant="default" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                 {t('common:button.bookNow')}
             </Button>
@@ -54,7 +55,7 @@ export default function Header() {
       )}
        {inSheet && (
         <>
-         <Link href="#booking" passHref>
+         <Link href="/#booking" passHref>
             <Button variant="default" size="lg" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setIsSheetOpen(false)}>
                 {t('common:button.bookNow')}
             </Button>

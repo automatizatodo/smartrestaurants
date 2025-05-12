@@ -6,7 +6,9 @@
   "nav.aiSommelier": "Sommelier IA",
   "nav.bookTable": "Reservar Mesa",
   "nav.testimonials": "Testimonios",
+  "nav.fullMenu": "Menú Completo",
   "button.bookNow": "Reservar Ahora",
+  "button.viewFullMenu": "Ver Menú Completo",
   "footer.quickLinks": "Enlaces Rápidos",
   "footer.home": "Inicio",
   "footer.menu": "Menú",
@@ -25,5 +27,8 @@
   "next": "Siguiente",
   "goToTestimonial": "Ir al testimonio {number}",
   "guestSingular": "comensal",
-  "guestsPlural": "comensales"
+  "guestsPlural": "comensales",
+  "page.menu.title": "Nuestro Menú Exquisito",
+  "page.menu.description": "Explora la gama completa de delicias culinarias ofrecidas en {restaurantName}. Cada plato elaborado con pasión y arte.",
+  "allCategories": "Todo"
 }
