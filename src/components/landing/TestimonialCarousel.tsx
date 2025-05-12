@@ -2,46 +2,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import TestimonialCard, { type TestimonialProps } from './TestimonialCard';
+import TestimonialCard from './TestimonialCard';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-const testimonials: TestimonialProps[] = [
-  {
-    id: '1',
-    name: 'Alexandra Chen',
-    avatarUrl: 'https://picsum.photos/seed/person1/100/100',
-    avatarHint: 'woman smiling',
-    testimonial: 'An absolutely sublime experience from start to finish. The ambiance, service, and of course, the food were all impeccable. The AI Sommelier suggested the perfect wine pairing!',
-    rating: 5,
-    title: 'Food Critic, Gourmet Magazine',
-  },
-  {
-    id: '2',
-    name: 'Marcus Rodriguez',
-    avatarUrl: 'https://picsum.photos/seed/person2/100/100',
-    avatarHint: 'man professional',
-    testimonial: "Gastronomic Canvas isn't just a restaurant; it's a culinary journey. Every dish was a work of art. I've already booked my next visit.",
-    rating: 5,
-    title: 'Loyal Patron',
-  },
-  {
-    id: '3',
-    name: 'Sophie Dubois',
-    avatarUrl: 'https://picsum.photos/seed/person3/100/100',
-    avatarHint: 'woman elegant',
-    testimonial: "The attention to detail is astounding. From the decor to the presentation of each plate, everything is thoughtfully curated. Highly recommended for special occasions.",
-    rating: 4.5, // Will render as 4 full stars for simplicity with current Star component
-    title: 'Anniversary Dinner',
-  },
-   {
-    id: '4',
-    name: 'David Kim',
-    testimonial: "A truly innovative dining concept. The interactive menu was fun, and the food was exceptional. The booking process online was seamless.",
-    rating: 5,
-    title: 'Tech Entrepreneur',
-  },
-];
+import { testimonials } from '@/data/testimonials'; // Import from data file
 
 export default function TestimonialCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -55,9 +19,14 @@ export default function TestimonialCarousel() {
   };
 
   useEffect(() => {
+    if (testimonials.length <= 1) return; // Don't auto-scroll if only one testimonial
     const timer = setTimeout(nextTestimonial, 7000); // Auto-scroll every 7 seconds
     return () => clearTimeout(timer);
   }, [currentIndex, nextTestimonial]);
+
+  if (!testimonials || testimonials.length === 0) {
+    return null; // Don't render section if no testimonials
+  }
 
   return (
     <section id="testimonials" className="py-16 sm:py-24 bg-background">
@@ -77,7 +46,7 @@ export default function TestimonialCarousel() {
               className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
-              {testimonials.map((testimonial) => (
+              {testimonials.map((testimonial) => ( // Use imported testimonials
                 <div key={testimonial.id} className="w-full flex-shrink-0 px-2">
                   <TestimonialCard testimonialItem={testimonial} />
                 </div>

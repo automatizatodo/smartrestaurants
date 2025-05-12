@@ -1,4 +1,3 @@
-// use server'
 
 /**
  * @fileOverview AI-powered food recommendation flow.

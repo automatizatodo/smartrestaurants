@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
+// Ensure the interface is exported
 export interface MenuItemProps {
   id: string;
   name: string;
@@ -12,12 +13,15 @@ export interface MenuItemProps {
 }
 
 export default function MenuItemCard({ item }: { item: MenuItemProps }) {
+  // Ensure the URL has a protocol
+  const imageUrl = item.imageUrl.startsWith('http') ? item.imageUrl : `https://${item.imageUrl}`;
+
   return (
     <div className="h-full transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1">
       <Card className="overflow-hidden h-full flex flex-col group shadow-lg hover:shadow-xl bg-card text-card-foreground transition-all duration-300 ease-out">
         <div className="relative w-full h-56 sm:h-64 overflow-hidden">
           <Image
-            src={item.imageUrl}
+            src={imageUrl} // Use corrected URL
             alt={item.name}
             data-ai-hint={item.imageHint}
             layout="fill"

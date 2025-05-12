@@ -15,11 +15,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, Users, Clock, Loader2 } from "lucide-react";
 import { submitBooking, type BookingFormState } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
-
-const timeSlots = [
-  "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", 
-  "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM"
-];
+import restaurantConfig from '@/config/restaurant.config'; // Import config
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -132,7 +128,7 @@ export default function BookingSection() {
                       <SelectValue placeholder="Select time" />
                     </SelectTrigger>
                     <SelectContent>
-                      {timeSlots.map(slot => (
+                      {restaurantConfig.bookingTimeSlots.map(slot => ( // Use config value
                         <SelectItem key={slot} value={slot}>{slot}</SelectItem>
                       ))}
                     </SelectContent>

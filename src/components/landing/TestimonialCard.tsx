@@ -1,8 +1,9 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, StarHalf } from 'lucide-react'; // Assuming StarHalf is not available, will use full stars
+import { Star } from 'lucide-react'; // Removed StarHalf as it wasn't being used effectively
 import Image from 'next/image';
 
+// Ensure the interface is exported
 export interface TestimonialProps {
   id: string;
   name: string;
@@ -17,14 +18,10 @@ export default function TestimonialCard({ testimonialItem }: { testimonialItem: 
   const renderStars = () => {
     const stars = [];
     const fullStars = Math.floor(testimonialItem.rating);
-    // const hasHalfStar = testimonialItem.rating % 1 !== 0; // Not using half stars due to Lucide limitation without more complex SVG logic
-
+    // Simplified star rendering based on floor value
     for (let i = 0; i < fullStars; i++) {
       stars.push(<Star key={`full-${i}`} className="h-5 w-5 text-primary fill-primary" />);
     }
-    // if (hasHalfStar) {
-    //   stars.push(<StarHalf key="half" className="h-5 w-5 text-primary fill-primary" />);
-    // }
     for (let i = stars.length; i < 5; i++) {
       stars.push(<Star key={`empty-${i}`} className="h-5 w-5 text-primary/30" />);
     }

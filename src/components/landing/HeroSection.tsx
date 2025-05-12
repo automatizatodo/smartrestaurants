@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
+import restaurantConfig from '@/config/restaurant.config'; // Import config
 
 export default function HeroSection() {
   const [offsetY, setOffsetY] = useState(0);
@@ -21,9 +22,9 @@ export default function HeroSection() {
         style={{ transform: `translateY(${offsetY * 0.3}px)` }} // Parallax effect
       >
         <Image
-          src="https://picsum.photos/seed/restaurant-ambiance/1920/1080"
-          alt="Restaurant Ambiance"
-          data-ai-hint="restaurant ambiance elegant"
+          src={restaurantConfig.heroImageUrl} // Use config value
+          alt={`${restaurantConfig.restaurantName} Ambiance`} // Use config value
+          data-ai-hint={restaurantConfig.heroImageHint} // Use config value
           layout="fill"
           objectFit="cover"
           quality={80}
@@ -31,13 +32,13 @@ export default function HeroSection() {
           className="brightness-50" // Darken image for text readability
         />
       </div>
-      
+
       <div className="relative z-10 p-4 sm:p-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-bold text-white mb-6 shadow-text">
-          Gastronomic Canvas
+          {restaurantConfig.restaurantName} {/* Use config value */}
         </h1>
         <p className="text-xl sm:text-2xl md:text-3xl text-gray-200 mb-10 max-w-3xl mx-auto font-sans shadow-text">
-          Where every dish is a masterpiece, and every meal an unforgettable experience.
+          {restaurantConfig.tagline} {/* Use config value */}
         </p>
         <div className="space-x-4">
           <Link href="#menu" passHref>

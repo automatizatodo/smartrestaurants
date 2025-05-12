@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu as MenuIcon, X as XIcon, Wine } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import restaurantConfig from '@/config/restaurant.config'; // Import config
 
 const navItems = [
   { label: 'Our Menu', href: '#menu' },
@@ -63,7 +64,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-2">
             <Wine className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-serif font-bold text-foreground">Gastronomic Canvas</span>
+            <span className="text-2xl font-serif font-bold text-foreground">{restaurantConfig.restaurantName}</span>
           </Link>
 
           {isMobile ? (
@@ -78,7 +79,7 @@ export default function Header() {
                 <div className="flex justify-between items-center mb-8">
                     <Link href="/" className="flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
                         <Wine className="h-7 w-7 text-primary" />
-                        <span className="text-xl font-serif font-bold text-foreground">Gastronomic Canvas</span>
+                        <span className="text-xl font-serif font-bold text-foreground">{restaurantConfig.restaurantName}</span>
                     </Link>
                     <Button variant="ghost" size="icon" onClick={() => setIsSheetOpen(false)}>
                         <XIcon className="h-6 w-6" />

@@ -1,6 +1,7 @@
 
 import Link from 'next/link';
 import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail, Wine } from 'lucide-react';
+import restaurantConfig from '@/config/restaurant.config'; // Import config
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -13,9 +14,10 @@ export default function Footer() {
           <div>
             <Link href="/" className="flex items-center space-x-2 mb-4">
                 <Wine className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-serif font-bold text-foreground">Gastronomic Canvas</span>
+                <span className="text-2xl font-serif font-bold text-foreground">{restaurantConfig.restaurantName}</span>
             </Link>
             <p className="text-sm">
+              {/* Using tagline from config might be too long, keeping generic description */}
               Experience culinary artistry where every dish is a masterpiece and every meal an unforgettable journey.
             </p>
           </div>
@@ -38,15 +40,15 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 mr-2 mt-0.5 text-primary shrink-0" />
-                <span>123 Culinary Avenue, Flavor Town, CA 90210</span>
+                <span>{restaurantConfig.address}</span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 mr-2 text-primary shrink-0" />
-                <a href="tel:+1234567890" className="hover:text-primary transition-colors">(123) 456-7890</a>
+                <a href={restaurantConfig.phoneHref} className="hover:text-primary transition-colors">{restaurantConfig.phone}</a>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 mr-2 text-primary shrink-0" />
-                <a href="mailto:reservations@gastronomiccanvas.com" className="hover:text-primary transition-colors">reservations@gastronomiccanvas.com</a>
+                <a href={restaurantConfig.emailHref} className="hover:text-primary transition-colors">{restaurantConfig.email}</a>
               </li>
             </ul>
           </div>
@@ -55,25 +57,33 @@ export default function Footer() {
           <div>
             <h5 className="font-serif text-lg font-semibold text-foreground mb-4">Follow Us</h5>
             <div className="flex space-x-4">
-              <Link href="#" aria-label="Facebook" className="text-muted-foreground hover:text-primary transition-colors">
-                <Facebook className="h-6 w-6" />
-              </Link>
-              <Link href="#" aria-label="Instagram" className="text-muted-foreground hover:text-primary transition-colors">
-                <Instagram className="h-6 w-6" />
-              </Link>
-              <Link href="#" aria-label="Twitter" className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter className="h-6 w-6" />
-              </Link>
-               <Link href="#" aria-label="Youtube" className="text-muted-foreground hover:text-primary transition-colors">
-                <Youtube className="h-6 w-6" />
-              </Link>
+              {restaurantConfig.socialMediaLinks.facebook && (
+                <Link href={restaurantConfig.socialMediaLinks.facebook} aria-label="Facebook" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Facebook className="h-6 w-6" />
+                </Link>
+              )}
+              {restaurantConfig.socialMediaLinks.instagram && (
+                <Link href={restaurantConfig.socialMediaLinks.instagram} aria-label="Instagram" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Instagram className="h-6 w-6" />
+                </Link>
+              )}
+              {restaurantConfig.socialMediaLinks.twitter && (
+                <Link href={restaurantConfig.socialMediaLinks.twitter} aria-label="Twitter" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Twitter className="h-6 w-6" />
+                </Link>
+              )}
+               {restaurantConfig.socialMediaLinks.youtube && (
+                <Link href={restaurantConfig.socialMediaLinks.youtube} aria-label="Youtube" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Youtube className="h-6 w-6" />
+                </Link>
+              )}
             </div>
             <p className="text-xs mt-6">Stay updated with our latest creations and events.</p>
           </div>
         </div>
 
         <div className="border-t border-border/50 pt-8 text-center text-sm">
-          <p>&copy; {currentYear} Gastronomic Canvas. All rights reserved. Designed with passion.</p>
+          <p>&copy; {currentYear} {restaurantConfig.restaurantName}. All rights reserved. Designed with passion.</p>
         </div>
       </div>
     </footer>
