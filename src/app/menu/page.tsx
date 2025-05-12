@@ -1,23 +1,33 @@
 
+"use client"; // Add "use client" directive here
+
 import type { Metadata } from 'next';
 import Header from '@/components/landing/Header'; // Reusing landing header
 import Footer from '@/components/landing/Footer'; // Reusing landing footer
 import FullMenuDisplay from '@/components/menu/FullMenuDisplay';
-import { LanguageProvider, useLanguage } from '@/context/LanguageContext'; // Need provider potentially if metadata depends on it, or use hook directly if metadata is static/english
-import enCommon from '@/locales/en/common.json'; // For default metadata
+import { useLanguage } from '@/context/LanguageContext'; // Need provider potentially if metadata depends on it, or use hook directly if metadata is static/english
+import enCommon from '@/locales/en/common.json'; // For default metadata - metadata generation still happens server-side
 
-// Static metadata for now, as accessing language context server-side for metadata is complex.
-// Consider path-based i18n (e.g., /en/menu, /es/menu) for fully dynamic metadata.
-export const metadata: Metadata = {
-  title: `${enCommon['page.menu.title']} | ${enCommon.restaurantName}`,
-  description: enCommon['page.menu.description'].replace('{restaurantName}', enCommon.restaurantName),
-};
 
+// !!! IMPORTANT: Metadata generation remains server-side !!!
+// We cannot use hooks like useLanguage directly in metadata generation.
+// This metadata will use the 'en' default or needs a different i18n strategy (e.g., path-based).
+// export const metadata: Metadata = {
+//   title: `${enCommon['page.menu.title']} | ${enCommon.restaurantName}`,
+//   description: enCommon['page.menu.description'].replace('{restaurantName}', enCommon.restaurantName),
+// };
 
 // Component to use the hook *after* provider is set
 function MenuPageContent() {
-  const { t, translations } = useLanguage();
+  const { t, translations } = useLanguage(); // This hook call is now valid because of "use client"
   const restaurantName = translations.common.restaurantName;
+
+  // Set document title dynamically on the client side
+  useEffect(() => {
+    document.title = `${t('common:page.menu.title')} | ${restaurantName}`;
+    // You might also want to update meta description tag if needed, though less common client-side
+  }, [t, restaurantName]);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -43,6 +53,15 @@ function MenuPageContent() {
 // Page component wraps content with provider if needed, though AppInitializer handles it globally
 export default function MenuPage() {
   // LanguageProvider is already in RootLayout, so we don't need it here again.
+  // MenuPageContent is now a Client Component due to "use client" at the top.
   return <MenuPageContent />;
 }
 
+// Helper hook for client-side title setting (optional abstraction)
+import { useEffect } from 'react';
+
+function useDocumentTitle(title: string) {
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+}
