@@ -1,0 +1,22 @@
+
+{
+  "restaurantName": "Gastronomic Canvas",
+  "tagline": "Where every dish is a masterpiece, and every meal an unforgettable experience.",
+  "nav.ourMenu": "Our Menu",
+  "nav.aiSommelier": "AI Sommelier",
+  "nav.bookTable": "Book a Table",
+  "nav.testimonials": "Testimonials",
+  "button.bookNow": "Book Now",
+  "footer.quickLinks": "Quick Links",
+  "footer.home": "Home",
+  "footer.menu": "Menu",
+  "footer.aiSommelierLink": "AI Sommelier",
+  "footer.bookTableLink": "Book a Table",
+  "footer.testimonialsLink": "Testimonials",
+  "footer.contactUs": "Contact Us",
+  "footer.followUs": "Follow Us",
+  "footer.followUsDescription": "Stay updated with our latest creations and events.",
+  "footer.copyright": "© {year} {restaurantName}. All rights reserved. Designed with passion.",
+  "form.error.generic": "An unexpected error occurred. Please try again later.",
+  "form.error.invalidInput": "Invalid input. Please check your details."
+}

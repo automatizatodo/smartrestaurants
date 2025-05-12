@@ -15,33 +15,40 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, Users, Clock, Loader2 } from "lucide-react";
 import { submitBooking, type BookingFormState } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
-import restaurantConfig from '@/config/restaurant.config'; // Import config
+import restaurantConfig from '@/config/restaurant.config';
+import { useLanguage } from "@/context/LanguageContext";
+import { es, enUS as en } from 'date-fns/locale'; // Import date-fns locales
+
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const { t } = useLanguage();
   return (
     <Button type="submit" disabled={pending} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-      Request Booking
+      {t('landing:booking.buttonText')}
     </Button>
   );
 }
 
 export default function BookingSection() {
+  const { t, language } = useLanguage();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const initialState: BookingFormState = { message: null, success: false, errors: null };
+  const dateLocale = language === 'es' ? es : en;
+
+  const initialState: BookingFormState = { messageKey: null, success: false, errors: null, messageParams: null };
   const [state, formAction] = useFormState(submitBooking, initialState);
 
   useEffect(() => {
-    if (state?.message) {
+    if (state?.messageKey) {
       toast({
-        title: state.success ? "Booking Request Sent!" : "Booking Error",
-        description: state.message,
+        title: state.success ? t('landing:booking.toast.successTitle') : t('landing:booking.toast.errorTitle'),
+        description: t(state.messageKey, state.messageParams),
         variant: state.success ? "default" : "destructive",
       });
       if (state.success) {
@@ -51,49 +58,49 @@ export default function BookingSection() {
         setSelectedGuests(undefined);
       }
     }
-  }, [state, toast]);
+  }, [state, toast, t]);
 
   return (
     <section id="booking" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
-            Book Your Table
+            {t('landing:booking.sectionTitle')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Reserve your spot for an unforgettable dining experience. We look forward to welcoming you.
+            {t('landing:booking.sectionDescription')}
           </p>
         </div>
 
         <Card className="max-w-2xl mx-auto shadow-xl">
           <form action={formAction} ref={formRef} className="space-y-6">
             <CardHeader>
-              <CardTitle className="font-serif text-2xl">Reservation Details</CardTitle>
+              <CardTitle className="font-serif text-2xl">{t('landing:booking.cardTitle')}</CardTitle>
               <CardDescription>
-                Fill in your details to request a table. We'll confirm your booking via email or phone.
+                {t('landing:booking.cardDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" name="name" placeholder="John Doe" className="bg-input mt-1" />
-                  {state?.errors?.name && <p className="text-sm text-destructive mt-1">{state.errors.name.join(", ")}</p>}
+                  <Label htmlFor="name">{t('landing:booking.label.name')}</Label>
+                  <Input id="name" name="name" placeholder={t('landing:booking.placeholder.name')} className="bg-input mt-1" />
+                  {state?.errors?.name && <p className="text-sm text-destructive mt-1">{state.errors.name.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" name="email" type="email" placeholder="you@example.com" className="bg-input mt-1" />
-                  {state?.errors?.email && <p className="text-sm text-destructive mt-1">{state.errors.email.join(", ")}</p>}
+                  <Label htmlFor="email">{t('landing:booking.label.email')}</Label>
+                  <Input id="email" name="email" type="email" placeholder={t('landing:booking.placeholder.email')} className="bg-input mt-1" />
+                  {state?.errors?.email && <p className="text-sm text-destructive mt-1">{state.errors.email.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
               </div>
               <div>
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" name="phone" type="tel" placeholder="(123) 456-7890" className="bg-input mt-1" />
-                {state?.errors?.phone && <p className="text-sm text-destructive mt-1">{state.errors.phone.join(", ")}</p>}
+                <Label htmlFor="phone">{t('landing:booking.label.phone')}</Label>
+                <Input id="phone" name="phone" type="tel" placeholder={t('landing:booking.placeholder.phone')} className="bg-input mt-1" />
+                {state?.errors?.phone && <p className="text-sm text-destructive mt-1">{state.errors.phone.map(errKey => t(errKey)).join(", ")}</p>}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="date">Date</Label>
+                  <Label htmlFor="date">{t('landing:booking.label.date')}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -104,7 +111,7 @@ export default function BookingSection() {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                        {date ? format(date, "PPP", { locale: dateLocale }) : <span>{t('landing:booking.placeholder.date')}</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -113,42 +120,43 @@ export default function BookingSection() {
                         selected={date}
                         onSelect={setDate}
                         initialFocus
-                        disabled={(d) => d < new Date(new Date().setDate(new Date().getDate() -1))} // Disable past dates
+                        disabled={(d) => d < new Date(new Date().setDate(new Date().getDate() -1))}
+                        locale={dateLocale}
                       />
                     </PopoverContent>
                   </Popover>
                   <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
-                  {state?.errors?.date && <p className="text-sm text-destructive mt-1">{state.errors.date.join(", ")}</p>}
+                  {state?.errors?.date && <p className="text-sm text-destructive mt-1">{state.errors.date.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="time">Time</Label>
+                  <Label htmlFor="time">{t('landing:booking.label.time')}</Label>
                   <Select name="time" value={selectedTime} onValueChange={setSelectedTime}>
                     <SelectTrigger className="w-full mt-1 bg-input">
                       <Clock className="mr-2 h-4 w-4 inline-block" />
-                      <SelectValue placeholder="Select time" />
+                      <SelectValue placeholder={t('landing:booking.placeholder.time')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {restaurantConfig.bookingTimeSlots.map(slot => ( // Use config value
+                      {restaurantConfig.bookingTimeSlots.map(slot => (
                         <SelectItem key={slot} value={slot}>{slot}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {state?.errors?.time && <p className="text-sm text-destructive mt-1">{state.errors.time.join(", ")}</p>}
+                  {state?.errors?.time && <p className="text-sm text-destructive mt-1">{state.errors.time.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="guests">Guests</Label>
+                  <Label htmlFor="guests">{t('landing:booking.label.guests')}</Label>
                   <Select name="guests" value={selectedGuests} onValueChange={setSelectedGuests}>
                     <SelectTrigger className="w-full mt-1 bg-input">
                       <Users className="mr-2 h-4 w-4 inline-block" />
-                      <SelectValue placeholder="Number of guests" />
+                      <SelectValue placeholder={t('landing:booking.placeholder.guests')} />
                     </SelectTrigger>
                     <SelectContent>
                       {[...Array(8)].map((_, i) => (
-                        <SelectItem key={i + 1} value={(i + 1).toString()}>{i + 1} Guest{i > 0 ? 's' : ''}</SelectItem>
+                        <SelectItem key={i + 1} value={(i + 1).toString()}>{i + 1} {t(i > 0 ? 'common:guestsPlural' : 'common:guestSingular', {count: i+1})}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {state?.errors?.guests && <p className="text-sm text-destructive mt-1">{state.errors.guests.join(", ")}</p>}
+                  {state?.errors?.guests && <p className="text-sm text-destructive mt-1">{state.errors.guests.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
               </div>
             </CardContent>

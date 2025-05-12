@@ -5,10 +5,13 @@ import { useState, useEffect, useCallback } from 'react';
 import TestimonialCard from './TestimonialCard';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { testimonials } from '@/data/testimonials'; // Import from data file
+import { testimonials } from '@/data/testimonials';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function TestimonialCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { t, translations } = useLanguage();
+  const restaurantName = translations.common.restaurantName;
 
   const nextTestimonial = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
@@ -19,13 +22,13 @@ export default function TestimonialCarousel() {
   };
 
   useEffect(() => {
-    if (testimonials.length <= 1) return; // Don't auto-scroll if only one testimonial
-    const timer = setTimeout(nextTestimonial, 7000); // Auto-scroll every 7 seconds
+    if (testimonials.length <= 1) return; 
+    const timer = setTimeout(nextTestimonial, 7000); 
     return () => clearTimeout(timer);
   }, [currentIndex, nextTestimonial]);
 
   if (!testimonials || testimonials.length === 0) {
-    return null; // Don't render section if no testimonials
+    return null; 
   }
 
   return (
@@ -33,10 +36,10 @@ export default function TestimonialCarousel() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
-            Words From Our Guests
+            {t('landing:testimonials.sectionTitle')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Hear what our patrons are saying about their experience at Gastronomic Canvas.
+            {t('landing:testimonials.sectionDescription', { restaurantName: restaurantName })}
           </p>
         </div>
 
@@ -46,7 +49,7 @@ export default function TestimonialCarousel() {
               className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
-              {testimonials.map((testimonial) => ( // Use imported testimonials
+              {testimonials.map((testimonial) => (
                 <div key={testimonial.id} className="w-full flex-shrink-0 px-2">
                   <TestimonialCard testimonialItem={testimonial} />
                 </div>
@@ -61,7 +64,7 @@ export default function TestimonialCarousel() {
                 size="icon"
                 className="absolute top-1/2 left-0 sm:-left-10 transform -translate-y-1/2 rounded-full bg-background/70 hover:bg-background text-foreground"
                 onClick={prevTestimonial}
-                aria-label="Previous testimonial"
+                aria-label={t('common:previous')}
               >
                 <ChevronLeft className="h-6 w-6" />
               </Button>
@@ -70,7 +73,7 @@ export default function TestimonialCarousel() {
                 size="icon"
                 className="absolute top-1/2 right-0 sm:-right-10 transform -translate-y-1/2 rounded-full bg-background/70 hover:bg-background text-foreground"
                 onClick={nextTestimonial}
-                aria-label="Next testimonial"
+                aria-label={t('common:next')}
               >
                 <ChevronRight className="h-6 w-6" />
               </Button>
@@ -82,7 +85,7 @@ export default function TestimonialCarousel() {
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                aria-label={`Go to testimonial ${index + 1}`}
+                aria-label={t('common:goToTestimonial', { number: index + 1})}
                 className={`w-3 h-3 rounded-full transition-all ${currentIndex === index ? 'bg-primary scale-125' : 'bg-muted hover:bg-muted-foreground/50'}`}
               />
             ))}

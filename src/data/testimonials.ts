@@ -1,42 +1,47 @@
 
-import type { TestimonialProps } from '@/components/landing/TestimonialCard';
-import restaurantConfig from '@/config/restaurant.config'; // Import config if needed for dynamic text
+export interface TestimonialData {
+  id: string;
+  nameKey: string; // e.g., "testimonials:t1.name"
+  avatarUrl?: string;
+  avatarHint?: string;
+  testimonialKey: string; // e.g., "testimonials:t1.testimonial"
+  rating: number;
+  titleKey?: string; // e.g., "testimonials:t1.title"
+}
 
-export const testimonials: TestimonialProps[] = [
+export const testimonials: TestimonialData[] = [
   {
     id: '1',
-    name: 'Alexandra Chen',
+    nameKey: 'testimonials:t1.name',
     avatarUrl: 'https://picsum.photos/seed/person1/100/100',
     avatarHint: 'woman smiling',
-    testimonial: 'An absolutely sublime experience from start to finish. The ambiance, service, and of course, the food were all impeccable. The AI Sommelier suggested the perfect wine pairing!',
+    testimonialKey: 'testimonials:t1.testimonial',
     rating: 5,
-    title: 'Food Critic, Gourmet Magazine',
+    titleKey: 'testimonials:t1.title',
   },
   {
     id: '2',
-    name: 'Marcus Rodriguez',
+    nameKey: 'testimonials:t2.name',
     avatarUrl: 'https://picsum.photos/seed/person2/100/100',
     avatarHint: 'man professional',
-    // Example using config value within the data file
-    testimonial: `${restaurantConfig.restaurantName} isn't just a restaurant; it's a culinary journey. Every dish was a work of art. I've already booked my next visit.`,
+    testimonialKey: 'testimonials:t2.testimonial', // This key will be interpolated with restaurantName
     rating: 5,
-    title: 'Loyal Patron',
+    titleKey: 'testimonials:t2.title',
   },
   {
     id: '3',
-    name: 'Sophie Dubois',
+    nameKey: 'testimonials:t3.name',
     avatarUrl: 'https://picsum.photos/seed/person3/100/100',
     avatarHint: 'woman elegant',
-    testimonial: "The attention to detail is astounding. From the decor to the presentation of each plate, everything is thoughtfully curated. Highly recommended for special occasions.",
-    rating: 4.5, // Will render as 4 full stars for simplicity with current Star component
-    title: 'Anniversary Dinner',
+    testimonialKey: 'testimonials:t3.testimonial',
+    rating: 4.5,
+    titleKey: 'testimonials:t3.title',
   },
-   {
+  {
     id: '4',
-    name: 'David Kim',
-    // Example without avatar
-    testimonial: "A truly innovative dining concept. The interactive menu was fun, and the food was exceptional. The booking process online was seamless.",
+    nameKey: 'testimonials:t4.name',
+    testimonialKey: 'testimonials:t4.testimonial',
     rating: 5,
-    title: 'Tech Entrepreneur',
+    titleKey: 'testimonials:t4.title',
   },
 ];

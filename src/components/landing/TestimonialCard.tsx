@@ -1,24 +1,19 @@
 
+"use client";
 import { Card, CardContent } from '@/components/ui/card';
-import { Star } from 'lucide-react'; // Removed StarHalf as it wasn't being used effectively
+import { Star } from 'lucide-react';
 import Image from 'next/image';
+import type { TestimonialData } from '@/data/testimonials'; // Import the updated interface
+import { useLanguage } from '@/context/LanguageContext';
 
-// Ensure the interface is exported
-export interface TestimonialProps {
-  id: string;
-  name: string;
-  avatarUrl?: string; // Optional avatar
-  avatarHint?: string;
-  testimonial: string;
-  rating: number; // e.g., 4.5
-  title?: string; // e.g., "Food Critic" or "Regular Customer"
-}
+export default function TestimonialCard({ testimonialItem }: { testimonialItem: TestimonialData }) {
+  const { t, translations } = useLanguage();
+  const restaurantName = translations.common.restaurantName;
 
-export default function TestimonialCard({ testimonialItem }: { testimonialItem: TestimonialProps }) {
+
   const renderStars = () => {
     const stars = [];
     const fullStars = Math.floor(testimonialItem.rating);
-    // Simplified star rendering based on floor value
     for (let i = 0; i < fullStars; i++) {
       stars.push(<Star key={`full-${i}`} className="h-5 w-5 text-primary fill-primary" />);
     }
@@ -27,6 +22,9 @@ export default function TestimonialCard({ testimonialItem }: { testimonialItem: 
     }
     return stars;
   };
+  
+  const testimonialText = t(testimonialItem.testimonialKey, { restaurantName });
+
 
   return (
     <Card className="h-full flex flex-col bg-card text-card-foreground shadow-lg p-6 rounded-lg">
@@ -35,7 +33,7 @@ export default function TestimonialCard({ testimonialItem }: { testimonialItem: 
           <div className="relative w-20 h-20 mb-4 rounded-full overflow-hidden shadow-md">
             <Image
               src={testimonialItem.avatarUrl}
-              alt={testimonialItem.name}
+              alt={t(testimonialItem.nameKey)}
               data-ai-hint={testimonialItem.avatarHint || "person portrait"}
               layout="fill"
               objectFit="cover"
@@ -43,9 +41,9 @@ export default function TestimonialCard({ testimonialItem }: { testimonialItem: 
           </div>
         )}
         <div className="flex mb-3">{renderStars()}</div>
-        <p className="text-muted-foreground italic mb-4 text-md flex-grow">&ldquo;{testimonialItem.testimonial}&rdquo;</p>
-        <h4 className="font-semibold font-serif text-lg text-primary">{testimonialItem.name}</h4>
-        {testimonialItem.title && <p className="text-xs text-muted-foreground">{testimonialItem.title}</p>}
+        <p className="text-muted-foreground italic mb-4 text-md flex-grow">&ldquo;{testimonialText}&rdquo;</p>
+        <h4 className="font-semibold font-serif text-lg text-primary">{t(testimonialItem.nameKey)}</h4>
+        {testimonialItem.titleKey && <p className="text-xs text-muted-foreground">{t(testimonialItem.titleKey)}</p>}
       </CardContent>
     </Card>
   );

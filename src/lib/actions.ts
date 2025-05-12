@@ -3,17 +3,18 @@
 
 import { aiSommelier, type AISommelierInput, type AISommelierOutput } from "@/ai/flows/ai-sommelier";
 import { z } from "zod";
-import restaurantConfig from "@/config/restaurant.config"; // Import config if needed, e.g., for restaurant name
 
+// Validation schemas remain the same
 const SommelierRequestSchema = z.object({
-  tastePreferences: z.string().min(10, "Please describe your preferences in more detail.").max(500, "Description too long."),
+  tastePreferences: z.string().min(10, "landing:aiSommelier.error.preferencesRequired").max(500, "landing:aiSommelier.error.preferencesTooLong"),
 });
 
 export interface SommelierFormState {
-  message: string | null;
-  recommendations: string | null;
+  messageKey: string | null; // Key for localization
+  messageParams?: Record<string, string | number> | null; // Params for interpolation
+  recommendations: string | null; // AI recommendations are direct text from AI
   errors?: {
-    tastePreferences?: string[];
+    tastePreferences?: string[]; // Error keys for localization
   } | null;
 }
 
@@ -27,9 +28,10 @@ export async function getAISommelierRecommendations(
 
   if (!validatedFields.success) {
     return {
-      message: "Invalid input. Please check your preferences.",
+      messageKey: "common:form.error.invalidInput",
       recommendations: null,
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: validatedFields.error.flatten().fieldErrors, // These are already keys
+      messageParams: null,
     };
   }
 
@@ -41,39 +43,42 @@ export async function getAISommelierRecommendations(
     const result: AISommelierOutput = await aiSommelier(input);
     if (result.dishRecommendations) {
       return {
-        message: "Here are your personalized recommendations!",
+        messageKey: "landing:aiSommelier.toast.successDescriptionKey",
         recommendations: result.dishRecommendations,
         errors: null,
+        messageParams: null,
       };
     } else {
       return {
-        message: "Could not generate recommendations at this time. Please try again.",
+        messageKey: "landing:aiSommelier.toast.errorDescriptionKey",
         recommendations: null,
         errors: null,
+        messageParams: null,
       };
     }
   } catch (error) {
     console.error("AI Sommelier Error:", error);
     return {
-      message: "An unexpected error occurred. Please try again later.",
+      messageKey: "common:form.error.generic",
       recommendations: null,
       errors: null,
+      messageParams: null,
     };
   }
 }
 
-// Mock booking action
 const BookingSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(1, "Phone number is required"),
-  date: z.string().min(1, "Date is required"), // Ideally, this should be a date object
-  time: z.string().min(1, "Time is required"),
-  guests: z.coerce.number().min(1, "At least one guest is required"),
+  name: z.string().min(1, "landing:booking.error.nameRequired"),
+  email: z.string().email("landing:booking.error.emailInvalid"),
+  phone: z.string().min(1, "landing:booking.error.phoneRequired"),
+  date: z.string().min(1, "landing:booking.error.dateRequired"),
+  time: z.string().min(1, "landing:booking.error.timeRequired"),
+  guests: z.coerce.number().min(1, "landing:booking.error.guestsRequired"),
 });
 
 export interface BookingFormState {
-  message: string | null;
+  messageKey: string | null;
+  messageParams?: Record<string, string | number> | null;
   success: boolean;
   errors?: {
     name?: string[];
@@ -103,19 +108,23 @@ export async function submitBooking(
 
   if (!validatedFields.success) {
     return {
-      message: "Invalid input. Please check your booking details.",
+      messageKey: "common:form.error.invalidInput",
       success: false,
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: validatedFields.error.flatten().fieldErrors, // These are already keys
+      messageParams: null,
     };
   }
 
-  // In a real app, you would process the booking here (e.g., save to DB, call API)
   console.log("Booking submitted:", validatedFields.data);
 
-  // Use a slightly more generic success message, or interpolate restaurant name from config if desired
   return {
-    message: `Thank you, ${validatedFields.data.name}! Your booking request for ${validatedFields.data.guests} guest(s) on ${validatedFields.data.date} at ${validatedFields.data.time} has been received. We will contact you shortly to confirm.`,
-    // Example using config: `Thank you, ${validatedFields.data.name}! Your booking request at ${restaurantConfig.restaurantName} ...`
+    messageKey: "landing:booking.successMessage",
+    messageParams: { 
+      name: validatedFields.data.name,
+      guests: validatedFields.data.guests,
+      date: validatedFields.data.date, // Consider formatting date based on locale on client
+      time: validatedFields.data.time 
+    },
     success: true,
     errors: null,
   };

@@ -1,0 +1,22 @@
+
+{
+  "restaurantName": "Lienzo Gastronómico",
+  "tagline": "Donde cada plato es una obra maestra y cada comida una experiencia inolvidable.",
+  "nav.ourMenu": "Nuestro Menú",
+  "nav.aiSommelier": "Sommelier IA",
+  "nav.bookTable": "Reservar Mesa",
+  "nav.testimonials": "Testimonios",
+  "button.bookNow": "Reservar Ahora",
+  "footer.quickLinks": "Enlaces Rápidos",
+  "footer.home": "Inicio",
+  "footer.menu": "Menú",
+  "footer.aiSommelierLink": "Sommelier IA",
+  "footer.bookTableLink": "Reservar Mesa",
+  "footer.testimonialsLink": "Testimonios",
+  "footer.contactUs": "Contáctanos",
+  "footer.followUs": "Síguenos",
+  "footer.followUsDescription": "Mantente al día con nuestras últimas creaciones y eventos.",
+  "footer.copyright": "© {year} {restaurantName}. Todos los derechos reservados. Diseñado con pasión.",
+  "form.error.generic": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.",
+  "form.error.invalidInput": "Entrada inválida. Por favor, revisa tus datos."
+}

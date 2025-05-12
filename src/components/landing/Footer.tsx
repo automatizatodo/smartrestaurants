@@ -1,42 +1,43 @@
 
+"use client";
 import Link from 'next/link';
 import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail, Wine } from 'lucide-react';
-import restaurantConfig from '@/config/restaurant.config'; // Import config
+import restaurantConfig from '@/config/restaurant.config';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Footer() {
+  const { t, translations } = useLanguage();
+  const restaurantName = translations.common.restaurantName;
+  const tagline = translations.common.tagline;
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-secondary text-muted-foreground border-t border-border/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          {/* About Section */}
           <div>
             <Link href="/" className="flex items-center space-x-2 mb-4">
                 <Wine className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-serif font-bold text-foreground">{restaurantConfig.restaurantName}</span>
+                <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
             </Link>
             <p className="text-sm">
-              {/* Using tagline from config might be too long, keeping generic description */}
-              Experience culinary artistry where every dish is a masterpiece and every meal an unforgettable journey.
+              {tagline}
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h5 className="font-serif text-lg font-semibold text-foreground mb-4">Quick Links</h5>
+            <h5 className="font-serif text-lg font-semibold text-foreground mb-4">{t('common:footer.quickLinks')}</h5>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#hero" className="hover:text-primary transition-colors">Home</Link></li>
-              <li><Link href="#menu" className="hover:text-primary transition-colors">Menu</Link></li>
-              <li><Link href="#ai-sommelier" className="hover:text-primary transition-colors">AI Sommelier</Link></li>
-              <li><Link href="#booking" className="hover:text-primary transition-colors">Book a Table</Link></li>
-              <li><Link href="#testimonials" className="hover:text-primary transition-colors">Testimonials</Link></li>
+              <li><Link href="#hero" className="hover:text-primary transition-colors">{t('common:footer.home')}</Link></li>
+              <li><Link href="#menu" className="hover:text-primary transition-colors">{t('common:footer.menu')}</Link></li>
+              <li><Link href="#ai-sommelier" className="hover:text-primary transition-colors">{t('common:footer.aiSommelierLink')}</Link></li>
+              <li><Link href="#booking" className="hover:text-primary transition-colors">{t('common:footer.bookTableLink')}</Link></li>
+              <li><Link href="#testimonials" className="hover:text-primary transition-colors">{t('common:footer.testimonialsLink')}</Link></li>
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
-            <h5 className="font-serif text-lg font-semibold text-foreground mb-4">Contact Us</h5>
+            <h5 className="font-serif text-lg font-semibold text-foreground mb-4">{t('common:footer.contactUs')}</h5>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 mr-2 mt-0.5 text-primary shrink-0" />
@@ -53,9 +54,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Social Media */}
           <div>
-            <h5 className="font-serif text-lg font-semibold text-foreground mb-4">Follow Us</h5>
+            <h5 className="font-serif text-lg font-semibold text-foreground mb-4">{t('common:footer.followUs')}</h5>
             <div className="flex space-x-4">
               {restaurantConfig.socialMediaLinks.facebook && (
                 <Link href={restaurantConfig.socialMediaLinks.facebook} aria-label="Facebook" className="text-muted-foreground hover:text-primary transition-colors">
@@ -78,12 +78,12 @@ export default function Footer() {
                 </Link>
               )}
             </div>
-            <p className="text-xs mt-6">Stay updated with our latest creations and events.</p>
+            <p className="text-xs mt-6">{t('common:footer.followUsDescription')}</p>
           </div>
         </div>
 
         <div className="border-t border-border/50 pt-8 text-center text-sm">
-          <p>&copy; {currentYear} {restaurantConfig.restaurantName}. All rights reserved. Designed with passion.</p>
+          <p>{t('common:footer.copyright', { year: currentYear, restaurantName: restaurantName })}</p>
         </div>
       </div>
     </footer>

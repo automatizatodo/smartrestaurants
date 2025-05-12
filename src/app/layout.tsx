@@ -1,10 +1,14 @@
 
-import type {Metadata} from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Lora } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import restaurantConfig from '@/config/restaurant.config'; // Import config
+import { LanguageProvider } from '@/context/LanguageContext';
+import AppInitializer from '@/components/AppInitializer';
+// Import a default set of translations for metadata, assuming 'en' as fallback or initial.
+// In a more advanced setup, this could be dynamic based on URL or other detection.
+import enCommon from '@/locales/en/common.json';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,11 +26,21 @@ const lora = Lora({
   weight: ['400', '700'],
 });
 
-// Dynamically generate metadata from config
+// generateMetadata can't easily access browser language, so we use default English.
+// For fully dynamic metadata based on user lang, a different strategy (e.g. path-based i18n) is needed.
 export const metadata: Metadata = {
-  title: restaurantConfig.restaurantName,
-  description: restaurantConfig.tagline,
+  title: enCommon.restaurantName,
+  description: enCommon.tagline,
 };
+
+export const viewport: Viewport = {
+  themeColor: [ // Example theme colors, adjust as needed
+    { media: '(prefers-color-scheme: light)', color: 'hsl(var(--background))' },
+    { media: '(prefers-color-scheme: dark)', color: 'hsl(var(--background))' },
+  ],
+  // Add other viewport settings if necessary
+};
+
 
 export default function RootLayout({
   children,
@@ -34,11 +48,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark"> {/* Defaulting to dark theme */}
-      <body className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}>
+    <LanguageProvider>
+      <AppInitializer>
         {children}
         <Toaster />
-      </body>
-    </html>
+      </AppInitializer>
+    </LanguageProvider>
   );
 }
