@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useEffect, useRef } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAISommelierRecommendations, type SommelierFormState } from "@/lib/actions";
-import { useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Bot, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -31,7 +31,8 @@ export default function AISommelierSection() {
     errors: null,
     messageParams: null,
   };
-  const [state, formAction] = useFormState(getAISommelierRecommendations, initialState);
+  // Use React.useActionState instead of ReactDOM.useFormState
+  const [state, formAction] = useActionState(getAISommelierRecommendations, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 

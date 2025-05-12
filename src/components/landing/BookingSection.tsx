@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useState, useEffect, useRef, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +42,8 @@ export default function BookingSection() {
   const dateLocale = language === 'es' ? es : en;
 
   const initialState: BookingFormState = { messageKey: null, success: false, errors: null, messageParams: null };
-  const [state, formAction] = useFormState(submitBooking, initialState);
+  // Use React.useActionState instead of ReactDOM.useFormState
+  const [state, formAction] = useActionState(submitBooking, initialState);
 
   useEffect(() => {
     if (state?.messageKey) {
