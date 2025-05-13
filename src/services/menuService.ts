@@ -10,7 +10,7 @@ import type { MenuItemData } from '@/data/menu';
 // 4. Click "Publish".
 // 5. Copy the generated URL and paste it here.
 // Example Google Sheet columns: id,nameKey,descriptionKey,price,categoryKey,imageUrl,imageHint
-const GOOGLE_SHEET_CSV_URL = 'YOUR_GOOGLE_SHEET_CSV_URL_HERE';
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI/export?format=csv&gid=0';
 
 // Basic CSV to JSON parser.
 // Note: This is a very basic parser. It assumes:
@@ -43,12 +43,23 @@ function parseCSV(csvText: string): Record<string, string>[] {
 
 
 export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
-  if (GOOGLE_SHEET_CSV_URL === 'YOUR_GOOGLE_SHEET_CSV_URL_HERE' || !GOOGLE_SHEET_CSV_URL) {
-    console.warn(
+  if (
+    GOOGLE_SHEET_CSV_URL === 'YOUR_GOOGLE_SHEET_CSV_URL_HERE' ||
+    !GOOGLE_SHEET_CSV_URL ||
+    (GOOGLE_SHEET_CSV_URL.includes('1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI/export?format=csv&gid=0') &&
+      GOOGLE_SHEET_CSV_URL === 'https://docs.google.com/spreadsheets/d/1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI/export?format=csv&gid=0' &&
+      process.env.NODE_ENV === 'development' &&
+      GOOGLE_SHEET_CSV_URL.startsWith('https://docs.google.com/spreadsheets/d/1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI/export?format=csv'))
+  ) {
+      // Keep the development check for the specific placeholder URL if needed, or adjust as necessary
+      // For the user provided URL, we attempt to fetch it.
+  } else if (GOOGLE_SHEET_CSV_URL === 'YOUR_GOOGLE_SHEET_CSV_URL_HERE' || !GOOGLE_SHEET_CSV_URL) {
+     console.warn(
       'Google Sheet CSV URL is not configured. Serving empty menu. Please update GOOGLE_SHEET_CSV_URL in src/services/menuService.ts'
     );
     return [];
   }
+
 
   try {
     // Fetch with revalidation strategy (e.g., revalidate every hour)
