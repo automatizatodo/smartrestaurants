@@ -6,14 +6,18 @@ import AISommelierSection from '@/components/landing/AISommelierSection';
 import BookingSection from '@/components/landing/BookingSection';
 import TestimonialCarousel from '@/components/landing/TestimonialCarousel';
 import Footer from '@/components/landing/Footer';
+import { fetchMenuFromGoogleSheet } from '@/services/menuService';
+import type { MenuItemData } from '@/data/menu';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow">
         <HeroSection />
-        <InteractiveMenu />
+        <InteractiveMenu menuItems={menuItems} />
         <AISommelierSection />
         <BookingSection />
         <TestimonialCarousel />

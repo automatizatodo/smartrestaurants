@@ -4,24 +4,52 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import MenuItemCard from './MenuItemCard';
-import { menuItems, menuCategories } from '@/data/menu';
+import { menuCategories } from '@/data/menu'; 
+import type { MenuItemData } from '@/data/menu'; 
 import { useLanguage } from '@/context/LanguageContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { UtensilsCrossed } from 'lucide-react'; // Icon for button
+import { UtensilsCrossed, AlertTriangle } from 'lucide-react'; 
 
-export default function InteractiveMenu() {
+interface InteractiveMenuProps {
+  menuItems: MenuItemData[];
+}
+
+export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   const { t } = useLanguage();
 
-  // Get unique category keys from menuItems and sort them based on defined order
-  const availableCategoryKeys = Array.from(new Set(menuItems.map(item => item.categoryKey)));
+  const availableCategoryKeys = Array.from(new Set(menuItems.map(item => item.categoryKey).filter(Boolean)));
   const sortedCategories = menuCategories
     .filter(cat => availableCategoryKeys.includes(cat.key))
     .sort((a, b) => a.order - b.order);
 
-  // Determine the default active tab (e.g., the first category)
-  const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all'; // Fallback if no categories defined/matched
+  const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all';
   const [activeTab, setActiveTab] = useState<string>(defaultCategory);
+  
+  if (!menuItems || menuItems.length === 0 || sortedCategories.length === 0) {
+    return (
+      <section id="menu" className="py-16 sm:py-24 bg-secondary">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
+            {t('landing:menu.sectionTitle')}
+          </h2>
+           <div className="flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
+            <AlertTriangle className="w-12 h-12 mb-4 text-destructive" />
+            <p className="text-lg mb-2">{t('landing:menu.loadingErrorTitle')}</p>
+            <p className="text-sm">{t('landing:menu.loadingError')}</p>
+          </div>
+           <div className="text-center mt-12 sm:mt-16">
+            <Link href="/menu" passHref>
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105">
+                <UtensilsCrossed className="mr-2 h-5 w-5" />
+                {t('common:button.viewFullMenu')}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="menu" className="py-16 sm:py-24 bg-secondary">
@@ -37,31 +65,12 @@ export default function InteractiveMenu() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap justify-center mb-10">
-             {/* Add an "All" tab */}
-             {/*
-             <TabsTrigger value="all" className="text-sm md:text-base">
-               {t('common:allCategories')}
-             </TabsTrigger>
-             */}
             {sortedCategories.map((category) => (
               <TabsTrigger key={category.key} value={category.key} className="text-sm md:text-base">
                 {t(category.key)}
               </TabsTrigger>
             ))}
           </TabsList>
-
-          {/* Add content for "All" tab */}
-           {/*
-          <TabsContent value="all">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
-              {menuItems.map((item, index) => (
-                <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.05}s` }}>
-                  <MenuItemCard item={item} />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          */}
 
           {sortedCategories.map((category) => (
             <TabsContent key={category.key} value={category.key}>
