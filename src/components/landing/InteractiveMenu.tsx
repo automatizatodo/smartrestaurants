@@ -26,7 +26,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all';
   const [activeTab, setActiveTab] = useState<string>(defaultCategory);
   
-  if (!menuItems || menuItems.length === 0 || sortedCategories.length === 0) {
+  if (!menuItems || menuItems.length === 0) {
     return (
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -50,6 +50,33 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
       </section>
     );
   }
+
+  if (sortedCategories.length === 0) {
+    // This case handles when menuItems exist but none match any displayable categories.
+    return (
+      <section id="menu" className="py-16 sm:py-24 bg-secondary">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
+            {t('landing:menu.sectionTitle')}
+          </h2>
+           <div className="flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
+            <AlertTriangle className="w-12 h-12 mb-4 text-primary" /> {/* Changed icon color for differentiation */}
+            <p className="text-lg mb-2">{t('landing:menu.noCategoriesTitle')}</p>
+            <p className="text-sm">{t('landing:menu.noCategoriesError')}</p>
+          </div>
+           <div className="text-center mt-12 sm:mt-16">
+            <Link href="/menu" passHref>
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105">
+                <UtensilsCrossed className="mr-2 h-5 w-5" />
+                {t('common:button.viewFullMenu')}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
 
   return (
     <section id="menu" className="py-16 sm:py-24 bg-secondary">
@@ -99,3 +126,4 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     </section>
   );
 }
+
