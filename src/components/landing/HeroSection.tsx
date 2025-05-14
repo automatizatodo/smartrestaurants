@@ -23,7 +23,7 @@ export default function HeroSection() {
     <section id="hero" className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
       <div
         className="absolute inset-0 z-0"
-        style={{ transform: `translateY(${offsetY * 0.3}px)` }} // Parallax effect
+        // style={{ transform: `translateY(${offsetY * 0.3}px)` }} // Temporarily remove parallax for debugging
       >
         <Image
           src={restaurantConfig.heroImageUrl}
@@ -33,7 +33,7 @@ export default function HeroSection() {
           objectFit="cover"
           quality={80}
           priority
-          className="brightness-50" // Darken image for text readability
+          // className="brightness-50" // Temporarily remove brightness filter for debugging
         />
       </div>
 
@@ -45,7 +45,7 @@ export default function HeroSection() {
           {t('landing:hero.tagline')}
         </p>
         <div className="space-x-4">
-          <Link href="#menu" passHref>
+          <Link href="/#menu" passHref>
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105">
               {t('landing:hero.viewMenuButton')}
             </Button>
