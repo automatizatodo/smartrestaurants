@@ -1,9 +1,9 @@
 
 {
-  "category.appetizer": "Entrantes",
-  "category.mainCourse": "Platos Principales",
-  "category.dessert": "Postres",
-  "category.luxury": "Selección de Lujo",
+  "category.starters": "Entrantes",
+  "category.mainCourses": "Platos Principales",
+  "category.desserts": "Postres",
+  "category.drinks": "Bebidas",
 
   "item1.name": "Risotto Milanese al Azafrán",
   "item1.description": "Cremoso arroz Arborio infusionado con azafrán, parmesano y un toque de vino blanco, coronado con pan de oro.",

@@ -15,14 +15,15 @@ export interface MenuCategory {
 }
 
 // Define category keys and their display order
-// This could also be fetched from Google Sheets if needed, e.g., from a separate tab.
+// These keys must match those used in SHEETS_CONFIG in `src/app/api/menu/route.ts`
 export const menuCategories: MenuCategory[] = [
-  { key: 'menu:category.appetizer', order: 1 },
-  { key: 'menu:category.mainCourse', order: 2 },
-  { key: 'menu:category.dessert', order: 3 },
-  { key: 'menu:category.luxury', order: 4 },
+  { key: 'menu:category.starters', order: 1 },       // Corresponds to "Entrantes"
+  { key: 'menu:category.mainCourses', order: 2 }, // Corresponds to "Platos Principales"
+  { key: 'menu:category.desserts', order: 3 },      // Corresponds to "Postres"
+  { key: 'menu:category.drinks', order: 4 },        // Corresponds to "Bebidas"
+  // Removed 'menu:category.luxury' as it's not in the new sheet structure. Add back if needed.
 ];
 
 // The static menuItems array has been removed.
-// Menu data will now be fetched dynamically using the fetchMenuFromGoogleSheet function
-// in src/services/menuService.ts.
+// Menu data will now be fetched dynamically via the /api/menu route,
+// which in turn fetches from the configured Google Sheets.

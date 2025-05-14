@@ -2,10 +2,31 @@
 import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
-// Ensure this URL is the correct "Publish to web" CSV export URL for your Google Sheet
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
+// --- Configuration for Google Sheets ---
+// IMPORTANT: Replace this with your Google Spreadsheet ID
+const SPREADSHEET_ID = '1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI';
 
-function parseCSV(csvText: string): Record<string, string>[] {
+// IMPORTANT: You need to find the GID for each sheet.
+// How to find GID:
+// 1. Open your Google Sheet.
+// 2. Click on the tab for the sheet (e.g., "Entrantes").
+// 3. Look at the URL in the browser's address bar. It will end with something like #gid=123456789. That number is the GID.
+//    - The first sheet created usually has GID=0.
+const SHEETS_CONFIG = [
+  { name: 'Entrantes', gid: '0', categoryKey: 'menu:category.starters', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] }, // Replace '0' with actual GID if not the first sheet
+  { name: 'Platos Principales', gid: 'GID_PLATOS_PRINCIPALES', categoryKey: 'menu:category.mainCourses', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] },
+  { name: 'Postres', gid: 'GID_POSTRES', categoryKey: 'menu:category.desserts', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] },
+  { name: 'Bebidas', gid: 'GID_BEBIDAS', categoryKey: 'menu:category.drinks', expectedHeaders: ["Nombre de la Bebida", "Descripción", "Precio (€)"] },
+];
+
+// Column names from your sheets
+const NAME_COLUMN_ES = "Nombre del Plato";
+const DRINK_NAME_COLUMN_ES = "Nombre de la Bebida";
+const DESCRIPTION_COLUMN_ES = "Descripción";
+const PRICE_COLUMN_ES = "Precio (€)";
+
+
+function parseCSV(csvText: string, expectedHeaders: string[]): Record<string, string>[] {
   console.log("API_ROUTE_PARSE_CSV: Received CSV text length:", csvText.length);
   const lines = csvText.trim().split(/\r\n|\n/);
   
@@ -17,19 +38,33 @@ function parseCSV(csvText: string): Record<string, string>[] {
     console.warn("API_ROUTE_PARSE_CSV: CSV text is effectively empty after trim.");
     return [];
   }
-  if (lines.length < 2 && lines.length > 0) {
-     console.warn("API_ROUTE_PARSE_CSV: CSV text has less than 2 lines (only headers or less). Headers if present:", lines[0]);
-     // If only headers, it's valid for parsing headers but will result in no data rows.
+
+  const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''));
+  console.log(`API_ROUTE_PARSE_CSV: Headers found in sheet: ${headersFromSheet.join(", ")}`);
+  console.log(`API_ROUTE_PARSE_CSV: Expected headers: ${expectedHeaders.join(", ")}`);
+
+  // Validate headers
+  let validHeaders = true;
+  const headerMap: Record<string, string> = {};
+
+  expectedHeaders.forEach(expectedHeader => {
+    if (!headersFromSheet.includes(expectedHeader)) {
+      console.warn(`API_ROUTE_PARSE_CSV: Missing expected header '${expectedHeader}' in sheet. Found: ${headersFromSheet.join(", ")}`);
+      validHeaders = false;
+    }
+  });
+
+  if (!validHeaders && !expectedHeaders.every(eh => headersFromSheet.includes(eh))) {
+     console.warn(`API_ROUTE_PARSE_CSV: Header mismatch. Sheet might not conform to expected structure for this category. Expected: ${expectedHeaders.join(", ")}, Got: ${headersFromSheet.join(", ")}`);
+     // Depending on strictness, you might want to return [] here or try to parse anyway if some headers match
+     // For now, we'll try to proceed if at least one expected header is present, but log a strong warning.
+     if (!expectedHeaders.some(eh => headersFromSheet.includes(eh))) {
+        return [];
+     }
   }
-
-
-  const headers = lines[0].split(',').map(header => header.trim());
-  console.log("API_ROUTE_PARSE_CSV: Headers found:", headers);
   
-  if (headers.length === 1 && headers[0] === '' && lines.length === 1) {
-    console.warn("API_ROUTE_PARSE_CSV: CSV appears to be completely empty or malformed (single empty header).");
-    return [];
-  }
+  // Create a map for actual header names to standardized keys (e.g., "Nombre del Plato" -> "name")
+  // This is useful if you want to abstract column names later. For now, we'll use direct access.
 
   const jsonData = [];
   for (let i = 1; i < lines.length; i++) {
@@ -38,77 +73,92 @@ function parseCSV(csvText: string): Record<string, string>[] {
         continue;
     }
     const values = lines[i].split(',').map(value => value.trim().replace(/^"|"$/g, ''));
-    if (values.length === headers.length) {
+    if (values.length === headersFromSheet.length) {
       const entry: Record<string, string> = {};
-      headers.forEach((header, index) => {
+      headersFromSheet.forEach((header, index) => {
         entry[header] = values[index];
       });
       jsonData.push(entry);
     } else {
-      console.warn(`API_ROUTE_PARSE_CSV: Skipping malformed CSV line ${i + 1}. Expected ${headers.length} values, got ${values.length}. Line content: "${lines[i]}"`);
+      console.warn(`API_ROUTE_PARSE_CSV: Skipping malformed CSV line ${i + 1} for sheet. Expected ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
     }
   }
-  console.log(`API_ROUTE_PARSE_CSV: Parsed ${jsonData.length} data rows.`);
+  console.log(`API_ROUTE_PARSE_CSV: Parsed ${jsonData.length} data rows for one sheet.`);
   return jsonData;
 }
 
 export async function GET() {
   console.log("API_ROUTE_GET_MENU: /api/menu GET handler called.");
+  let allMenuItems: MenuItemData[] = [];
 
-  if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes('YOUR_GOOGLE_SHEET_CSV_URL_HERE')) {
-    console.error('API_ROUTE_GET_MENU: Google Sheet CSV URL is not configured correctly or is placeholder.');
-    return NextResponse.json({ error: 'Google Sheet CSV URL is not configured on the server.' }, { status: 500 });
+  for (const sheetConfig of SHEETS_CONFIG) {
+    if (sheetConfig.gid === `GID_${sheetConfig.name.toUpperCase().replace(/\s/g, '_')}`) {
+      console.warn(`API_ROUTE_GET_MENU: Placeholder GID used for sheet "${sheetConfig.name}". Please update with actual GID in SHEETS_CONFIG.`);
+      continue; // Skip fetching if placeholder GID is used
+    }
+
+    const googleSheetCsvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${sheetConfig.gid}`;
+    console.log(`API_ROUTE_GET_MENU: Fetching menu for category '${sheetConfig.name}' from Google Sheet URL: ${googleSheetCsvUrl}`);
+
+    try {
+      const response = await fetch(googleSheetCsvUrl, {
+        cache: 'no-store', // Ensures fresh fetch every time
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API_ROUTE_GET_MENU: Failed to fetch from Google Sheet for category '${sheetConfig.name}'. Status: ${response.status} ${response.statusText}. URL: ${googleSheetCsvUrl}. Response: ${errorText}`);
+        continue; // Skip to next sheet
+      }
+
+      const csvText = await response.text();
+      console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV data for '${sheetConfig.name}'. Length: ${csvText.length}`);
+
+      if (!csvText.trim()) {
+        console.warn(`API_ROUTE_GET_MENU: Fetched CSV from Google Sheet for '${sheetConfig.name}' is empty. URL: ${googleSheetCsvUrl}`);
+        continue; // Skip to next sheet
+      }
+
+      const parsedData = parseCSV(csvText, sheetConfig.expectedHeaders);
+      console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV for '${sheetConfig.name}'.`);
+
+      const nameColumn = sheetConfig.categoryKey === 'menu:category.drinks' ? DRINK_NAME_COLUMN_ES : NAME_COLUMN_ES;
+
+      const categoryItems: MenuItemData[] = parsedData.map((item: Record<string, string>, index: number) => {
+        const itemName = item[nameColumn] || `Unnamed Item ${index + 1}`;
+        const itemDescription = item[DESCRIPTION_COLUMN_ES] || `Description for ${itemName}`;
+        
+        // Price formatting: "X,XX" or "X.XX" to "€X.XX"
+        let price = item[PRICE_COLUMN_ES] || '0.00';
+        price = price.replace(',', '.'); // Ensure decimal point is a period
+        if (!price.includes('€')) {
+            price = `€${price}`;
+        }
+        
+        // For nameKey and descriptionKey, we'll use the Spanish text directly from the sheet.
+        // For a fully internationalized app, you'd generate unique keys and add them to locale files.
+        return {
+          id: `${sheetConfig.categoryKey}-${index}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+          nameKey: itemName, // Using direct Spanish name as key for now
+          descriptionKey: itemDescription, // Using direct Spanish description as key
+          price: price,
+          categoryKey: sheetConfig.categoryKey,
+          imageUrl: `https://picsum.photos/seed/${encodeURIComponent(itemName.substring(0,10))}${index}/400/300`,
+          imageHint: `${sheetConfig.name.toLowerCase()} food item`, // Generic hint
+        };
+      }).filter(item => item.nameKey && !item.nameKey.startsWith('Unnamed Item')); // Filter out items that likely failed to parse name
+      
+      console.log(`API_ROUTE_GET_MENU: Mapped to ${categoryItems.length} valid MenuItemData objects for '${sheetConfig.name}'.`);
+      allMenuItems = allMenuItems.concat(categoryItems);
+
+    } catch (error: any) {
+      console.error(`API_ROUTE_GET_MENU: Unhandled error fetching/parsing for category '${sheetConfig.name}': ${error.message}`, error.stack);
+    }
   }
 
-  console.log(`API_ROUTE_GET_MENU: Fetching menu from Google Sheet URL: ${GOOGLE_SHEET_CSV_URL}`);
-
-  try {
-    const response = await fetch(GOOGLE_SHEET_CSV_URL, {
-      // For API routes, standard fetch cache headers are more common if caching is desired at this level.
-      // Next.js fetch cache options (like next: { revalidate: ...}) are primarily for RSCs and server-side data fetching functions.
-      // To ensure fresh data or control caching, you can use Cache-Control headers or no-cache.
-      cache: 'no-store', // Ensures fresh fetch every time for debugging; adjust for production
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API_ROUTE_GET_MENU: Failed to fetch from Google Sheet. Status: ${response.status} ${response.statusText}. Response: ${errorText}`);
-      return NextResponse.json({ error: `Failed to fetch menu from Google Sheet: ${response.statusText}` }, { status: response.status });
-    }
-
-    const csvText = await response.text();
-    console.log("API_ROUTE_GET_MENU: Successfully fetched CSV data. Length:", csvText.length);
-
-    if (!csvText.trim()) {
-      console.warn('API_ROUTE_GET_MENU: Fetched CSV from Google Sheet is empty.');
-      return NextResponse.json([], { status: 200 });
-    }
-
-    const parsedData = parseCSV(csvText);
-    console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV.`);
-
-    const menuItems: MenuItemData[] = parsedData.map((item: Record<string, string>, index: number) => ({
-      id: item.id || `item-${index}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-      nameKey: item.nameKey || `menu:itemUnknown${index+1}.name`,
-      descriptionKey: item.descriptionKey || `menu:itemUnknown${index+1}.description`,
-      price: item.price || '$0.00',
-      categoryKey: item.categoryKey || 'menu:category.uncategorized',
-      imageUrl: item.imageUrl && (item.imageUrl.startsWith('http://') || item.imageUrl.startsWith('https://')) 
-                  ? item.imageUrl 
-                  : `https://picsum.photos/seed/menuplaceholder${index}/400/300`,
-      imageHint: item.imageHint || 'food item',
-    })).filter(item => item.nameKey && item.categoryKey && !item.nameKey.startsWith('menu:itemUnknown') && item.categoryKey !== 'menu:category.uncategorized');
-    
-    console.log(`API_ROUTE_GET_MENU: Mapped to ${menuItems.length} valid MenuItemData objects. Sending response.`);
-    if (menuItems.length === 0 && parsedData.length > 0) {
-      console.warn("API_ROUTE_GET_MENU: All parsed items were filtered out. Check mapping logic and CSV headers (id, nameKey, descriptionKey, price, categoryKey, imageUrl, imageHint).");
-    }
-
-
-    return NextResponse.json(menuItems, { status: 200 });
-
-  } catch (error: any) {
-    console.error('API_ROUTE_GET_MENU: Unhandled error in /api/menu GET handler:', error.message, error.stack);
-    return NextResponse.json({ error: `Internal server error: ${error.message}` }, { status: 500 });
+  console.log(`API_ROUTE_GET_MENU: Total menu items fetched from all sheets: ${allMenuItems.length}. Sending response.`);
+  if (allMenuItems.length === 0) {
+      console.warn("API_ROUTE_GET_MENU: No menu items were successfully fetched or parsed from any sheet. Check GIDs, sheet publishing settings, and header names.");
   }
+  return NextResponse.json(allMenuItems, { status: 200 });
 }

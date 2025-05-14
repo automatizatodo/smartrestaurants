@@ -1,9 +1,9 @@
 
 {
-  "category.appetizer": "Appetizers",
-  "category.mainCourse": "Main Courses",
-  "category.dessert": "Desserts",
-  "category.luxury": "Luxury Selection",
+  "category.starters": "Starters",
+  "category.mainCourses": "Main Courses",
+  "category.desserts": "Desserts",
+  "category.drinks": "Drinks",
 
   "item1.name": "Saffron Risotto Milanese",
   "item1.description": "Creamy Arborio rice infused with saffron, Parmesan, and a hint of white wine, topped with gold leaf.",
