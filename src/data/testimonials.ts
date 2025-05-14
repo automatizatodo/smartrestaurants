@@ -13,8 +13,8 @@ export const testimonials: TestimonialData[] = [
   {
     id: '1',
     nameKey: 'testimonials:t1.name',
-    avatarUrl: 'https://picsum.photos/seed/person1/100/100',
-    avatarHint: 'woman smiling',
+    avatarUrl: 'https://placehold.co/100x100.png', // Updated to placehold.co
+    avatarHint: 'smiling person', // Updated hint
     testimonialKey: 'testimonials:t1.testimonial',
     rating: 5,
     titleKey: 'testimonials:t1.title',
@@ -22,8 +22,8 @@ export const testimonials: TestimonialData[] = [
   {
     id: '2',
     nameKey: 'testimonials:t2.name',
-    avatarUrl: 'https://picsum.photos/seed/person2/100/100',
-    avatarHint: 'man professional',
+    avatarUrl: 'https://placehold.co/100x100.png', // Updated to placehold.co
+    avatarHint: 'happy customer', // Updated hint
     testimonialKey: 'testimonials:t2.testimonial', // This key will be interpolated with restaurantName
     rating: 5,
     titleKey: 'testimonials:t2.title',
@@ -31,8 +31,8 @@ export const testimonials: TestimonialData[] = [
   {
     id: '3',
     nameKey: 'testimonials:t3.name',
-    avatarUrl: 'https://picsum.photos/seed/person3/100/100',
-    avatarHint: 'woman elegant',
+    avatarUrl: 'https://placehold.co/100x100.png', // Updated to placehold.co
+    avatarHint: 'person dining', // Updated hint
     testimonialKey: 'testimonials:t3.testimonial',
     rating: 4.5,
     titleKey: 'testimonials:t3.title',
@@ -40,6 +40,8 @@ export const testimonials: TestimonialData[] = [
   {
     id: '4',
     nameKey: 'testimonials:t4.name',
+    // avatarUrl: 'https://placehold.co/100x100.png', // Example if avatar was desired
+    avatarHint: 'food enthusiast', // Updated hint, even if no avatar, for consistency
     testimonialKey: 'testimonials:t4.testimonial',
     rating: 5,
     titleKey: 'testimonials:t4.title',

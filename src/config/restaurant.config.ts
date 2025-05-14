@@ -33,20 +33,20 @@ const restaurantConfig: RestaurantConfig = {
   email: 'reservations@gastronomiccanvas.com',
   emailHref: 'mailto:reservations@gastronomiccanvas.com',
   socialMediaLinks: {
-    facebook: '#', 
+    facebook: '#',
     instagram: '#',
-    twitter: '#', 
+    twitter: '#',
     youtube: '#',
   },
-  heroImageUrl: 'https://picsum.photos/seed/restaurant-ambiance/1920/1080',
-  heroImageHint: 'restaurant ambiance elegant', // Consider if this needs localization key
+  heroImageUrl: 'https://placehold.co/1920x1080.png', // Updated to placehold.co
+  heroImageHint: 'restaurant interior dining', // Updated hint
   bookingTimeSlots: [
     "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM",
     "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM"
   ],
   theme: {
     // Primary color HSL from globals.css: 51 100% 50% (Gold)
-    primary: 'hsl(51, 100%, 50%)', 
+    primary: 'hsl(51, 100%, 50%)',
   },
 };
 

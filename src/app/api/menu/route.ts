@@ -33,8 +33,8 @@ function mapCategoryToKey(categoryEN: string): string {
       return 'mainCourses';
     case 'desserts':
       return 'desserts';
-    case 'beverages': 
-    case 'drinks': 
+    case 'beverages':
+    case 'drinks':
       return 'drinks';
     default:
       console.warn(`API_ROUTE_MAP_CATEGORY: Unknown category encountered: '${categoryEN}'. Defaulting to '${lowerCategory.replace(/\s+/g, '') || 'other'}'.`);
@@ -63,7 +63,7 @@ function parseCSV(csvText: string): Record<string, string>[] {
     console.error(`API_ROUTE_PARSE_CSV: Critical header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
     return [];
   }
-  
+
   const extraHeaders = headersFromSheet.filter(sh => !EXPECTED_HEADERS.includes(sh));
   if (extraHeaders.length > 0) {
     console.warn(`API_ROUTE_PARSE_CSV: Warning: Sheet contains extra headers not in EXPECTED_HEADERS: [${extraHeaders.join(", ")}]. These will be ignored.`);
@@ -97,6 +97,7 @@ export async function GET() {
   console.log(`API_ROUTE_GET_MENU: Fetching menu from URL: ${googleSheetCsvUrl}`);
 
   let allMenuItems: MenuItemData[] = [];
+  let parsedData: Record<string, string>[] = []; // Define parsedData here to check its length later
 
   try {
     const response = await fetch(googleSheetCsvUrl, { cache: 'no-store' });
@@ -109,7 +110,6 @@ export async function GET() {
 
     const csvText = await response.text();
     console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV. Length: ${csvText.length}`);
-    // console.log(`API_ROUTE_GET_MENU: CSV Content (first 500 chars): ${csvText.substring(0,500)}`);
 
 
     if (!csvText.trim()) {
@@ -117,12 +117,10 @@ export async function GET() {
       return NextResponse.json({ error: "Fetched menu data is empty" }, { status: 500 });
     }
 
-    const parsedData = parseCSV(csvText);
+    parsedData = parseCSV(csvText); // Assign to the outer scope variable
     console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV.`);
 
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
-      // console.log(`API_ROUTE_PROCESSING_ITEM_RAW_DATA (row ${index + 2}):`, JSON.stringify(item));
-      
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
       const categoryEN = item[CATEGORY_EN_COL];
@@ -141,27 +139,32 @@ export async function GET() {
         if (!isNaN(numericPrice)) {
             price = `€${numericPrice.toFixed(2)}`;
         } else {
-            price = `€ N/A`; 
+            price = `€ N/A`;
             console.warn(`API_ROUTE_GET_MENU: Item '${nameEN}' (row ${index + 2}) has unparseable price: '${item[PRECIO_COL]}'. Setting to '€ N/A'.`);
         }
       }
-      
+
       const categoryKey = mapCategoryToKey(categoryEN);
-      const nameENForSeed = nameEN || "unknown-item";
-      const imageHintSeed = nameENForSeed.trim().toLowerCase().split(" ").slice(0,2).join("-") || `item-${index}`;
+      const nameENForHint = nameEN || "food item"; // Fallback for hint
+
+      // Create a more specific image hint using the English name or category
+      let imageHint = nameENForHint.toLowerCase().split(' ').slice(0, 2).join(' ');
+      if (!imageHint || imageHint === "food item") {
+        imageHint = categoryEN.toLowerCase() || "food plate";
+      }
 
 
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`, 
+        id: `${categoryKey}-${index}-${Date.now()}`,
         name: { en: nameEN.trim(), es: nameES.trim() },
-        description: { 
-          en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(), 
-          es: (item[DESCRIPCION_ES_COL] || "Descripción no disponible.").trim() 
+        description: {
+          en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(),
+          es: (item[DESCRIPCION_ES_COL] || "Descripción no disponible.").trim()
         },
         price: price,
         categoryKey: categoryKey,
-        imageUrl: `https://picsum.photos/seed/${encodeURIComponent(imageHintSeed)}/400/300`,
-        imageHint: `${categoryEN.toLowerCase()} ${nameENForSeed.toLowerCase().split(" ").slice(0,1).join("")}`,
+        imageUrl: `https://placehold.co/400x300.png`, // Using placehold.co
+        imageHint: imageHint, // Using the generated hint
       };
     }).filter(item => item !== null) as MenuItemData[];
 
@@ -173,7 +176,7 @@ export async function GET() {
   }
 
   console.log(`API_ROUTE_GET_MENU: Total menu items processed: ${allMenuItems.length}. Sending response.`);
-  if (allMenuItems.length === 0 && parsedData.length > 0) { // Check if parsing produced data but mapping failed
+  if (allMenuItems.length === 0 && parsedData.length > 0) {
     console.warn("API_ROUTE_GET_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency.");
   } else if (allMenuItems.length === 0) {
     console.warn("API_ROUTE_GET_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
