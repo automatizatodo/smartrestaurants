@@ -1,24 +1,8 @@
 
 {
-  "category.starters": "Entrantes",
-  "category.mainCourses": "Platos Principales",
-  "category.desserts": "Postres",
-  "category.drinks": "Bebidas",
-
-  "item1.name": "Risotto Milanese al Azafrán",
-  "item1.description": "Cremoso arroz Arborio infusionado con azafrán, parmesano y un toque de vino blanco, coronado con pan de oro.",
-  "item2.name": "Vieiras Selladas con Trufa",
-  "item2.description": "Vieiras U10 selladas a la plancha servidas con un puré de coliflor infusionado con trufa negra y espárragos.",
-  "item3.name": "Medallones de Ternera Wagyu",
-  "item3.description": "Ternera Wagyu A5, asada a la perfección, acompañada de una rica reducción de vino tinto y gratinado de patatas.",
-  "item4.name": "Langosta Thermidor",
-  "item4.description": "Plato clásico francés de carne de langosta cocinada en una rica salsa de vino, rellenada de nuevo en el caparazón de la langosta y gratinada.",
-  "item5.name": "Tiramisú Deconstruido",
-  "item5.description": "Una interpretación artística del postre italiano clásico, con bizcochos de soletilla empapados en espresso, crema de mascarpone y polvo de cacao.",
-  "item6.name": "Sundae Opulencia Dorada",
-  "item6.description": "Helado de vainilla de Tahití, vainilla de Madagascar, pan de oro comestible de 23k y raro chocolate Amedei Porcelana.",
-  "item7.name": "Burrata Caprese",
-  "item7.description": "Queso Burrata fresco servido con tomates reliquia, pesto de albahaca y un glaseado balsámico.",
-  "item8.name": "Crème Brûlée Clásica",
-  "item8.description": "Base rica de crema pastelera cubierta con una capa de azúcar caramelizado endurecido."
+  "starters": "Entrantes",
+  "mainCourses": "Platos Principales",
+  "desserts": "Postres",
+  "drinks": "Bebidas",
+  "other": "Otros"
 }

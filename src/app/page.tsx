@@ -11,6 +11,7 @@ import type { MenuItemData } from '@/data/menu';
 
 export default async function HomePage() {
   const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
+  console.log("HOMEPAGE_LOG: Received menuItems in HomePage:", JSON.stringify(menuItems, null, 2));
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

@@ -3,28 +3,17 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import { useEffect } from 'react';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { Lora } from 'next/font/google';
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
-const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
-const lora = Lora({ variable: '--font-lora', subsets: ['latin'], weight: ['400', '700'] });
-
-export default function AppInitializer({ children }: { children: React.ReactNode }) {
+export default function AppInitializer() {
   const { language } = useLanguage();
 
   useEffect(() => {
-    document.documentElement.lang = language;
+    // Ensure this runs only on the client side
+    if (typeof window !== 'undefined') {
+      document.documentElement.lang = language;
+    }
   }, [language]);
 
-  // Set initial lang attribute, will be updated by useEffect after hydration
-  // This helps avoid a flash of incorrect lang if server render defaults to 'en'
-  // and client detects 'es'.
-  return (
-    <html lang={typeof window === 'undefined' ? 'en' : language} className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}>
-        {children}
-      </body>
-    </html>
-  );
+  // This component primarily handles side effects and does not need to render UI.
+  return null;
 }

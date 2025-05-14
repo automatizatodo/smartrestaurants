@@ -19,11 +19,13 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   const { t } = useLanguage();
 
   const availableCategoryKeys = Array.from(new Set(menuItems.map(item => item.categoryKey).filter(Boolean)));
+  
+  // Filter and sort categories based on predefined order and availability
   const sortedCategories = menuCategories
     .filter(cat => availableCategoryKeys.includes(cat.key))
     .sort((a, b) => a.order - b.order);
 
-  const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all';
+  const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all'; // 'all' might not be used if categories exist
   const [activeTab, setActiveTab] = useState<string>(defaultCategory);
   
   if (!menuItems || menuItems.length === 0) {
@@ -52,7 +54,6 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   }
 
   if (sortedCategories.length === 0) {
-    // This case handles when menuItems exist but none match any displayable categories.
     return (
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -60,7 +61,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
             {t('landing:menu.sectionTitle')}
           </h2>
            <div className="flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
-            <AlertTriangle className="w-12 h-12 mb-4 text-primary" /> {/* Changed icon color for differentiation */}
+            <AlertTriangle className="w-12 h-12 mb-4 text-primary" /> 
             <p className="text-lg mb-2">{t('landing:menu.noCategoriesTitle')}</p>
             <p className="text-sm">{t('landing:menu.noCategoriesError')}</p>
           </div>
@@ -94,7 +95,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap justify-center mb-10">
             {sortedCategories.map((category) => (
               <TabsTrigger key={category.key} value={category.key} className="text-sm md:text-base">
-                {t(category.key)}
+                {t(`menu:${category.key}`)} 
               </TabsTrigger>
             ))}
           </TabsList>
@@ -104,6 +105,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
                 {menuItems
                   .filter(item => item.categoryKey === category.key)
+                  .slice(0, 3) // Show only first 3 items for interactive menu preview
                   .map((item, index) => (
                     <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                       <MenuItemCard item={item} />
@@ -126,4 +128,3 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     </section>
   );
 }
-

@@ -12,26 +12,22 @@ const SommelierRequestSchema = z.object({
 });
 
 export interface SommelierFormState {
-  messageKey: string | null; // Key for localization
-  messageParams?: Record<string, string | number> | null; // Params for interpolation
-  recommendations: string | null; // AI recommendations are direct text from AI
+  messageKey: string | null; 
+  messageParams?: Record<string, string | number> | null;
+  recommendations: string | null; 
   errors?: {
-    tastePreferences?: string[]; // Error keys for localization
+    tastePreferences?: string[]; 
   } | null;
 }
 
 // Helper function to format menu items for the AI.
-// This function assumes that you have a way to get the translated names and descriptions.
-// For simplicity, it currently uses the keys directly. In a real app, you'd resolve these keys
-// to the current language before sending to the AI if the AI needs to understand the specific language.
-// However, often it's better to send keys + English (or a base language) and let the AI work with that,
-// then re-translate AI output if needed. Here, we'll just pass the keys and raw price.
 const formatMenuForAI = (menuItems: MenuItemData[]): string => {
   if (!menuItems || menuItems.length === 0) {
     return "No menu items available.";
   }
+  // Use English names and descriptions for the AI for consistency.
   return menuItems.map(item => 
-    `Dish: ${item.nameKey}\nDescription: ${item.descriptionKey}\nPrice: ${item.price}\nCategory: ${item.categoryKey}`
+    `Dish: ${item.name.en}\nDescription: ${item.description.en}\nPrice: ${item.price}\nCategory: ${item.categoryKey}`
   ).join("\n\n");
 };
 
@@ -48,7 +44,7 @@ export async function getAISommelierRecommendations(
     return {
       messageKey: "common:form.error.invalidInput",
       recommendations: null,
-      errors: validatedFields.error.flatten().fieldErrors, // These are already keys
+      errors: validatedFields.error.flatten().fieldErrors, 
       messageParams: null,
     };
   }
@@ -57,18 +53,10 @@ export async function getAISommelierRecommendations(
   try {
     const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
     if (menuItems.length > 0) {
-      // It's better to pass structured data, or at least clear textual data.
-      // For now, we'll join nameKey, descriptionKey, and price.
-      // The AI will see the translation keys. If it needs to understand the actual text,
-      // you'd need to translate them here based on a default language or pass multiple languages.
-      menuInformationString = menuItems.map(item => {
-        return `Item Name Key: ${item.nameKey}\nDescription Key: ${item.descriptionKey}\nPrice: ${item.price}\nCategory Key: ${item.categoryKey}`;
-      }).join('\n---\n');
+      menuInformationString = formatMenuForAI(menuItems);
     }
   } catch (error) {
     console.error("Failed to fetch menu for AI Sommelier:", error);
-    // Optionally, you could inform the user or proceed without menu context if desired.
-    // For now, the AI will get a "menu unavailable" message.
   }
 
 
@@ -96,9 +84,8 @@ export async function getAISommelierRecommendations(
     }
   } catch (error) {
     console.error("AI Sommelier Error:", error);
-    // Check if error is a Genkit-specific error or a generic one for better user feedback
     let errorMessageKey = "common:form.error.generic";
-    if (error instanceof Error && error.message.includes("NO_RESPONSE")) { // Example check
+    if (error instanceof Error && error.message.includes("NO_RESPONSE")) { 
         errorMessageKey = "landing:aiSommelier.error.couldNotGenerate";
     }
     return {
@@ -153,37 +140,22 @@ export async function submitBooking(
     return {
       messageKey: "common:form.error.invalidInput",
       success: false,
-      errors: validatedFields.error.flatten().fieldErrors, // These are already keys
+      errors: validatedFields.error.flatten().fieldErrors,
       messageParams: null,
     };
   }
 
-  // Simulate booking submission (e.g., API call, database insert)
-  // For this example, we'll just log the data.
-  // In a real application, replace this with actual booking logic.
   console.log("Booking submitted:", validatedFields.data);
-  // await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-
-  // Example: If booking fails, return an error state
-  // if (Math.random() > 0.8) { // Simulate a random failure
-  //   return {
-  //     messageKey: "landing:booking.error.failedToBook", // Add this key to locales
-  //     success: false,
-  //     errors: null,
-  //     messageParams: null
-  //   };
-  // }
 
   return {
-    messageKey: "landing:booking.successMessage", // This key should exist in your locale files
+    messageKey: "landing:booking.successMessage", 
     messageParams: { 
       name: validatedFields.data.name,
       guests: validatedFields.data.guests,
-      date: validatedFields.data.date, // Consider formatting date based on locale on client
+      date: validatedFields.data.date, 
       time: validatedFields.data.time 
     },
     success: true,
     errors: null,
   };
 }
-

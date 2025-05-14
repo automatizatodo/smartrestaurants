@@ -1,29 +1,30 @@
 
+export interface MenuItemText {
+  en: string;
+  es: string;
+}
+
 export interface MenuItemData {
   id: string;
-  nameKey: string; 
-  descriptionKey: string; 
+  name: MenuItemText;
+  description: MenuItemText;
   price: string;
-  categoryKey: string; 
+  categoryKey: string; // e.g., "starters", "mainCourses", "desserts", "drinks"
   imageUrl: string;
   imageHint: string;
 }
 
 export interface MenuCategory {
-  key: string;
+  key: string; // "starters", "mainCourses", etc.
   order: number;
 }
 
 // Define category keys and their display order
-// These keys must match those used in SHEETS_CONFIG in `src/app/api/menu/route.ts`
+// These keys will be derived from the 'Category (EN)' column in the Google Sheet
+// and used to look up translations in menu.json (e.g., t('menu:starters'))
 export const menuCategories: MenuCategory[] = [
-  { key: 'menu:category.starters', order: 1 },       // Corresponds to "Entrantes"
-  { key: 'menu:category.mainCourses', order: 2 }, // Corresponds to "Platos Principales"
-  { key: 'menu:category.desserts', order: 3 },      // Corresponds to "Postres"
-  { key: 'menu:category.drinks', order: 4 },        // Corresponds to "Bebidas"
-  // Removed 'menu:category.luxury' as it's not in the new sheet structure. Add back if needed.
+  { key: 'starters', order: 1 },
+  { key: 'mainCourses', order: 2 },
+  { key: 'desserts', order: 3 },
+  { key: 'drinks', order: 4 },
 ];
-
-// The static menuItems array has been removed.
-// Menu data will now be fetched dynamically via the /api/menu route,
-// which in turn fetches from the configured Google Sheets.

@@ -35,6 +35,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
     return acc;
   }, {} as Record<string, MenuItemData[]>);
 
+  // Sort categories based on the predefined order in menuCategories
   const sortedCategoryKeys = Object.keys(groupedMenu).sort((a, b) => {
     const orderA = menuCategories.find(cat => cat.key === a)?.order ?? 99;
     const orderB = menuCategories.find(cat => cat.key === b)?.order ?? 99;
@@ -58,12 +59,14 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
       {sortedCategoryKeys.map((categoryKey) => {
         const itemsInCategory = groupedMenu[categoryKey];
         if (!itemsInCategory || itemsInCategory.length === 0) {
-          return null; // Skip rendering this category if it has no items
+          return null; 
         }
+        // Construct the translation key for the category title
+        const categoryTitleKey = `menu:${categoryKey}`;
         return (
           <AccordionItem key={categoryKey} value={categoryKey} className="border-b-0 rounded-lg overflow-hidden shadow-md bg-card">
             <AccordionTrigger className="px-6 py-4 text-xl font-serif text-primary hover:no-underline hover:bg-accent/50 transition-colors">
-              {t(categoryKey)}
+              {t(categoryTitleKey)}
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6 pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pt-4">
