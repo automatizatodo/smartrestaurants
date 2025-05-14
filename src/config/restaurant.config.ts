@@ -39,7 +39,7 @@ const restaurantConfig: RestaurantConfig = {
     twitter: '#',
     youtube: '#',
   },
-  heroImageUrl: '/background_rest.jpg', // Updated path
+  heroImageUrl: 'https://placehold.co/1920x1080.png', // Reverted to placeholder
   heroImageHint: 'restaurant interior dining',
   bookingTimeSlots: [
     "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM",
@@ -49,7 +49,7 @@ const restaurantConfig: RestaurantConfig = {
     // Primary color HSL from globals.css: 51 100% 50% (Gold)
     primary: 'hsl(51, 100%, 50%)',
   },
-  showMenuItemImages: false, // Set to true by default to show images
+  showMenuItemImages: true, // Set to true by default to show images
 };
 
 export default restaurantConfig;
