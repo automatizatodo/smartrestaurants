@@ -3,76 +3,67 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
-// IMPORTANT: Replace this with your Google Spreadsheet ID
+// IMPORTANT: This is the Spreadsheet ID from your Google Sheet URL
 const SPREADSHEET_ID = '1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI';
 
-// IMPORTANT: You need to find the GID for each sheet.
 // How to find GID:
 // 1. Open your Google Sheet.
 // 2. Click on the tab for the sheet (e.g., "Entrantes").
 // 3. Look at the URL in the browser's address bar. It will end with something like #gid=123456789. That number is the GID.
-//    - The first sheet created usually has GID=0.
 const SHEETS_CONFIG = [
-  { name: 'Entrantes', gid: '0', categoryKey: 'menu:category.starters', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] }, // Replace '0' with actual GID if not the first sheet
-  { name: 'Platos Principales', gid: 'GID_PLATOS_PRINCIPALES', categoryKey: 'menu:category.mainCourses', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] },
-  { name: 'Postres', gid: 'GID_POSTRES', categoryKey: 'menu:category.desserts', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] },
-  { name: 'Bebidas', gid: 'GID_BEBIDAS', categoryKey: 'menu:category.drinks', expectedHeaders: ["Nombre de la Bebida", "Descripción", "Precio (€)"] },
+  { name: 'Entrantes', gid: '0', categoryKey: 'menu:category.starters', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] },
+  { name: 'Platos Principales', gid: '1881659107', categoryKey: 'menu:category.mainCourses', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] },
+  { name: 'Postres', gid: '1794450508', categoryKey: 'menu:category.desserts', expectedHeaders: ["Nombre del Plato", "Descripción", "Precio (€)"] },
+  { name: 'Bebidas', gid: '2130971891', categoryKey: 'menu:category.drinks', expectedHeaders: ["Nombre de la Bebida", "Descripción", "Precio (€)"] },
 ];
 
-// Column names from your sheets
+// Column names from your Spanish sheets
 const NAME_COLUMN_ES = "Nombre del Plato";
 const DRINK_NAME_COLUMN_ES = "Nombre de la Bebida";
 const DESCRIPTION_COLUMN_ES = "Descripción";
 const PRICE_COLUMN_ES = "Precio (€)";
 
 
-function parseCSV(csvText: string, expectedHeaders: string[]): Record<string, string>[] {
-  console.log("API_ROUTE_PARSE_CSV: Received CSV text length:", csvText.length);
-  const lines = csvText.trim().split(/\r\n|\n/);
+function parseCSV(csvText: string, expectedHeaders: string[], sheetNameForLogging: string): Record<string, string>[] {
+  console.log(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Received CSV text length: ${csvText.length}`);
+  const lines = csvText.trim().split(/\r\n|\n|\r/).filter(line => line.trim() !== ''); // Filter out empty lines robustly
   
-  if (lines.length === 0) {
-    console.warn("API_ROUTE_PARSE_CSV: CSV text is empty or only whitespace.");
-    return [];
-  }
-  if (lines.length === 1 && lines[0].trim() === "") {
-    console.warn("API_ROUTE_PARSE_CSV: CSV text is effectively empty after trim.");
+  if (lines.length < 2) { // Expecting at least one header row and one data row
+    console.warn(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: CSV content is too short (less than 2 lines) or headers are missing. Lines found: ${lines.length}`);
     return [];
   }
 
   const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''));
-  console.log(`API_ROUTE_PARSE_CSV: Headers found in sheet: ${headersFromSheet.join(", ")}`);
-  console.log(`API_ROUTE_PARSE_CSV: Expected headers: ${expectedHeaders.join(", ")}`);
+  console.log(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Headers found in sheet: [${headersFromSheet.join(", ")}]`);
+  console.log(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Expected headers: [${expectedHeaders.join(", ")}]`);
 
-  // Validate headers
-  let validHeaders = true;
-  const headerMap: Record<string, string> = {};
-
-  expectedHeaders.forEach(expectedHeader => {
+  let allExpectedHeadersPresent = true;
+  for (const expectedHeader of expectedHeaders) {
     if (!headersFromSheet.includes(expectedHeader)) {
-      console.warn(`API_ROUTE_PARSE_CSV: Missing expected header '${expectedHeader}' in sheet. Found: ${headersFromSheet.join(", ")}`);
-      validHeaders = false;
+      console.warn(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Missing expected header '${expectedHeader}'. Sheet headers: [${headersFromSheet.join(", ")}]`);
+      allExpectedHeadersPresent = false;
     }
-  });
+  }
 
-  if (!validHeaders && !expectedHeaders.every(eh => headersFromSheet.includes(eh))) {
-     console.warn(`API_ROUTE_PARSE_CSV: Header mismatch. Sheet might not conform to expected structure for this category. Expected: ${expectedHeaders.join(", ")}, Got: ${headersFromSheet.join(", ")}`);
-     // Depending on strictness, you might want to return [] here or try to parse anyway if some headers match
-     // For now, we'll try to proceed if at least one expected header is present, but log a strong warning.
-     if (!expectedHeaders.some(eh => headersFromSheet.includes(eh))) {
-        return [];
-     }
+  if (!allExpectedHeadersPresent) {
+    console.warn(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Not all expected headers were found. Proceeding with available data, but menu items might be incomplete or incorrect for this category.`);
+    // Decide if you want to stop processing this sheet or continue with partial data
+    // For now, we'll continue if at least one expected header is present, as before.
+    if (!expectedHeaders.some(eh => headersFromSheet.includes(eh))) {
+       console.error(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Critical header mismatch. None of the expected headers found. Skipping this sheet.`);
+       return [];
+    }
   }
   
-  // Create a map for actual header names to standardized keys (e.g., "Nombre del Plato" -> "name")
-  // This is useful if you want to abstract column names later. For now, we'll use direct access.
-
   const jsonData = [];
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) {
-        console.log(`API_ROUTE_PARSE_CSV: Skipping empty line at index ${i}`);
+        console.log(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Skipping empty line at index ${i}`);
         continue;
     }
-    const values = lines[i].split(',').map(value => value.trim().replace(/^"|"$/g, ''));
+    // This regex handles commas inside quoted fields
+    const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(value => value.trim().replace(/^"|"$/g, ''));
+    
     if (values.length === headersFromSheet.length) {
       const entry: Record<string, string> = {};
       headersFromSheet.forEach((header, index) => {
@@ -80,10 +71,10 @@ function parseCSV(csvText: string, expectedHeaders: string[]): Record<string, st
       });
       jsonData.push(entry);
     } else {
-      console.warn(`API_ROUTE_PARSE_CSV: Skipping malformed CSV line ${i + 1} for sheet. Expected ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
+      console.warn(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Skipping malformed CSV line ${i + 1}. Expected ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
     }
   }
-  console.log(`API_ROUTE_PARSE_CSV: Parsed ${jsonData.length} data rows for one sheet.`);
+  console.log(`API_ROUTE_PARSE_CSV [${sheetNameForLogging}]: Parsed ${jsonData.length} data rows.`);
   return jsonData;
 }
 
@@ -92,61 +83,71 @@ export async function GET() {
   let allMenuItems: MenuItemData[] = [];
 
   for (const sheetConfig of SHEETS_CONFIG) {
-    if (sheetConfig.gid === `GID_${sheetConfig.name.toUpperCase().replace(/\s/g, '_')}`) {
-      console.warn(`API_ROUTE_GET_MENU: Placeholder GID used for sheet "${sheetConfig.name}". Please update with actual GID in SHEETS_CONFIG.`);
-      continue; // Skip fetching if placeholder GID is used
-    }
+    // The GID placeholder check is less critical now that specific GIDs are set,
+    // but it's good to keep a general awareness for future changes.
+    // It's important that the GIDs above are correct for SPREADSHEET_ID.
 
     const googleSheetCsvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${sheetConfig.gid}`;
-    console.log(`API_ROUTE_GET_MENU: Fetching menu for category '${sheetConfig.name}' from Google Sheet URL: ${googleSheetCsvUrl}`);
+    console.log(`API_ROUTE_GET_MENU: Fetching menu for category '${sheetConfig.name}' (GID: ${sheetConfig.gid}) from URL: ${googleSheetCsvUrl}`);
 
     try {
       const response = await fetch(googleSheetCsvUrl, {
-        cache: 'no-store', // Ensures fresh fetch every time
+        cache: 'no-store', 
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`API_ROUTE_GET_MENU: Failed to fetch from Google Sheet for category '${sheetConfig.name}'. Status: ${response.status} ${response.statusText}. URL: ${googleSheetCsvUrl}. Response: ${errorText}`);
-        continue; // Skip to next sheet
+        console.error(`API_ROUTE_GET_MENU: Failed to fetch CSV for '${sheetConfig.name}'. Status: ${response.status} ${response.statusText}. URL: ${googleSheetCsvUrl}. Response: ${errorText.substring(0, 500)}...`);
+        continue; 
       }
 
       const csvText = await response.text();
-      console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV data for '${sheetConfig.name}'. Length: ${csvText.length}`);
+      console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV for '${sheetConfig.name}'. Length: ${csvText.length}`);
 
       if (!csvText.trim()) {
-        console.warn(`API_ROUTE_GET_MENU: Fetched CSV from Google Sheet for '${sheetConfig.name}' is empty. URL: ${googleSheetCsvUrl}`);
-        continue; // Skip to next sheet
+        console.warn(`API_ROUTE_GET_MENU: Fetched CSV for '${sheetConfig.name}' is empty. URL: ${googleSheetCsvUrl}. Ensure sheet is published and has content.`);
+        continue; 
       }
 
-      const parsedData = parseCSV(csvText, sheetConfig.expectedHeaders);
+      const parsedData = parseCSV(csvText, sheetConfig.expectedHeaders, sheetConfig.name);
       console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV for '${sheetConfig.name}'.`);
 
-      const nameColumn = sheetConfig.categoryKey === 'menu:category.drinks' ? DRINK_NAME_COLUMN_ES : NAME_COLUMN_ES;
+      const nameColumnKey = sheetConfig.categoryKey === 'menu:category.drinks' ? DRINK_NAME_COLUMN_ES : NAME_COLUMN_ES;
 
       const categoryItems: MenuItemData[] = parsedData.map((item: Record<string, string>, index: number) => {
-        const itemName = item[nameColumn] || `Unnamed Item ${index + 1}`;
-        const itemDescription = item[DESCRIPTION_COLUMN_ES] || `Description for ${itemName}`;
-        
-        // Price formatting: "X,XX" or "X.XX" to "€X.XX"
-        let price = item[PRICE_COLUMN_ES] || '0.00';
-        price = price.replace(',', '.'); // Ensure decimal point is a period
-        if (!price.includes('€')) {
-            price = `€${price}`;
+        const itemName = item[nameColumnKey];
+        const itemDescription = item[DESCRIPTION_COLUMN_ES];
+        let price = item[PRICE_COLUMN_ES];
+
+        if (!itemName) {
+            console.warn(`API_ROUTE_GET_MENU [${sheetConfig.name}]: Item at row ${index + 2} is missing name (expected column: '${nameColumnKey}'). Skipping.`);
+            return null;
+        }
+        if (!itemDescription) {
+            console.warn(`API_ROUTE_GET_MENU [${sheetConfig.name}]: Item '${itemName}' is missing description (expected column: '${DESCRIPTION_COLUMN_ES}').`);
+        }
+        if (!price) {
+            console.warn(`API_ROUTE_GET_MENU [${sheetConfig.name}]: Item '${itemName}' is missing price (expected column: '${PRICE_COLUMN_ES}'). Setting to 'N/A'.`);
+            price = 'N/A';
         }
         
-        // For nameKey and descriptionKey, we'll use the Spanish text directly from the sheet.
-        // For a fully internationalized app, you'd generate unique keys and add them to locale files.
+        price = price.replace(',', '.'); 
+        if (!price.includes('€')) {
+            price = `€${parseFloat(price).toFixed(2)}`;
+        } else {
+            price = `€${parseFloat(price.replace('€','')).toFixed(2)}`;
+        }
+        
         return {
-          id: `${sheetConfig.categoryKey}-${index}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-          nameKey: itemName, // Using direct Spanish name as key for now
-          descriptionKey: itemDescription, // Using direct Spanish description as key
+          id: `${sheetConfig.categoryKey}-${sheetConfig.gid}-${index}-${Date.now()}`, // More robust ID
+          nameKey: itemName.trim(), 
+          descriptionKey: (itemDescription || `Descripción para ${itemName}`).trim(),
           price: price,
           categoryKey: sheetConfig.categoryKey,
-          imageUrl: `https://picsum.photos/seed/${encodeURIComponent(itemName.substring(0,10))}${index}/400/300`,
-          imageHint: `${sheetConfig.name.toLowerCase()} food item`, // Generic hint
+          imageUrl: `https://picsum.photos/seed/${encodeURIComponent(itemName.trim().substring(0,10))}${index}/400/300`,
+          imageHint: `${sheetConfig.name.toLowerCase()} food item plate`, 
         };
-      }).filter(item => item.nameKey && !item.nameKey.startsWith('Unnamed Item')); // Filter out items that likely failed to parse name
+      }).filter(item => item !== null) as MenuItemData[]; // Filter out nulls from skipped items
       
       console.log(`API_ROUTE_GET_MENU: Mapped to ${categoryItems.length} valid MenuItemData objects for '${sheetConfig.name}'.`);
       allMenuItems = allMenuItems.concat(categoryItems);
@@ -158,7 +159,8 @@ export async function GET() {
 
   console.log(`API_ROUTE_GET_MENU: Total menu items fetched from all sheets: ${allMenuItems.length}. Sending response.`);
   if (allMenuItems.length === 0) {
-      console.warn("API_ROUTE_GET_MENU: No menu items were successfully fetched or parsed from any sheet. Check GIDs, sheet publishing settings, and header names.");
+      console.warn("API_ROUTE_GET_MENU: No menu items were successfully fetched or parsed from any sheet. Check GIDs, sheet publishing status (File > Share > Publish to web > CSV), and header names in your Google Sheet matching expected headers.");
   }
   return NextResponse.json(allMenuItems, { status: 200 });
 }
+
