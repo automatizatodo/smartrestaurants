@@ -6,7 +6,7 @@ import type { MenuItemData } from '@/data/menu';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function MenuItemCard({ item }: { item: MenuItemData }) {
-  const { language }_ = useLanguage(); // Removed t as it's not used for item name/desc directly
+  const { language } = useLanguage(); // Corrected destructuring
   // Ensure the URL has a protocol
   const imageUrl = item.imageUrl.startsWith('http') ? item.imageUrl : `https://${item.imageUrl}`;
 
