@@ -19,7 +19,7 @@ interface RestaurantConfig {
   email: string;
   emailHref: string; // Mailto link format
   socialMediaLinks: SocialMediaLinks;
-  heroImageUrl: string;
+  heroImageUrl: string; // Path should be relative to the `public` directory, e.g., /images/hero.jpg
   heroImageHint: string; // This could potentially be localized via a key
   bookingTimeSlots: string[];
   theme: ThemeColors;
@@ -39,8 +39,8 @@ const restaurantConfig: RestaurantConfig = {
     twitter: '#',
     youtube: '#',
   },
-  heroImageUrl: 'https://placehold.co/1920x1080.png', 
-  heroImageHint: 'restaurant interior dining', 
+  heroImageUrl: '/assets/background_rest.jpg', // Corrected path
+  heroImageHint: 'restaurant interior dining',
   bookingTimeSlots: [
     "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM",
     "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM"
@@ -49,7 +49,7 @@ const restaurantConfig: RestaurantConfig = {
     // Primary color HSL from globals.css: 51 100% 50% (Gold)
     primary: 'hsl(51, 100%, 50%)',
   },
-  showMenuItemImages: true, // Set to true by default to show images
+  showMenuItemImages: false, // Set to true by default to show images
 };
 
 export default restaurantConfig;
