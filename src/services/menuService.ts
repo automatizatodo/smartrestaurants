@@ -14,7 +14,7 @@ export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
   if (typeof window === 'undefined') {
     const host = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
-      : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'); // Ensure NEXT_PUBLIC_APP_URL is set in .env for local dev if needed
+      : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002'); // Fallback to port 9002
     fullApiUrl = `${host}${internalApiUrl}`;
     console.log(`SERVICE_FETCH_MENU: Running on server. Using full API URL: ${fullApiUrl}`);
   } else {
@@ -49,3 +49,4 @@ export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
     return [];
   }
 }
+
