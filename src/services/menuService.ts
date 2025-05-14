@@ -10,7 +10,7 @@ import type { MenuItemData } from '@/data/menu';
 // 4. Click "Publish".
 // 5. Copy the generated URL and paste it here.
 // Example Google Sheet columns: id,nameKey,descriptionKey,price,categoryKey,imageUrl,imageHint
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI/export?format=csv&gid=0';
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
 
 // Basic CSV to JSON parser.
 // Note: This is a very basic parser. It assumes:
@@ -43,17 +43,7 @@ function parseCSV(csvText: string): Record<string, string>[] {
 
 
 export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
-  if (
-    GOOGLE_SHEET_CSV_URL === 'YOUR_GOOGLE_SHEET_CSV_URL_HERE' ||
-    !GOOGLE_SHEET_CSV_URL ||
-    (GOOGLE_SHEET_CSV_URL.includes('1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI/export?format=csv&gid=0') &&
-      GOOGLE_SHEET_CSV_URL === 'https://docs.google.com/spreadsheets/d/1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI/export?format=csv&gid=0' &&
-      process.env.NODE_ENV === 'development' &&
-      GOOGLE_SHEET_CSV_URL.startsWith('https://docs.google.com/spreadsheets/d/1zXWQRP-YsyM_8pii8xPXV29ao9SvkC5BJjM0S2kVviI/export?format=csv'))
-  ) {
-      // Keep the development check for the specific placeholder URL if needed, or adjust as necessary
-      // For the user provided URL, we attempt to fetch it.
-  } else if (GOOGLE_SHEET_CSV_URL === 'YOUR_GOOGLE_SHEET_CSV_URL_HERE' || !GOOGLE_SHEET_CSV_URL) {
+  if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL === 'YOUR_GOOGLE_SHEET_CSV_URL_HERE') {
      console.warn(
       'Google Sheet CSV URL is not configured. Serving empty menu. Please update GOOGLE_SHEET_CSV_URL in src/services/menuService.ts'
     );
@@ -66,10 +56,20 @@ export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
     const response = await fetch(GOOGLE_SHEET_CSV_URL, { next: { revalidate: 3600 } }); 
     if (!response.ok) {
       console.error(`Failed to fetch menu from Google Sheet: ${response.status} ${response.statusText}`);
+      console.error('Attempted URL:', GOOGLE_SHEET_CSV_URL);
       return [];
     }
     const csvText = await response.text();
+    if (!csvText.trim()) {
+      console.warn('Fetched CSV is empty. Check Google Sheet content and publishing settings.');
+      return [];
+    }
     const parsedData = parseCSV(csvText);
+
+    if (parsedData.length === 0 && csvText.trim().length > 0) {
+      console.warn('CSV parsing might have failed or returned no data despite fetching content. CSV Text:', csvText);
+    }
+
 
     return parsedData.map((item: Record<string, string>, index: number) => ({
       id: item.id || `item-${index}-${Math.random().toString(36).substring(2, 7)}`, // Ensure ID exists, fallback to generated
@@ -85,6 +85,7 @@ export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
     })).filter(item => item.nameKey && item.categoryKey); // Filter out items missing essential keys
   } catch (error) {
     console.error('Error fetching or parsing menu from Google Sheet:', error);
-    return []; 
+    console.error('GOOGLE_SHEET_CSV_URL:', GOOGLE_SHEET_CSV_URL); // Log the URL for verification
+    return [];
   }
 }
