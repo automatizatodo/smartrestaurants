@@ -45,7 +45,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}>
+      <body 
+        className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}
+        suppressHydrationWarning={true}
+      >
         <LanguageProvider>
           <AppInitializer /> {/* Runs client-side effects like setting lang */}
           {children}
@@ -55,3 +58,4 @@ export default function RootLayout({
     </html>
   );
 }
+
