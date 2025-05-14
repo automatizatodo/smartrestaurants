@@ -39,7 +39,7 @@ const restaurantConfig: RestaurantConfig = {
     twitter: '#',
     youtube: '#',
   },
-  heroImageUrl: '/assets/background_rest.jpg', // Corrected path
+  heroImageUrl: '/background_rest.jpg', // Updated path
   heroImageHint: 'restaurant interior dining',
   bookingTimeSlots: [
     "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM",
