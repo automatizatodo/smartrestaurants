@@ -22,6 +22,8 @@
   "footer.followUs": "Síguenos",
   "footer.followUsDescription": "Mantente al día con nuestras últimas creaciones y eventos.",
   "footer.copyright": "© {year} {restaurantName}. Todos los derechos reservados. Diseñado con pasión.",
+  "footer.managedByText": "Sitio web gestionado por",
+  "footer.managedByBrand": "automatizatodo.com",
   "form.error.generic": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.",
   "form.error.invalidInput": "Entrada inválida. Por favor, revisa tus datos.",
   "languageSelector.label": "Seleccionar idioma",

@@ -29,7 +29,7 @@ export default function Footer() {
             <h5 className="font-serif text-lg font-semibold text-foreground mb-4">{t('common:footer.quickLinks')}</h5>
             <ul className="space-y-2 text-sm">
               <li><Link href="/" className="hover:text-primary transition-colors">{t('common:footer.home')}</Link></li>
-              <li><Link href="/menu" className="hover:text-primary transition-colors">{t('common:footer.menu')}</Link></li> {/* Changed to /menu */}
+              <li><Link href="/menu" className="hover:text-primary transition-colors">{t('common:footer.menu')}</Link></li>
               <li><Link href="/#ai-sommelier" className="hover:text-primary transition-colors">{t('common:footer.aiSommelierLink')}</Link></li>
               <li><Link href="/#booking" className="hover:text-primary transition-colors">{t('common:footer.bookTableLink')}</Link></li>
               <li><Link href="/#testimonials" className="hover:text-primary transition-colors">{t('common:footer.testimonialsLink')}</Link></li>
@@ -84,6 +84,12 @@ export default function Footer() {
 
         <div className="border-t border-border/50 pt-8 text-center text-sm">
           <p>{t('common:footer.copyright', { year: currentYear, restaurantName: restaurantName })}</p>
+          <p className="mt-2 text-xs">
+            {t('common:footer.managedByText')}{' '}
+            <Link href="https://automatizatodo.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+              {t('common:footer.managedByBrand')}
+            </Link>
+          </p>
         </div>
       </div>
     </footer>

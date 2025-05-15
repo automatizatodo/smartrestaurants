@@ -22,6 +22,8 @@
   "footer.followUs": "Segueix-nos",
   "footer.followUsDescription": "Estigues al dia amb les nostres últimes creacions i esdeveniments.",
   "footer.copyright": "© {year} {restaurantName}. Tots els drets reservats. Dissenyat amb passió.",
+  "footer.managedByText": "Lloc web gestionat per",
+  "footer.managedByBrand": "automatizatodo.com",
   "form.error.generic": "S'ha produït un error inesperat. Si us plau, torna-ho a provar més tard.",
   "form.error.invalidInput": "Entrada invàlida. Si us plau, revisa les teves dades.",
   "languageSelector.label": "Selecciona idioma",
