@@ -32,6 +32,8 @@ interface RestaurantConfig {
   whatsappBookingNumber?: string;
   googleMapsEmbedUrl: string; // For the iframe embed
   googleMapsLink: string; // For a direct link to Google Maps
+  googleReviewUrl?: string; // Link to leave a Google Review
+  tripAdvisorReviewUrl?: string; // Link to leave a TripAdvisor Review
 }
 
 // --- Configuration Object ---
@@ -64,7 +66,9 @@ const restaurantConfig: RestaurantConfig = {
   bookingMethod: 'whatsapp',
   whatsappBookingNumber: '+34687606761',
   googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.521161858839!2d-79.99999998523096!3d-2.1900000374999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMsKwMTEnMjQuMCJTIDc5wrA1OSc2MC4wIlc!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus', // Replace with your actual embed URL
-  googleMapsLink: 'https://maps.google.com/?q=123+Culinary+Avenue,+Flavor+Town,+CA+90210' // Replace with your actual Google Maps link
+  googleMapsLink: 'https://maps.google.com/?q=123+Culinary+Avenue,+Flavor+Town,+CA+90210', // Replace with your actual Google Maps link
+  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID', // Replace YOUR_PLACE_ID
+  tripAdvisorReviewUrl: 'https://www.tripadvisor.com/UserReviewEdit-gXXXXXX-dYYYYYY-YourRestaurantName.html', // Replace with your TripAdvisor link
 };
 
 export default restaurantConfig;

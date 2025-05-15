@@ -70,6 +70,8 @@
   "booking.error.unknownMethod": "Mètode de reserva desconegut configurat. Si us plau, contacta amb suport.",
   "testimonials.sectionTitle": "Paraules Dels Nostres Clients",
   "testimonials.sectionDescription": "Escolta el que els nostres clients diuen sobre la seva experiència a {restaurantName}.",
+  "testimonials.leaveGoogleReview": "Deixar Ressenya a Google",
+  "testimonials.leaveTripAdvisorReview": "Deixar Ressenya a TripAdvisor",
   "aboutUs.title": "La Nostra Història",
   "aboutUs.introduction": "Benvinguts a {restaurantName}, un lloc on la passió per la gastronomia es troba amb l'art de la cuina.",
   "aboutUs.paragraph1": "Fundat el 2005 per l'aclamat xef Joan Roca, el nostre restaurant va néixer d'un somni: crear un espai on cada plat expliqués una història, on els ingredients frescos i de temporada fossin els protagonistes i on cada comensal se sentís como a casa. Des dels nostres humils inicis en un petit local del barri Gòtic, hem crescut gràcies a la dedicació del nostre equip i la fidelitat dels nostres clients.",

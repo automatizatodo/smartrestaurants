@@ -70,6 +70,8 @@
   "booking.error.unknownMethod": "Método de reserva desconocido configurado. Por favor, contacta con soporte.",
   "testimonials.sectionTitle": "Palabras de Nuestros Clientes",
   "testimonials.sectionDescription": "Escucha lo que nuestros clientes dicen sobre su experiencia en {restaurantName}.",
+  "testimonials.leaveGoogleReview": "Dejar Reseña en Google",
+  "testimonials.leaveTripAdvisorReview": "Dejar Reseña en TripAdvisor",
   "aboutUs.title": "Nuestra Historia",
   "aboutUs.introduction": "Bienvenidos a {restaurantName}, un lugar donde la pasión por la gastronomía se encuentra con el arte de la cocina.",
   "aboutUs.paragraph1": "Fundado en 2005 por la aclamada Chef Elena Soler, nuestro restaurante nació de un sueño: crear un espacio donde cada plato contara una historia, donde los ingredientes frescos y de temporada fueran los protagonistas y donde cada comensal se sintiera como en casa. Desde nuestros humildes comienzos en un pequeño local del barrio Gótico, hemos crecido gracias a la dedicación de nuestro equipo y la fidelidad de nuestros clientes.",
