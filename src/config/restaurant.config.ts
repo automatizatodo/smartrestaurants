@@ -22,8 +22,9 @@ interface RestaurantConfig {
   heroImageUrl: string; // Path should be relative to the `public` directory, e.g., /images/hero.jpg
   heroImageHint: string; // This could potentially be localized via a key
   bookingTimeSlots: string[];
+  bookingSlotDurationMinutes: number; // New: Duration of a booking slot in minutes
   theme: ThemeColors;
-  showMenuItemImages: boolean; // New flag to control menu item images
+  showMenuItemImages: boolean;
 }
 
 // --- Configuration Object ---
@@ -39,17 +40,18 @@ const restaurantConfig: RestaurantConfig = {
     twitter: '#',
     youtube: '#',
   },
-  heroImageUrl: 'https://placehold.co/1920x1080.png', // Reverted to placeholder
+  heroImageUrl: '/background_rest.jpg',
   heroImageHint: 'restaurant interior dining',
   bookingTimeSlots: [
     "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM",
     "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM"
   ],
+  bookingSlotDurationMinutes: 120, // e.g., 2 hours
   theme: {
     // Primary color HSL from globals.css: 51 100% 50% (Gold)
     primary: 'hsl(51, 100%, 50%)',
   },
-  showMenuItemImages: true, // Set to true by default to show images
+  showMenuItemImages: false,
 };
 
 export default restaurantConfig;

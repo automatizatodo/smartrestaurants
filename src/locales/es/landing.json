@@ -53,6 +53,13 @@
   "booking.error.dateRequired": "La fecha es obligatoria",
   "booking.error.timeRequired": "La hora es obligatoria",
   "booking.error.guestsRequired": "Se requiere al menos un comensal",
+  "booking.error.guestsTooMany": "Se permite un máximo de {count} comensales por reserva para esta franja horaria.",
+  "booking.error.slotUnavailable": "La franja horaria seleccionada ({time} el {date}) no está disponible. Por favor, elige otra hora.",
+  "booking.error.slotUnavailable.fullyBooked": "La franja horaria seleccionada está completamente reservada. Por favor, elige otra hora.",
+  "booking.error.slotUnavailable.tooManyGuests": "Esta franja horaria no puede acomodar a {guests} comensales. Intenta con menos personas o elige otra hora.",
+  "booking.error.calendarError": "Hubo un problema al confirmar tu reserva con el calendario. Por favor, inténtalo de nuevo o contáctanos.",
+  "booking.error.calendarCheckFailed": "No se pudo verificar la disponibilidad del calendario. Por favor, inténtalo más tarde.",
+  "booking.error.invalidDateTime": "La fecha u hora seleccionada no es válida. Por favor, verifica e inténtalo de nuevo.",
   "testimonials.sectionTitle": "Palabras de Nuestros Clientes",
   "testimonials.sectionDescription": "Escucha lo que nuestros clientes dicen sobre su experiencia en {restaurantName}."
 }

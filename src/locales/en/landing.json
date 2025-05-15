@@ -51,6 +51,13 @@
   "booking.error.dateRequired": "Date is required",
   "booking.error.timeRequired": "Time is required",
   "booking.error.guestsRequired": "At least one guest is required",
+  "booking.error.guestsTooMany": "Maximum {count} guests allowed per booking for this slot.",
+  "booking.error.slotUnavailable": "The selected time slot {time} on {date} is not available. Please choose another time.",
+  "booking.error.slotUnavailable.fullyBooked": "The selected time slot is fully booked. Please choose another time.",
+  "booking.error.slotUnavailable.tooManyGuests": "This time slot cannot accommodate {guests} guests. Please try a smaller party or different time.",
+  "booking.error.calendarError": "We encountered an issue confirming your booking with the calendar. Please try again or contact us.",
+  "booking.error.calendarCheckFailed": "Could not check calendar availability. Please try again later.",
+  "booking.error.invalidDateTime": "The selected date or time is invalid. Please check and try again.",
   "testimonials.sectionTitle": "Words From Our Guests",
   "testimonials.sectionDescription": "Hear what our patrons are saying about their experience at {restaurantName}."
 }
