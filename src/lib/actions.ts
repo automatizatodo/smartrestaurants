@@ -11,6 +11,7 @@ import { fetchMenuFromGoogleSheet } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import { z } from "zod";
 import restaurantConfig from "@/config/restaurant.config";
+import { format } from "date-fns"; // For formatting date in WhatsApp message
 
 // Validation schemas remain the same
 const SommelierRequestSchema = z.object({
@@ -135,6 +136,10 @@ export interface BookingFormState {
     notes?: string[];
     general?: string[];
   } | null;
+  // New fields for WhatsApp redirection
+  bookingMethod?: 'whatsapp' | 'calendar';
+  whatsappNumber?: string;
+  whatsappMessage?: string;
 }
 
 export async function submitBooking(
@@ -169,96 +174,146 @@ export async function submitBooking(
 
   const { name, email, phone, date, time, guests, notes } = validatedFields.data;
 
-  // 1. Check calendar availability
-  let availabilityResult: CheckCalendarAvailabilityOutput | undefined;
-  try {
-    console.log("ACTIONS_BOOKING: Attempting to call checkCalendarAvailability flow...");
-    const availabilityInput: CheckCalendarAvailabilityInput = { date, time, guests };
-    availabilityResult = await checkCalendarAvailability(availabilityInput);
-    console.log("ACTIONS_BOOKING: checkCalendarAvailability flow response:", availabilityResult);
-
-    if (!availabilityResult || typeof availabilityResult.isAvailable === 'undefined') {
-        console.error("ACTIONS_BOOKING: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
-        return {
-            messageKey: "landing:booking.error.calendarCheckFailed",
-            success: false,
-            errors: { general: ["landing:booking.error.calendarCheckFailed"] },
-            messageParams: null,
-        };
-    }
-
-    if (!availabilityResult.isAvailable) {
-      const messageParams = availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests'
-        ? { time, date, guests: String(guests), maxGuestsForSlot: String(availabilityResult.maxGuestsForSlot) }
-        : { time, date };
-      console.warn("ACTIONS_BOOKING: Slot not available according to checkCalendarAvailability flow.", availabilityResult);
+  if (restaurantConfig.bookingMethod === 'whatsapp') {
+    console.log("ACTIONS_BOOKING: Processing booking via WhatsApp method.");
+    if (!restaurantConfig.whatsappBookingNumber) {
+      console.error("ACTIONS_BOOKING: WhatsApp booking number is not configured in restaurantConfig.");
       return {
-        messageKey: availabilityResult.reasonKey || "landing:booking.error.slotUnavailable",
+        messageKey: "landing:booking.error.whatsappConfigError",
         success: false,
-        errors: { general: [availabilityResult.reasonKey || "landing:booking.error.slotUnavailable"] },
-        messageParams: messageParams,
-      };
-    }
-  } catch (error: any) {
-    console.error("ACTIONS_BOOKING: CRITICAL - Error EXECUTING checkCalendarAvailability flow:", error.message, error.stack);
-    return {
-      messageKey: "landing:booking.error.calendarCheckFailed",
-      success: false,
-      errors: { general: ["landing:booking.error.calendarCheckFailed"] },
-      messageParams: null,
-    };
-  }
-
-  // 2. Create calendar event
-  let eventResult: CreateCalendarEventOutput | undefined;
-  try {
-    console.log("ACTIONS_BOOKING: Attempting to call createCalendarEvent flow...");
-    const eventInput: CreateCalendarEventInput = { name, email, phone, date, time, guests, notes };
-    eventResult = await createCalendarEvent(eventInput);
-    console.log("ACTIONS_BOOKING: createCalendarEvent flow response:", eventResult);
-
-    if (!eventResult || typeof eventResult.success === 'undefined') {
-        console.error("ACTIONS_BOOKING: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
-        return {
-            messageKey: "landing:booking.error.calendarError",
-            success: false,
-            errors: { general: ["landing:booking.error.calendarError"] },
-            messageParams: null,
-        };
-    }
-
-    if (!eventResult.success) {
-      console.warn("ACTIONS_BOOKING: Failed to create calendar event according to createCalendarEvent flow.", eventResult);
-      return {
-        messageKey: eventResult.errorKey || "landing:booking.error.calendarError",
-        success: false,
-        errors: { general: [eventResult.errorKey || "landing:booking.error.calendarError"] },
+        errors: { general: ["landing:booking.error.whatsappConfigError"] },
         messageParams: null,
       };
     }
 
-    console.log("ACTIONS_BOOKING: Booking successful. Event ID:", eventResult.eventId);
+    const formattedDate = format(new Date(date), "PPP"); // e.g., May 15th, 2025
+    const messageParts = [
+      `Hola ${restaurantConfig.restaurantName || 'restaurante'},`,
+      `Quisiera solicitar una reserva:`,
+      `- Nombre: ${name}`,
+      `- Email: ${email}`,
+      `- Teléfono: ${phone}`,
+      `- Fecha: ${formattedDate}`,
+      `- Hora: ${time}`,
+      `- Comensales: ${guests}`,
+    ];
+    if (notes) {
+      messageParts.push(`- Notas: ${notes}`);
+    }
+    const whatsappMessage = messageParts.join("\n");
+
+    console.log("ACTIONS_BOOKING: WhatsApp message prepared:", whatsappMessage);
+
     return {
-      messageKey: "landing:booking.successMessage",
-      messageParams: {
-        name: validatedFields.data.name,
-        guests: String(validatedFields.data.guests),
-        date: validatedFields.data.date,
-        time: validatedFields.data.time
-      },
+      messageKey: "landing:booking.successMessageWhatsapp",
       success: true,
       errors: null,
+      messageParams: { name },
+      bookingMethod: 'whatsapp',
+      whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''), // Remove non-digits
+      whatsappMessage: whatsappMessage,
     };
 
-  } catch (error: any) {
-    console.error("ACTIONS_BOOKING: CRITICAL - Error EXECUTING createCalendarEvent flow:", error.message, error.stack);
+  } else if (restaurantConfig.bookingMethod === 'calendar') {
+    console.log("ACTIONS_BOOKING: Processing booking via Google Calendar method.");
+    // 1. Check calendar availability
+    let availabilityResult: CheckCalendarAvailabilityOutput | undefined;
+    try {
+      console.log("ACTIONS_BOOKING: Attempting to call checkCalendarAvailability flow...");
+      const availabilityInput: CheckCalendarAvailabilityInput = { date, time, guests };
+      availabilityResult = await checkCalendarAvailability(availabilityInput);
+      console.log("ACTIONS_BOOKING: checkCalendarAvailability flow response:", availabilityResult);
+
+      if (!availabilityResult || typeof availabilityResult.isAvailable === 'undefined') {
+          console.error("ACTIONS_BOOKING: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
+          return {
+              messageKey: "landing:booking.error.calendarCheckFailed",
+              success: false,
+              errors: { general: ["landing:booking.error.calendarCheckFailed"] },
+              messageParams: null,
+          };
+      }
+
+      if (!availabilityResult.isAvailable) {
+        const messageParams = availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests'
+          ? { time, date, guests: String(guests), maxGuestsForSlot: String(availabilityResult.maxGuestsForSlot) }
+          : { time, date };
+        console.warn("ACTIONS_BOOKING: Slot not available according to checkCalendarAvailability flow.", availabilityResult);
+        return {
+          messageKey: availabilityResult.reasonKey || "landing:booking.error.slotUnavailable",
+          success: false,
+          errors: { general: [availabilityResult.reasonKey || "landing:booking.error.slotUnavailable"] },
+          messageParams: messageParams,
+        };
+      }
+    } catch (error: any) {
+      console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
+      return {
+        messageKey: "landing:booking.error.calendarCheckFailed",
+        success: false,
+        errors: { general: ["landing:booking.error.calendarCheckFailed"] },
+        messageParams: null,
+      };
+    }
+
+    // 2. Create calendar event
+    let eventResult: CreateCalendarEventOutput | undefined;
+    try {
+      console.log("ACTIONS_BOOKING: Attempting to call createCalendarEvent flow...");
+      const eventInput: CreateCalendarEventInput = { name, email, phone, date, time, guests, notes };
+      eventResult = await createCalendarEvent(eventInput);
+      console.log("ACTIONS_BOOKING: createCalendarEvent flow response:", eventResult);
+
+      if (!eventResult || typeof eventResult.success === 'undefined') {
+          console.error("ACTIONS_BOOKING: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
+          return {
+              messageKey: "landing:booking.error.calendarError",
+              success: false,
+              errors: { general: ["landing:booking.error.calendarError"] },
+              messageParams: null,
+          };
+      }
+
+      if (!eventResult.success) {
+        console.warn("ACTIONS_BOOKING: Failed to create calendar event according to createCalendarEvent flow.", eventResult);
+        return {
+          messageKey: eventResult.errorKey || "landing:booking.error.calendarError",
+          success: false,
+          errors: { general: [eventResult.errorKey || "landing:booking.error.calendarError"] },
+          messageParams: null,
+        };
+      }
+
+      console.log("ACTIONS_BOOKING: Booking successful. Event ID:", eventResult.eventId);
+      return {
+        messageKey: "landing:booking.successMessage",
+        messageParams: {
+          name: validatedFields.data.name,
+          guests: String(validatedFields.data.guests),
+          date: validatedFields.data.date,
+          time: validatedFields.data.time
+        },
+        success: true,
+        errors: null,
+        bookingMethod: 'calendar',
+      };
+
+    } catch (error: any) {
+      console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
+      return {
+        messageKey: "landing:booking.error.calendarError",
+        success: false,
+        errors: { general: ["landing:booking.error.calendarError"] },
+        messageParams: null,
+      };
+    }
+  } else {
+    console.error("ACTIONS_BOOKING: Unknown booking method configured:", restaurantConfig.bookingMethod);
     return {
-      messageKey: "landing:booking.error.calendarError",
+      messageKey: "landing:booking.error.unknownMethod",
       success: false,
-      errors: { general: ["landing:booking.error.calendarError"] },
+      errors: { general: ["landing:booking.error.unknownMethod"] },
       messageParams: null,
     };
   }
 }
-
-    

@@ -1,12 +1,8 @@
 
 "use client";
 
-import { useState, useEffect, useRef }
-// Remove useActionState for simplified test
-// import { useActionState } from "react";
-// Remove useFormStatus for simplified test
-// import { useFormStatus } from "react-dom";
-from "react";
+import { useState, useEffect, useRef, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,88 +13,67 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Users, Clock, Loader2 } from "lucide-react";
-import { submitBooking, type BookingFormState } from "@/lib/actions"; // Keep type for state, action for submit
+import { submitBooking, type BookingFormState } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from "@/context/LanguageContext";
-import { es, enUS as en } from 'date-fns/locale';
+import { es, enUS as en, ca } from 'date-fns/locale';
 
-// Original SubmitButton commented out for simplified test
-// function SubmitButton() {
-//   const { pending } = useFormStatus();
-//   const { t } = useLanguage();
-//   return (
-//     <Button type="submit" disabled={pending} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-//       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-//       {t('landing:booking.buttonText')}
-//     </Button>
-//   );
-// }
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  const { t } = useLanguage();
+  return (
+    <Button type="submit" disabled={pending} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+      {t('landing:booking.buttonText')}
+    </Button>
+  );
+}
 
 export default function BookingSection() {
-  const { t, language } = useLanguage();
+  const { t, language, translations } = useLanguage();
+  const restaurantName = translations.common.restaurantName;
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const dateLocale = language === 'es' ? es : en;
-
-  // State for simplified response handling (not using useActionState temporarily)
-  const [formState, setFormState] = useState<BookingFormState | null>(null);
-
-
-  // Simplified handler for testing
-  const handleSimplifiedSubmit = async () => {
-    console.log("CLIENT_BOOKING: Simplified submit button clicked!");
-    if (!formRef.current) {
-      console.error("CLIENT_BOOKING: Form reference is not available.");
-      return;
-    }
-    const formData = new FormData(formRef.current);
-    
-    // Append date, time, guests if they are not directly in formData or need specific formatting
-    if (date) formData.set('date', format(date, "yyyy-MM-dd")); // Ensure date is in formData
-    if (selectedTime) formData.set('time', selectedTime); // Ensure time is in formData
-    if (selectedGuests) formData.set('guests', selectedGuests); // Ensure guests are in formData
-    
-    console.log("CLIENT_BOOKING: FormData created:", Object.fromEntries(formData.entries()));
-
-    try {
-      const result = await submitBooking(null, formData); // Call the server action
-      console.log("CLIENT_BOOKING: Action response:", result);
-      setFormState(result); // Update local state with the response
-
-      if (result?.messageKey) {
-        toast({
-          title: result.success ? t('landing:booking.toast.successTitle') : t('landing:booking.toast.errorTitle'),
-          description: t(result.messageKey, result.messageParams || undefined),
-          variant: result.success ? "default" : "destructive",
-        });
-        if (result.success) {
-          formRef.current?.reset();
-          setDate(new Date());
-          setSelectedTime(undefined);
-          setSelectedGuests(undefined);
-        }
-      }
-    } catch (error) {
-      console.error("CLIENT_BOOKING: Error submitting form:", error);
-      toast({
-        title: t('landing:booking.toast.errorTitle'),
-        description: t('common:form.error.generic'),
-        variant: "destructive",
-      });
-    }
-  };
   
-  // Effect to react to formState changes (similar to original useEffect for state)
+  let dateLocale;
+  if (language === 'es') dateLocale = es;
+  else if (language === 'ca') dateLocale = ca;
+  else dateLocale = en;
+
+
+  const initialState: BookingFormState = { 
+    messageKey: null, 
+    success: false, 
+    errors: null, 
+    messageParams: null 
+  };
+  const [state, formAction] = useActionState(submitBooking, initialState);
+
   useEffect(() => {
-    if (formState?.messageKey) {
-      // Toasting logic is now inside handleSimplifiedSubmit or can be triggered here
-      // This effect is mostly for observing state changes if needed
+    if (state?.messageKey) {
+      toast({
+        title: state.success ? t('landing:booking.toast.successTitle') : t('landing:booking.toast.errorTitle'),
+        description: t(state.messageKey, state.messageParams || undefined),
+        variant: state.success ? "default" : "destructive",
+      });
+
+      if (state.success) {
+        if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
+          const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
+          console.log("CLIENT_BOOKING: Opening WhatsApp URL:", whatsappUrl);
+          window.open(whatsappUrl, '_blank');
+        }
+        formRef.current?.reset();
+        setDate(new Date());
+        setSelectedTime(undefined);
+        setSelectedGuests(undefined);
+      }
     }
-  }, [formState, toast, t]);
+  }, [state, toast, t]);
 
 
   return (
@@ -114,13 +89,11 @@ export default function BookingSection() {
         </div>
 
         <Card className="max-w-2xl mx-auto shadow-xl">
-          {/* Form tag is still useful for grouping inputs and FormData creation */}
-          {/* We prevent default submission with type="button" on the button and manual handling */}
-          <form ref={formRef} className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+          <form action={formAction} ref={formRef} className="space-y-6">
             <CardHeader>
               <CardTitle className="font-serif text-2xl">{t('landing:booking.cardTitle')}</CardTitle>
               <CardDescription>
-                {t('landing:booking.cardDescription')}
+                {t(restaurantConfig.bookingMethod === 'whatsapp' ? 'landing:booking.cardDescriptionWhatsapp' : 'landing:booking.cardDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -128,18 +101,18 @@ export default function BookingSection() {
                 <div>
                   <Label htmlFor="name">{t('landing:booking.label.name')}</Label>
                   <Input id="name" name="name" placeholder={t('landing:booking.placeholder.name')} className="bg-input mt-1" />
-                  {formState?.errors?.name && <p className="text-sm text-destructive mt-1">{formState.errors.name.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.name && <p className="text-sm text-destructive mt-1">{state.errors.name.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
                   <Label htmlFor="email">{t('landing:booking.label.email')}</Label>
                   <Input id="email" name="email" type="email" placeholder={t('landing:booking.placeholder.email')} className="bg-input mt-1" />
-                  {formState?.errors?.email && <p className="text-sm text-destructive mt-1">{formState.errors.email.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.email && <p className="text-sm text-destructive mt-1">{state.errors.email.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
               </div>
               <div>
                 <Label htmlFor="phone">{t('landing:booking.label.phone')}</Label>
                 <Input id="phone" name="phone" type="tel" placeholder={t('landing:booking.placeholder.phone')} className="bg-input mt-1" />
-                {formState?.errors?.phone && <p className="text-sm text-destructive mt-1">{formState.errors.phone.map(errKey => t(errKey)).join(", ")}</p>}
+                {state?.errors?.phone && <p className="text-sm text-destructive mt-1">{state.errors.phone.map(errKey => t(errKey)).join(", ")}</p>}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div>
@@ -169,9 +142,8 @@ export default function BookingSection() {
                       />
                     </PopoverContent>
                   </Popover>
-                  {/* Hidden input for date is less critical now as we manually add it, but good for FormData if not explicitly set */}
                   <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
-                  {formState?.errors?.date && <p className="text-sm text-destructive mt-1">{formState.errors.date.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.date && <p className="text-sm text-destructive mt-1">{state.errors.date.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
                   <Label htmlFor="time">{t('landing:booking.label.time')}</Label>
@@ -186,7 +158,7 @@ export default function BookingSection() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {formState?.errors?.time && <p className="text-sm text-destructive mt-1">{formState.errors.time.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.time && <p className="text-sm text-destructive mt-1">{state.errors.time.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
                   <Label htmlFor="guests">{t('landing:booking.label.guests')}</Label>
@@ -196,29 +168,27 @@ export default function BookingSection() {
                       <SelectValue placeholder={t('landing:booking.placeholder.guests')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {[...Array(8)].map((_, i) => (
+                      {[...Array(restaurantConfig.bookingMaxGuestsPerSlot || 8)].map((_, i) => (
                         <SelectItem key={i + 1} value={(i + 1).toString()}>{i + 1} {t(i === 0 ? 'common:guestSingular' : 'common:guestsPlural', {count: i+1})}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {formState?.errors?.guests && <p className="text-sm text-destructive mt-1">{formState.errors.guests.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.guests && <p className="text-sm text-destructive mt-1">{state.errors.guests.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
               </div>
-               {/* General errors can be displayed here */}
-              {formState?.errors?.general && (
+              <div>
+                <Label htmlFor="notes">{t('landing:booking.label.notes', { restaurantName })}</Label>
+                <Input id="notes" name="notes" placeholder={t('landing:booking.placeholder.notes')} className="bg-input mt-1" />
+                {state?.errors?.notes && <p className="text-sm text-destructive mt-1">{state.errors.notes.map(errKey => t(errKey)).join(", ")}</p>}
+              </div>
+              {state?.errors?.general && (
                 <p className="text-sm text-destructive mt-1 text-center">
-                  {formState.errors.general.map(errKey => t(errKey, formState.messageParams || undefined )).join(' ')}
+                  {state.errors.general.map(errKey => t(errKey, state.messageParams || undefined )).join(' ')}
                 </p>
               )}
             </CardContent>
             <CardFooter>
-              <Button 
-                type="button" // Changed from "submit"
-                onClick={handleSimplifiedSubmit} // Added onClick handler
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {t('landing:booking.buttonText')} (Simplified Test)
-              </Button>
+              <SubmitButton />
             </CardFooter>
           </form>
         </Card>
@@ -226,4 +196,3 @@ export default function BookingSection() {
     </section>
   );
 }
-
