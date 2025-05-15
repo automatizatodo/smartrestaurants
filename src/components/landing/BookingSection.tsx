@@ -67,6 +67,7 @@ export default function BookingSection() {
   const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const processedSuccessKeyRef = useRef<string | null>(null);
   
   let dateLocale;
   if (language === 'es') dateLocale = es;
@@ -82,6 +83,7 @@ export default function BookingSection() {
   };
   const [state, formAction] = useActionState(submitBooking, initialState);
 
+  // Effect for displaying toasts
   useEffect(() => {
     if (state?.messageKey) {
       toast({
@@ -89,20 +91,37 @@ export default function BookingSection() {
         description: t(state.messageKey, state.messageParams || undefined),
         variant: state.success ? "default" : "destructive",
       });
+    }
+  }, [state?.messageKey, state?.success, state?.messageParams, toast, t]); // Toast can depend on `t` for re-translation
 
-      if (state.success) {
+  // Effect for handling successful submissions (WhatsApp redirect, form reset)
+  // This effect should ONLY depend on `state` to avoid re-triggering on language change.
+  useEffect(() => {
+    if (state?.success && state.messageKey) {
+      // Only proceed if this specific success state hasn't been processed for side effects yet
+      if (processedSuccessKeyRef.current !== state.messageKey) {
         if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
           const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
-          console.log("CLIENT_BOOKING: Opening WhatsApp URL:", whatsappUrl);
+          console.log("CLIENT_BOOKING: Opening WhatsApp URL for new submission:", whatsappUrl);
           window.open(whatsappUrl, '_blank');
         }
+        
         formRef.current?.reset();
         setDate(new Date());
         setSelectedTime(undefined);
         setSelectedGuests(undefined);
+        
+        processedSuccessKeyRef.current = state.messageKey; // Mark this success as processed
       }
+    } else if (!state?.success && state?.messageKey) {
+      // If the last action resulted in an error, reset the processed key
+      // so that a subsequent successful submission can be processed.
+      processedSuccessKeyRef.current = null;
+    } else if (!state?.messageKey) {
+      // If the state is initial (no messageKey), also ensure processed key is reset.
+      processedSuccessKeyRef.current = null;
     }
-  }, [state, toast, t]);
+  }, [state]); // Crucially, only depend on `state`
 
 
   return (
@@ -225,3 +244,5 @@ export default function BookingSection() {
     </section>
   );
 }
+
+    

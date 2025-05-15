@@ -60,7 +60,7 @@ const restaurantConfig: RestaurantConfig = {
   showMenuItemImages: true,
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp', 
-  whatsappBookingNumber: '+12345678900', 
+  whatsappBookingNumber: '+34687606761', 
 };
 
 export default restaurantConfig;
