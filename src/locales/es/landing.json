@@ -47,6 +47,7 @@
   "booking.label.notes": "Notas Especiales (opcional)",
   "booking.placeholder.notes": "Ej., restricciones alimentarias, celebración...",
   "booking.buttonText": "Solicitar Reserva",
+  "booking.buttonTextWhatsapp": "Solicitar Reserva por WhatsApp",
   "booking.toast.successTitle": "¡Solicitud de Reserva Enviada!",
   "booking.toast.errorTitle": "Error en la Reserva",
   "booking.successMessage": "¡Gracias, {name}! Tu solicitud de reserva para {guests} comensal(es) el {date} a las {time} ha sido recibida. Nos pondremos en contacto contigo en breve para confirmar.",

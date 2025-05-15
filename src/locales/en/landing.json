@@ -45,6 +45,7 @@
   "booking.label.notes": "Special Notes (optional)",
   "booking.placeholder.notes": "E.g., dietary restrictions, celebration...",
   "booking.buttonText": "Request Booking",
+  "booking.buttonTextWhatsapp": "Request Booking via WhatsApp",
   "booking.toast.successTitle": "Booking Request Sent!",
   "booking.toast.errorTitle": "Booking Error",
   "booking.successMessage": "Thank you, {name}! Your booking request for {guests} guest(s) on {date} at {time} has been received. We will contact you shortly to confirm.",
