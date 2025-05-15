@@ -132,6 +132,7 @@ export async function submitBooking(
   prevState: BookingFormState | null,
   formData: FormData
 ): Promise<BookingFormState> {
+  console.log("SUBMIT_BOOKING_ACTION: Received form data:", Object.fromEntries(formData.entries()));
 
   const rawFormData = {
     name: formData.get("name"),
@@ -154,6 +155,7 @@ export async function submitBooking(
       messageParams: null,
     };
   }
+  console.log("SUBMIT_BOOKING_ACTION: Form data validated successfully:", validatedFields.data);
 
   const { name, email, phone, date, time, guests, notes } = validatedFields.data;
 
@@ -178,9 +180,9 @@ export async function submitBooking(
       };
     }
   } catch (error: any) {
-    console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability flow execution:", error.message, error.stack);
+    console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability flow EXECUTION (unexpected error from flow):", error.message, error.stack);
     return {
-      messageKey: "landing:booking.error.calendarCheckFailed",
+      messageKey: "landing:booking.error.calendarCheckFailed", // This is a general fallback
       success: false,
       errors: { general: ["landing:booking.error.calendarCheckFailed"] },
       messageParams: null,
@@ -219,9 +221,9 @@ export async function submitBooking(
     };
 
   } catch (error: any) {
-    console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent flow execution:", error.message, error.stack);
+    console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent flow EXECUTION (unexpected error from flow):", error.message, error.stack);
     return {
-      messageKey: "landing:booking.error.calendarError",
+      messageKey: "landing:booking.error.calendarError", // This is a general fallback
       success: false,
       errors: { general: ["landing:booking.error.calendarError"] },
       messageParams: null,
