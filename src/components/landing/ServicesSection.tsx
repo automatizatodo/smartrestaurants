@@ -3,7 +3,7 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import ServiceCard from './ServiceCard';
-import { Coffee, ClipboardList, ChefHat, Flame } from 'lucide-react';
+import { Coffee, ClipboardList, ChefHat } from 'lucide-react'; // Changed Flame to ChefHat for merged
 
 const servicesList = [
   {
@@ -17,14 +17,9 @@ const servicesList = [
     descriptionKey: "landing:services.setMenus.description"
   },
   {
-    icon: ChefHat,
-    titleKey: "landing:services.traditionalFood.title",
-    descriptionKey: "landing:services.traditionalFood.description"
-  },
-  {
-    icon: Flame,
-    titleKey: "landing:services.grilledDinners.title",
-    descriptionKey: "landing:services.grilledDinners.description"
+    icon: ChefHat, // Using ChefHat for the combined service
+    titleKey: "landing:services.traditionalAndGrilled.title",
+    descriptionKey: "landing:services.traditionalAndGrilled.description"
   }
 ];
 
@@ -42,7 +37,7 @@ export default function ServicesSection() {
             {t('landing:services.sectionDescription')}
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"> {/* Adjusted grid for 3 items */}
           {servicesList.map((service, index) => (
             <ServiceCard 
               key={service.titleKey} 
