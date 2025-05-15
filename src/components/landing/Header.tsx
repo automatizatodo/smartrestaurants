@@ -2,18 +2,20 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image'; // Import next/image
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu as MenuIcon, X as XIcon, Wine } from 'lucide-react';
+import { Menu as MenuIcon, X as XIcon } from 'lucide-react'; // Wine removed
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
+import restaurantConfig from '@/config/restaurant.config'; // Import restaurant config
 
 const navItemKeys = [
   { labelKey: 'common:nav.ourMenu', href: '/#menu' },
   { labelKey: 'common:nav.fullMenu', href: '/menu' },
-  { labelKey: 'common:nav.services', href: '/#services' }, // New Services link
+  { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
   { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' },
   { labelKey: 'common:nav.bookTable', href: '/#booking' },
@@ -76,8 +78,20 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-2">
-            <Wine className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
+            {restaurantConfig.logoUrl ? (
+              <Image
+                src={restaurantConfig.logoUrl}
+                alt={`${restaurantName} Logo`}
+                width={120} // Adjust width as needed, or use height and w-auto
+                height={40} // Set a height
+                className="h-10 w-auto dark:filter dark:invert" // Invert colors in dark mode
+                priority
+              />
+            ) : (
+              // Fallback if no logoUrl is provided, though we removed Wine icon
+              <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
+            )}
+            <span className="text-2xl font-serif font-bold text-foreground hidden sm:inline-block">{restaurantName}</span>
           </Link>
 
           {isMobile ? (
@@ -92,8 +106,18 @@ export default function Header() {
                 <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background p-6">
                   <div className="flex justify-between items-center mb-8">
                       <Link href="/" className="flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
-                          <Wine className="h-7 w-7 text-primary" />
-                          <span className="text-xl font-serif font-bold text-foreground">{restaurantName}</span>
+                        {restaurantConfig.logoUrl ? (
+                          <Image
+                            src={restaurantConfig.logoUrl}
+                            alt={`${restaurantName} Logo`}
+                            width={100}
+                            height={32}
+                            className="h-8 w-auto dark:filter dark:invert"
+                          />
+                        ) : (
+                           <span className="text-xl font-serif font-bold text-foreground">{restaurantName}</span>
+                        )}
+                         <span className="text-xl font-serif font-bold text-foreground">{restaurantName}</span>
                       </Link>
                       <Button variant="ghost" size="icon" onClick={() => setIsSheetOpen(false)}>
                           <XIcon className="h-6 w-6" />

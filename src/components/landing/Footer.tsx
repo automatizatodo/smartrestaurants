@@ -1,7 +1,8 @@
 
 "use client";
 import Link from 'next/link';
-import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail, Wine } from 'lucide-react';
+import Image from 'next/image'; // Import next/image
+import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react'; // Wine removed
 import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -17,7 +18,17 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div>
             <Link href="/" className="flex items-center space-x-2 mb-4">
-                <Wine className="h-8 w-8 text-primary" />
+                {restaurantConfig.logoUrl ? (
+                  <Image
+                    src={restaurantConfig.logoUrl}
+                    alt={`${restaurantName} Logo`}
+                    width={100} // Adjust as needed
+                    height={32}  // Adjust as needed
+                    className="h-8 w-auto dark:filter dark:invert" // Invert colors in dark mode
+                  />
+                ) : (
+                  <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
+                )}
                 <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
             </Link>
             <p className="text-sm">
