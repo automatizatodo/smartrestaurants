@@ -73,7 +73,15 @@ const createCalendarEventFlow = ai.defineFlow(
   async (input) => {
     console.log('CALENDAR_CREATE_EVENT: Attempting to create event for:', input);
 
-    const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
+    const calendarId = process.env.GOOGLE_CALENDAR_ID;
+    if (!calendarId) {
+        console.error('CALENDAR_CREATE_EVENT: GOOGLE_CALENDAR_ID is not set in environment variables.');
+        return { success: false, errorKey: 'landing:booking.error.calendarConfigError' };
+    }
+    if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      console.error('CALENDAR_CREATE_EVENT: GOOGLE_APPLICATION_CREDENTIALS is not set.');
+      return { success: false, errorKey: 'landing:booking.error.calendarConfigError' };
+    }
 
     let eventTimes;
     try {
@@ -85,15 +93,12 @@ const createCalendarEventFlow = ai.defineFlow(
     
     const { startTimeIso, endTimeIso } = eventTimes;
 
-    // !! IMPORTANT: Google Calendar API Integration Placeholder !!
-    // You need to:
-    // 1. Ensure GOOGLE_APPLICATION_CREDENTIALS and GOOGLE_CALENDAR_ID are set in your .env.local.
-    // 2. The service account must have permissions to write to the calendar.
-    // 3. Adapt the event object below to your needs.
+    const eventSummary = `Reserva para ${input.name} (${input.guests} ${input.guests === 1 ? 'comensal' : 'comensales'})`;
+    const eventDescription = `Reserva realizada a través del sitio web.\n\nNombre: ${input.name}\nEmail: ${input.email}\nTeléfono: ${input.phone}\nComensales: ${input.guests}\nNotas: ${input.notes || 'N/A'}\n\n---\nGuestCount: ${input.guests} <!-- Simple marker for parsing -->`;
 
     const event = {
-      summary: `Reserva para ${input.name} (${input.guests} ${input.guests === 1 ? 'comensal' : 'comensales'})`,
-      description: `Reserva realizada a través del sitio web.\n\nNombre: ${input.name}\nEmail: ${input.email}\nTeléfono: ${input.phone}\nComensales: ${input.guests}\nNotas: ${input.notes || 'N/A'}`,
+      summary: eventSummary,
+      description: eventDescription,
       start: {
         dateTime: startTimeIso,
         timeZone: restaurantConfig.timeZone,
@@ -104,8 +109,8 @@ const createCalendarEventFlow = ai.defineFlow(
       },
       // Optional: Add attendees
       // attendees: [
-      //   { email: input.email },
-      //   // { email: 'restaurant-booking-notifications@example.com' } // Your notification email
+      //   { email: input.email }, // Customer's email
+      //   // { email: 'your-restaurant-notifications@example.com' } // Your internal notification email
       // ],
       // Optional: Add reminders
       // reminders: {
@@ -119,51 +124,35 @@ const createCalendarEventFlow = ai.defineFlow(
 
     try {
       // Initialize Google Auth (Service Account)
-      // const auth = new google.auth.GoogleAuth({
-      //   scopes: ['https://www.googleapis.com/auth/calendar.events'],
-      // });
-      // const authClient = await auth.getClient();
-      // google.options({ auth: authClient });
+      const auth = new google.auth.GoogleAuth({
+        scopes: ['https://www.googleapis.com/auth/calendar.events'],
+        // GOOGLE_APPLICATION_CREDENTIALS env var is used automatically
+      });
+      const authClient = await auth.getClient();
+      google.options({ auth: authClient });
 
-      // const calendar = google.calendar({ version: 'v3' });
+      const calendar = google.calendar({ version: 'v3' });
 
-      // const createdEvent = await calendar.events.insert({
-      //   calendarId: calendarId,
-      //   requestBody: event,
-      // });
+      const createdEvent = await calendar.events.insert({
+        calendarId: calendarId,
+        requestBody: event,
+      });
 
-      // if (createdEvent.data.id) {
-      //   console.log(`CALENDAR_CREATE_EVENT: Successfully created event (ID: ${createdEvent.data.id}) from ${startTimeIso} to ${endTimeIso}.`);
-      //   return {
-      //     success: true,
-      //     eventId: createdEvent.data.id,
-      //   };
-      // } else {
-      //   console.error('CALENDAR_CREATE_EVENT: Event created but no ID returned from API.');
-      //   return {
-      //     success: false,
-      //     errorKey: 'landing:booking.error.calendarError',
-      //   };
-      // }
-
-      // Placeholder logic (remove or adapt when implementing real API calls):
-      const isSimulatedError = false; // Math.random() < 0.1; // Simulate a 10% chance of error
-      if (isSimulatedError) {
-        console.error('CALENDAR_CREATE_EVENT: Simulated error creating calendar event.');
+      if (createdEvent.data.id) {
+        console.log(`CALENDAR_CREATE_EVENT: Successfully created event (ID: ${createdEvent.data.id}) from ${startTimeIso} to ${endTimeIso}.`);
+        return {
+          success: true,
+          eventId: createdEvent.data.id,
+        };
+      } else {
+        console.error('CALENDAR_CREATE_EVENT: Event created but no ID returned from API.');
         return {
           success: false,
           errorKey: 'landing:booking.error.calendarError',
         };
       }
-      const simulatedEventId = `simulated_event_${Date.now()}`;
-      console.log(`CALENDAR_CREATE_EVENT: Successfully created simulated event (ID: ${simulatedEventId}) from ${startTimeIso} to ${endTimeIso}. Event details:`, event);
-      return {
-        success: true,
-        eventId: simulatedEventId,
-      };
-
     } catch (error: any) {
-      console.error('CALENDAR_CREATE_EVENT: Error creating Google Calendar event:', error.message, error.stack);
+      console.error('CALENDAR_CREATE_EVENT: Error creating Google Calendar event:', error.response?.data || error.message, error.stack);
       return {
         success: false,
         errorKey: 'landing:booking.error.calendarError',

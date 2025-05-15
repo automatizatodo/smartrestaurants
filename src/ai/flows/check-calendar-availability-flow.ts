@@ -51,6 +51,23 @@ const getEventDateTimeRange = (dateStr: string, timeStr: string, durationMinutes
   return { timeMin, timeMax };
 };
 
+// Function to parse guest count from event summary/description
+// Example: "Booking for John Doe (4 guests)" -> 4
+// This is a simple parser and might need to be more robust.
+const parseGuestsFromEvent = (event: any): number => {
+  const summary = event.summary || '';
+  const description = event.description || '';
+  
+  const combinedText = `${summary} ${description}`;
+  const guestsMatch = combinedText.match(/\((\d+)\s*(guest|guests|comensal|comensales)\)/i);
+  
+  if (guestsMatch && guestsMatch[1]) {
+    return parseInt(guestsMatch[1], 10);
+  }
+  return 0; // Default to 0 if not found, or handle as an error
+};
+
+
 // Exported wrapper function
 export async function checkCalendarAvailability(input: CheckCalendarAvailabilityInput): Promise<CheckCalendarAvailabilityOutput> {
   return checkCalendarAvailabilityFlow(input);
@@ -64,14 +81,17 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
   },
   async (input) => {
     console.log('CALENDAR_CHECK_AVAIL: Checking availability for:', input);
+    
+    const calendarId = process.env.GOOGLE_CALENDAR_ID;
+    if (!calendarId) {
+        console.error('CALENDAR_CHECK_AVAIL: GOOGLE_CALENDAR_ID is not set in environment variables.');
+        return { isAvailable: false, reasonKey: 'landing:booking.error.calendarConfigError' };
+    }
+    if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      console.error('CALENDAR_CHECK_AVAIL: GOOGLE_APPLICATION_CREDENTIALS is not set.');
+      return { isAvailable: false, reasonKey: 'landing:booking.error.calendarConfigError' };
+    }
 
-    // !! IMPORTANT: Google Calendar API Integration Placeholder !!
-    // You need to:
-    // 1. Ensure GOOGLE_APPLICATION_CREDENTIALS and GOOGLE_CALENDAR_ID are set in your .env.local.
-    // 2. The service account must have permissions to read the calendar.
-    // 3. Implement robust logic to check for overlapping events and guest capacity.
-
-    const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
 
     let eventDateTime;
     try {
@@ -84,60 +104,62 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
 
     try {
       // Initialize Google Auth (Service Account)
-      // const auth = new google.auth.GoogleAuth({
-      //   scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
-      // });
-      // const authClient = await auth.getClient();
-      // google.options({ auth: authClient });
+      const auth = new google.auth.GoogleAuth({
+        scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+        // GOOGLE_APPLICATION_CREDENTIALS env var is used automatically
+      });
+      const authClient = await auth.getClient();
+      google.options({ auth: authClient });
 
-      // const calendar = google.calendar({ version: 'v3' });
+      const calendar = google.calendar({ version: 'v3' });
 
-      // const response = await calendar.events.list({
-      //   calendarId: calendarId,
-      //   timeMin: timeMin,
-      //   timeMax: timeMax,
-      //   singleEvents: true, // Important for expanding recurring events
-      //   orderBy: 'startTime',
-      //   // q: 'Booking for', // Optional: filter by event summary if you have a consistent naming
-      //   timeZone: restaurantConfig.timeZone,
-      // });
+      const response = await calendar.events.list({
+        calendarId: calendarId,
+        timeMin: timeMin,
+        timeMax: timeMax,
+        singleEvents: true, 
+        orderBy: 'startTime',
+        timeZone: restaurantConfig.timeZone,
+      });
 
-      // const events = response.data.items;
-      // if (events && events.length > 0) {
-      //   // TODO: Implement logic to check total guests from existing events
-      //   // and compare against restaurantConfig.bookingMaxGuestsPerSlot
-      //   // For now, any event means it's booked.
-      //   console.log(`CALENDAR_CHECK_AVAIL: Found ${events.length} existing event(s) in this slot.`);
-      //   return {
-      //     isAvailable: false,
-      //     reasonKey: 'landing:booking.error.slotUnavailable.fullyBooked',
-      //   };
-      // }
+      const events = response.data.items;
+      let totalGuestsInSlot = 0;
 
-      // Placeholder logic (remove or adapt when implementing real API calls):
-      if (input.time === "7:00 PM" && input.guests > 4) {
-        console.log('CALENDAR_CHECK_AVAIL: Simulated conflict for 7:00 PM with > 4 guests.');
-        return {
-          isAvailable: false,
-          reasonKey: 'landing:booking.error.slotUnavailable.tooManyGuests',
-        };
-      }
-      if (input.date === "2024-12-25") {
-        console.log('CALENDAR_CHECK_AVAIL: Simulated fully booked for Christmas.');
-        return {
-          isAvailable: false,
-          reasonKey: 'landing:booking.error.slotUnavailable.fullyBooked',
-        };
+      if (events && events.length > 0) {
+        console.log(`CALENDAR_CHECK_AVAIL: Found ${events.length} existing event(s) in this slot.`);
+        events.forEach(event => {
+          totalGuestsInSlot += parseGuestsFromEvent(event);
+        });
+         console.log(`CALENDAR_CHECK_AVAIL: Total guests already booked in this slot: ${totalGuestsInSlot}`);
       }
 
-      console.log('CALENDAR_CHECK_AVAIL: Slot appears available (placeholder or no conflicts).');
+      const maxGuestsAllowed = restaurantConfig.bookingMaxGuestsPerSlot || 8; // Default to 8 if not set
+      const remainingCapacity = maxGuestsAllowed - totalGuestsInSlot;
+
+      if (input.guests > remainingCapacity) {
+        if (remainingCapacity <= 0) {
+            console.log(`CALENDAR_CHECK_AVAIL: Slot fully booked. Requested ${input.guests}, capacity ${maxGuestsAllowed}, booked ${totalGuestsInSlot}.`);
+            return {
+                isAvailable: false,
+                reasonKey: 'landing:booking.error.slotUnavailable.fullyBooked',
+            };
+        } else {
+            console.log(`CALENDAR_CHECK_AVAIL: Not enough capacity. Requested ${input.guests}, remaining ${remainingCapacity}.`);
+            return {
+                isAvailable: false,
+                reasonKey: 'landing:booking.error.slotUnavailable.tooManyGuests',
+                maxGuestsForSlot: remainingCapacity, // Inform user about remaining capacity
+            };
+        }
+      }
+
+      console.log(`CALENDAR_CHECK_AVAIL: Slot available. Requested ${input.guests}, remaining capacity ${remainingCapacity}.`);
       return { isAvailable: true };
 
     } catch (error: any) {
-      console.error('CALENDAR_CHECK_AVAIL: Error querying Google Calendar API:', error.message);
-      // Consider if this should be a user-facing error or just a log
+      console.error('CALENDAR_CHECK_AVAIL: Error querying Google Calendar API:', error.response?.data || error.message, error.stack);
       return {
-        isAvailable: false, // Safer to assume not available if API call fails
+        isAvailable: false, 
         reasonKey: 'landing:booking.error.calendarCheckFailed',
       };
     }
