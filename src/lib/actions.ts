@@ -136,7 +136,6 @@ export interface BookingFormState {
     notes?: string[];
     general?: string[];
   } | null;
-  // New fields for WhatsApp redirection
   bookingMethod?: 'whatsapp' | 'calendar';
   whatsappNumber?: string;
   whatsappMessage?: string;
@@ -187,8 +186,10 @@ export async function submitBooking(
     }
 
     const formattedDate = format(new Date(date), "PPP"); // e.g., May 15th, 2025
+    // Using restaurantDisplayName from restaurantConfig
+    const restaurantNameForMsg = restaurantConfig.restaurantDisplayName || 'el restaurante'; 
     const messageParts = [
-      `Hola ${restaurantConfig.restaurantName || 'restaurante'},`,
+      `Hola ${restaurantNameForMsg},`,
       `Quisiera solicitar una reserva:`,
       `- Nombre: ${name}`,
       `- Email: ${email}`,
@@ -210,16 +211,15 @@ export async function submitBooking(
       errors: null,
       messageParams: { name },
       bookingMethod: 'whatsapp',
-      whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''), // Remove non-digits
+      whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''), 
       whatsappMessage: whatsappMessage,
     };
 
   } else if (restaurantConfig.bookingMethod === 'calendar') {
     console.log("ACTIONS_BOOKING: Processing booking via Google Calendar method.");
-    // 1. Check calendar availability
     let availabilityResult: CheckCalendarAvailabilityOutput | undefined;
     try {
-      console.log("ACTIONS_BOOKING: Attempting to call checkCalendarAvailability flow...");
+      console.log("ACTIONS_BOOKING: Calling checkCalendarAvailability flow...");
       const availabilityInput: CheckCalendarAvailabilityInput = { date, time, guests };
       availabilityResult = await checkCalendarAvailability(availabilityInput);
       console.log("ACTIONS_BOOKING: checkCalendarAvailability flow response:", availabilityResult);
@@ -256,7 +256,6 @@ export async function submitBooking(
       };
     }
 
-    // 2. Create calendar event
     let eventResult: CreateCalendarEventOutput | undefined;
     try {
       console.log("ACTIONS_BOOKING: Attempting to call createCalendarEvent flow...");
@@ -300,6 +299,7 @@ export async function submitBooking(
 
     } catch (error: any) {
       console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
+      console.error("SUBMIT_BOOKING_ACTION: Underlying error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       return {
         messageKey: "landing:booking.error.calendarError",
         success: false,

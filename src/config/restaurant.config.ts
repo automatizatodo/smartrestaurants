@@ -13,26 +13,28 @@ interface ThemeColors {
 
 interface RestaurantConfig {
   // Non-translatable details
+  restaurantDisplayName: string; // Name used for internal messages like WhatsApp
   address: string;
   phone: string;
   phoneHref: string; // Tel link format
   email: string;
   emailHref: string; // Mailto link format
   socialMediaLinks: SocialMediaLinks;
-  heroImageUrl: string; // Path should be relative to the `public` directory, e.g., /images/hero.jpg
-  heroImageHint: string; // This could potentially be localized via a key
+  heroImageUrl: string; 
+  heroImageHint: string; 
   bookingTimeSlots: string[];
   bookingSlotDurationMinutes: number;
   timeZone: string;
   theme: ThemeColors;
   showMenuItemImages: boolean;
   bookingMaxGuestsPerSlot?: number;
-  bookingMethod: 'calendar' | 'whatsapp'; // New: Booking method
-  whatsappBookingNumber?: string; // New: WhatsApp number (e.g., +12345678900)
+  bookingMethod: 'calendar' | 'whatsapp'; 
+  whatsappBookingNumber?: string; 
 }
 
 // --- Configuration Object ---
 const restaurantConfig: RestaurantConfig = {
+  restaurantDisplayName: 'Llenç Gastronòmic', // Default name for WhatsApp messages
   address: '123 Culinary Avenue, Flavor Town, CA 90210',
   phone: '(123) 456-7890',
   phoneHref: 'tel:+1234567890',
@@ -51,14 +53,14 @@ const restaurantConfig: RestaurantConfig = {
     "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM"
   ],
   bookingSlotDurationMinutes: 120,
-  timeZone: 'America/Los_Angeles',
+  timeZone: 'Europe/Madrid', // Example: Europe/Madrid
   theme: {
     primary: 'hsl(51, 100%, 50%)',
   },
   showMenuItemImages: true,
   bookingMaxGuestsPerSlot: 8,
-  bookingMethod: 'whatsapp', // Default to WhatsApp for now, can be 'calendar'
-  whatsappBookingNumber: '+12345678900', // **IMPORTANT: REPLACE WITH ACTUAL WHATSAPP NUMBER**
+  bookingMethod: 'whatsapp', 
+  whatsappBookingNumber: '+12345678900', 
 };
 
 export default restaurantConfig;
