@@ -13,6 +13,7 @@ import LanguageSelector from '@/components/LanguageSelector'; // Import the Lang
 const navItemKeys = [
   { labelKey: 'common:nav.ourMenu', href: '/#menu' }, // Link to section on home page
   { labelKey: 'common:nav.fullMenu', href: '/menu' }, // Link to the new menu page
+  { labelKey: 'common:nav.aboutUs', href: '/#about-us' }, // New link
   { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' },
   { labelKey: 'common:nav.bookTable', href: '/#booking' },
   { labelKey: 'common:nav.testimonials', href: '/#testimonials' },

@@ -15,7 +15,12 @@ import esLanding from '@/locales/es/landing.json';
 import esMenu from '@/locales/es/menu.json';
 import esTestimonials from '@/locales/es/testimonials.json';
 
-type Locale = 'en' | 'es';
+import caCommon from '@/locales/ca/common.json';
+import caLanding from '@/locales/ca/landing.json';
+import caMenu from '@/locales/ca/menu.json';
+import caTestimonials from '@/locales/ca/testimonials.json';
+
+type Locale = 'en' | 'es' | 'ca';
 
 interface Translations {
   common: Record<string, string>;
@@ -38,6 +43,12 @@ const translationsData: Record<Locale, Translations> = {
     menu: esMenu,
     testimonials: esTestimonials,
   },
+  ca: {
+    common: caCommon,
+    landing: caLanding,
+    menu: caMenu,
+    testimonials: caTestimonials,
+  },
 };
 
 interface LanguageContextType {
@@ -58,7 +69,11 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     if (browserLang === 'es' && translationsData.es) {
       setLanguage('es');
       setCurrentTranslations(translationsData.es);
-    } else {
+    } else if (browserLang === 'ca' && translationsData.ca) {
+      setLanguage('ca');
+      setCurrentTranslations(translationsData.ca);
+    }
+    else {
       setLanguage('en');
       setCurrentTranslations(translationsData.en);
     }

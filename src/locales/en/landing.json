@@ -60,5 +60,11 @@
   "booking.error.invalidDateTime": "The selected date or time is invalid. Please check and try again.",
   "booking.error.calendarConfigError": "There's an issue with the calendar configuration. Please contact support.",
   "testimonials.sectionTitle": "Words From Our Guests",
-  "testimonials.sectionDescription": "Hear what our patrons are saying about their experience at {restaurantName}."
+  "testimonials.sectionDescription": "Hear what our patrons are saying about their experience at {restaurantName}.",
+  "aboutUs.title": "Our Story",
+  "aboutUs.introduction": "Welcome to {restaurantName}, a place where passion for gastronomy meets the art of cuisine.",
+  "aboutUs.paragraph1": "Founded in 2005 by acclaimed Chef Elena Soler, our restaurant was born from a dream: to create a space where every dish tells a story, where fresh, seasonal ingredients are the protagonists, and where every diner feels at home. From our humble beginnings in a small Gòtic quarter venue, we have grown thanks to the dedication of our team and the loyalty of our customers.",
+  "aboutUs.paragraph2": "Over the years, we have perfected our techniques, explored new flavors, and expanded our horizons, always maintaining the essence of traditional cuisine with an innovative touch. Our commitment to excellence has led us to be recognized with several gastronomic awards, but our greatest satisfaction continues to be seeing the smiles of those who visit us.",
+  "aboutUs.paragraph3": "Today, {restaurantName} is not just a restaurant, but a meeting point for lovers of good food, a place to celebrate special moments, and to discover the magic of a unique culinary experience. We invite you to be part of our story.",
+  "aboutUs.imageAlt": "Cozy interior of the Gastronomic Canvas restaurant"
 }

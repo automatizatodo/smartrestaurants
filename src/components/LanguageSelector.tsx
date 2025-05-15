@@ -17,10 +17,11 @@ export default function LanguageSelector() {
   const languages = [
     { code: 'en', name: 'English' },
     { code: 'es', name: 'Español' },
+    { code: 'ca', name: 'Català' },
   ];
 
   const handleLanguageChange = (value: string) => {
-    setLanguage(value as 'en' | 'es');
+    setLanguage(value as 'en' | 'es' | 'ca');
   };
 
   return (

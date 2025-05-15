@@ -1,6 +1,7 @@
 
 import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
+import AboutUsSection from '@/components/landing/AboutUsSection'; // Import the new section
 import InteractiveMenu from '@/components/landing/InteractiveMenu';
 import AISommelierSection from '@/components/landing/AISommelierSection';
 import BookingSection from '@/components/landing/BookingSection';
@@ -18,6 +19,7 @@ export default async function HomePage() {
       <Header />
       <main className="flex-grow">
         <HeroSection />
+        <AboutUsSection /> {/* Add the new section here */}
         <InteractiveMenu menuItems={menuItems} />
         <AISommelierSection />
         <BookingSection />
