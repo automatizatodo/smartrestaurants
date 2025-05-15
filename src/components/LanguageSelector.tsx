@@ -15,9 +15,9 @@ export default function LanguageSelector() {
   const { language, setLanguage, t } = useLanguage();
 
   const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
     { code: 'ca', name: 'Català' },
+    { code: 'es', name: 'Español' },
+    { code: 'en', name: 'English' },
   ];
 
   const handleLanguageChange = (value: string) => {
