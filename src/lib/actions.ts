@@ -153,26 +153,31 @@ export async function submitBooking(
       messageParams: null,
     };
   }
-  
+
   const { name, email, phone, date, time, guests, notes } = validatedFields.data;
 
   // 1. Check calendar availability
   try {
+    console.log("SUBMIT_BOOKING_ACTION: Checking calendar availability...");
     const availabilityInput: CheckCalendarAvailabilityInput = { date, time, guests };
     const availabilityResult: CheckCalendarAvailabilityOutput = await checkCalendarAvailability(availabilityInput);
+    console.log("SUBMIT_BOOKING_ACTION: Availability check result:", availabilityResult);
 
     if (!availabilityResult.isAvailable) {
+      const messageParams = availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests' || availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable'
+        ? { time, date, guests: String(guests), maxGuestsForSlot: String(availabilityResult.maxGuestsForSlot) }
+        : { time, date };
       return {
         messageKey: availabilityResult.reasonKey || "landing:booking.error.slotUnavailable",
         success: false,
         errors: { general: [availabilityResult.reasonKey || "landing:booking.error.slotUnavailable"] },
-        messageParams: { time, date },
+        messageParams: messageParams,
       };
     }
-  } catch (error) {
-    console.error("SUBMIT_BOOKING_ACTION: Error checking calendar availability:", error);
+  } catch (error: any) { // Catch errors from checkCalendarAvailability flow itself
+    console.error("SUBMIT_BOOKING_ACTION: Error during calendar availability check flow:", error.message, error.stack);
     return {
-      messageKey: "landing:booking.error.calendarCheckFailed",
+      messageKey: "landing:booking.error.calendarCheckFailed", // Generic key if flow fails unexpectedly
       success: false,
       errors: { general: ["landing:booking.error.calendarCheckFailed"] },
       messageParams: null,
@@ -181,24 +186,27 @@ export async function submitBooking(
 
   // 2. Create calendar event
   try {
+    console.log("SUBMIT_BOOKING_ACTION: Creating calendar event...");
     const eventInput: CreateCalendarEventInput = { name, email, phone, date, time, guests, notes };
     const eventResult: CreateCalendarEventOutput = await createCalendarEvent(eventInput);
+    console.log("SUBMIT_BOOKING_ACTION: Calendar event creation result:", eventResult);
+
 
     if (!eventResult.success) {
       return {
         messageKey: eventResult.errorKey || "landing:booking.error.calendarError",
         success: false,
         errors: { general: [eventResult.errorKey || "landing:booking.error.calendarError"] },
-        messageParams: null,
+        messageParams: null, // No specific params needed for general calendar creation error
       };
     }
 
-    console.log("SUBMIT_BOOKING_ACTION: Booking submitted and calendar event created (simulated):", { ...validatedFields.data, eventId: eventResult.eventId });
+    console.log("SUBMIT_BOOKING_ACTION: Booking successful. Event ID:", eventResult.eventId);
     return {
       messageKey: "landing:booking.successMessage",
       messageParams: {
         name: validatedFields.data.name,
-        guests: validatedFields.data.guests,
+        guests: String(validatedFields.data.guests), // Ensure guests is a string for translations
         date: validatedFields.data.date,
         time: validatedFields.data.time
       },
@@ -206,10 +214,10 @@ export async function submitBooking(
       errors: null,
     };
 
-  } catch (error) {
-    console.error("SUBMIT_BOOKING_ACTION: Error creating calendar event:", error);
+  } catch (error: any) { // Catch errors from createCalendarEvent flow itself
+    console.error("SUBMIT_BOOKING_ACTION: Error during calendar event creation flow:", error.message, error.stack);
     return {
-      messageKey: "landing:booking.error.calendarError",
+      messageKey: "landing:booking.error.calendarError", // Generic key if flow fails unexpectedly
       success: false,
       errors: { general: ["landing:booking.error.calendarError"] },
       messageParams: null,
@@ -223,3 +231,4 @@ declare module '@/config/restaurant.config' {
   }
 }
 restaurantConfig.bookingMaxGuestsPerSlot = 8; // Example: max 8 guests per slot
+
