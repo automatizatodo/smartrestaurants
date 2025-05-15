@@ -3,11 +3,15 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import restaurantConfig from '@/config/restaurant.config';
-import { MapPin, Phone, Mail, ExternalLink } from 'lucide-react';
+import { MapPin, Phone, Mail, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ContactMapSection() {
   const { t } = useLanguage();
+  const restaurantName = t('common:restaurantName');
+
+  // Order of days for display
+  const openingHoursOrder = ['mon', 'tueWed', 'thuSat', 'sun'];
 
   return (
     <section id="contact-map" className="py-16 sm:py-24 bg-background">
@@ -22,8 +26,8 @@ export default function ContactMapSection() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Contact Information Column */}
-          <div className="space-y-8 bg-card p-8 rounded-lg shadow-lg">
+          {/* Contact Information & Opening Hours Column */}
+          <div className="space-y-8 bg-card p-6 sm:p-8 rounded-lg shadow-lg">
             <div>
               <h3 className="text-2xl font-serif font-semibold text-primary mb-4">{t('landing:contactMap.contactDetailsTitle')}</h3>
               <div className="space-y-4 text-foreground/90">
@@ -53,15 +57,25 @@ export default function ContactMapSection() {
                 </div>
               </div>
             </div>
-            {/* You can add opening hours here if needed */}
-            {/* <div>
-              <h4 className="text-xl font-serif font-semibold text-primary mb-3">{t('landing:contactMap.openingHoursTitle')}</h4>
-              <ul className="text-foreground/80 text-sm space-y-1">
-                <li>{t('landing:contactMap.hours.mondayFriday')}: 12:00 PM - 10:00 PM</li>
-                <li>{t('landing:contactMap.hours.saturday')}: 11:00 AM - 11:00 PM</li>
-                <li>{t('landing:contactMap.hours.sunday')}: Closed</li>
+            
+            <div>
+              <h3 className="text-2xl font-serif font-semibold text-primary mb-4 mt-6 flex items-center">
+                <Clock className="h-6 w-6 mr-3 text-primary shrink-0" />
+                {t('landing:contactMap.openingHoursTitle')}
+              </h3>
+              <ul className="text-foreground/90 space-y-1.5">
+                {openingHoursOrder.map(dayKey => {
+                  const dayLabelKey = `landing:contactMap.hours.${dayKey}`;
+                  const hours = restaurantConfig.openingHours[dayKey];
+                  return (
+                    <li key={dayKey} className="flex justify-between text-sm">
+                      <span>{t(dayLabelKey)}:</span>
+                      <span className="font-medium text-right">{hours === "landing:contactMap.hours.closed" ? t(hours) : hours}</span>
+                    </li>
+                  );
+                })}
               </ul>
-            </div> */}
+            </div>
           </div>
 
           {/* Google Maps Embed Column */}
@@ -75,7 +89,7 @@ export default function ContactMapSection() {
                 allowFullScreen={true}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title={t('landing:contactMap.mapTitle', { restaurantName: t('common:restaurantName') })}
+                title={t('landing:contactMap.mapTitle', { restaurantName })}
               ></iframe>
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
