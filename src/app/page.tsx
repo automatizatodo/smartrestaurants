@@ -3,9 +3,10 @@ import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
 import AboutUsSection from '@/components/landing/AboutUsSection';
 import InteractiveMenu from '@/components/landing/InteractiveMenu';
+import ServicesSection from '@/components/landing/ServicesSection'; // Import the new section
 import AISommelierSection from '@/components/landing/AISommelierSection';
 import BookingSection from '@/components/landing/BookingSection';
-import ContactMapSection from '@/components/landing/ContactMapSection'; // Import the new section
+import ContactMapSection from '@/components/landing/ContactMapSection';
 import TestimonialCarousel from '@/components/landing/TestimonialCarousel';
 import Footer from '@/components/landing/Footer';
 import { fetchMenuFromGoogleSheet } from '@/services/menuService';
@@ -22,9 +23,10 @@ export default async function HomePage() {
         <HeroSection />
         <AboutUsSection />
         <InteractiveMenu menuItems={menuItems} />
+        <ServicesSection /> {/* Add the new section here */}
         <AISommelierSection />
         <BookingSection />
-        <ContactMapSection /> {/* Add the new section here */}
+        <ContactMapSection />
         <TestimonialCarousel />
       </main>
       <Footer />

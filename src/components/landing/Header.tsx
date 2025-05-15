@@ -8,15 +8,16 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu as MenuIcon, X as XIcon, Wine } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/context/LanguageContext';
-import LanguageSelector from '@/components/LanguageSelector'; // Import the LanguageSelector
+import LanguageSelector from '@/components/LanguageSelector';
 
 const navItemKeys = [
   { labelKey: 'common:nav.ourMenu', href: '/#menu' },
   { labelKey: 'common:nav.fullMenu', href: '/menu' },
+  { labelKey: 'common:nav.services', href: '/#services' }, // New Services link
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
   { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' },
   { labelKey: 'common:nav.bookTable', href: '/#booking' },
-  { labelKey: 'common:nav.contact', href: '/#contact-map' }, // New link
+  { labelKey: 'common:nav.contact', href: '/#contact-map' },
   { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
 ];
 
