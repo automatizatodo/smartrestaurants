@@ -11,11 +11,12 @@ import { useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector'; // Import the LanguageSelector
 
 const navItemKeys = [
-  { labelKey: 'common:nav.ourMenu', href: '/#menu' }, // Link to section on home page
-  { labelKey: 'common:nav.fullMenu', href: '/menu' }, // Link to the new menu page
-  { labelKey: 'common:nav.aboutUs', href: '/#about-us' }, // New link
+  { labelKey: 'common:nav.ourMenu', href: '/#menu' },
+  { labelKey: 'common:nav.fullMenu', href: '/menu' },
+  { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
   { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' },
   { labelKey: 'common:nav.bookTable', href: '/#booking' },
+  { labelKey: 'common:nav.contact', href: '/#contact-map' }, // New link
   { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
 ];
 

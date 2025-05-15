@@ -75,5 +75,14 @@
   "aboutUs.paragraph1": "Fundat el 2005 per l'aclamat xef Joan Roca, el nostre restaurant va néixer d'un somni: crear un espai on cada plat expliqués una història, on els ingredients frescos i de temporada fossin els protagonistes i on cada comensal se sentís como a casa. Des dels nostres humils inicis en un petit local del barri Gòtic, hem crescut gràcies a la dedicació del nostre equip i la fidelitat dels nostres clients.",
   "aboutUs.paragraph2": "Amb el pas dels anys, hem perfeccionat les nostres tècniques, explorat nous sabors i ampliat els nostres horitzons, sempre mantenint l'essència de la cuina tradicional amb un toc innovador. El nostre compromís amb l'excel·lència ens ha portat a ser reconeguts amb diversos premis gastronòmics, però la nostra major satisfacció continua sent veure els somriures dels qui ens visiten.",
   "aboutUs.paragraph3": "Avui, {restaurantName} no és només un restaurant, sinó un punt de trobada per als amants del bon menjar, un lloc per celebrar moments especials i per descobrir la màgia d'una experiència culinària única. Us convidem a formar part de la nostra història.",
-  "aboutUs.imageAlt": "Interior acollidor del restaurant Llenç Gastronòmic"
+  "aboutUs.imageAlt": "Interior acollidor del restaurant Llenç Gastronòmic",
+  "contactMap.sectionTitle": "On Trobar-nos",
+  "contactMap.sectionDescription": "Visita'ns per a una experiència gastronòmica inoblidable. Estem convenientment ubicats i esperem donar-te la benvinguda.",
+  "contactMap.contactDetailsTitle": "Detalls de Contacte",
+  "contactMap.addressLabel": "La Nostra Adreça",
+  "contactMap.phoneLabel": "Truca'ns",
+  "contactMap.emailLabel": "Envia'ns un Email",
+  "contactMap.getDirections": "Com Arribar",
+  "contactMap.mapTitle": "Ubicació de {restaurantName}",
+  "contactMap.mapUnavailable": "El mapa no està disponible actualment."
 }
