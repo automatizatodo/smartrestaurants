@@ -14,6 +14,11 @@ import restaurantConfig from '@/config/restaurant.config';
 import { addMinutes, parse, formatISO } from 'date-fns';
 import { google } from 'googleapis';
 
+console.log('CALENDAR_CREATE_EVENT_FLOW_LOAD: Flow file loaded.');
+console.log('CALENDAR_CREATE_EVENT_FLOW_LOAD: Initial GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+console.log('CALENDAR_CREATE_EVENT_FLOW_LOAD: Initial GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
+
+
 // Define Zod schema for input
 const CreateCalendarEventInputSchema = z.object({
   name: z.string().describe('Name of the person making the booking.'),
@@ -37,30 +42,37 @@ export type CreateCalendarEventOutput = z.infer<typeof CreateCalendarEventOutput
 
 // Helper to parse time string (e.g., "5:00 PM") and combine with date
 const getEventDateTime = (dateStr: string, timeStr: string, durationMinutes: number) => {
+  console.log(`CALENDAR_CREATE_EVENT_HELPER_DTR: Parsing date '${dateStr}' and time '${timeStr}' with duration ${durationMinutes} mins.`);
   let parsedDate: Date;
   try {
     parsedDate = parse(`${dateStr} ${timeStr}`, 'yyyy-MM-dd h:mm a', new Date());
     if (isNaN(parsedDate.getTime())) {
+      console.log(`CALENDAR_CREATE_EVENT_HELPER_DTR: First parse (h:mm a) resulted in NaN. Trying HH:mm.`);
       parsedDate = parse(`${dateStr} ${timeStr}`, 'yyyy-MM-dd HH:mm', new Date());
     }
-  } catch (e) {
-     console.error(`CALENDAR_CREATE_EVENT_HELPER: Error parsing date/time string: ${dateStr} ${timeStr}`, e);
+  } catch (e: any) {
+     console.error(`CALENDAR_CREATE_EVENT_HELPER_DTR: Error parsing date/time string: ${dateStr} ${timeStr}`, e.message, e.stack);
      throw new Error("Invalid date/time format for event.");
   }
 
   if (isNaN(parsedDate.getTime())) {
-      console.error(`CALENDAR_CREATE_EVENT_HELPER: Parsed date is invalid for ${dateStr} ${timeStr}`);
+      console.error(`CALENDAR_CREATE_EVENT_HELPER_DTR: Parsed date is invalid for ${dateStr} ${timeStr} after all attempts.`);
       throw new Error("Invalid date/time format for event after parsing attempts.");
   }
+  console.log(`CALENDAR_CREATE_EVENT_HELPER_DTR: Successfully parsed to Date object:`, parsedDate.toISOString());
 
   const startTimeIso = formatISO(parsedDate);
   const endTimeIso = formatISO(addMinutes(parsedDate, durationMinutes));
+  console.log(`CALENDAR_CREATE_EVENT_HELPER_DTR: ISO range: startTimeIso=${startTimeIso}, endTimeIso=${endTimeIso}`);
   return { startTimeIso, endTimeIso };
 };
 
 
 // Exported wrapper function
 export async function createCalendarEvent(input: CreateCalendarEventInput): Promise<CreateCalendarEventOutput> {
+  console.log('CALENDAR_CREATE_EVENT_FLOW: Wrapper function called with input:', input);
+  console.log('CALENDAR_CREATE_EVENT_FLOW: Using GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+  console.log('CALENDAR_CREATE_EVENT_FLOW: Using GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   return createCalendarEventFlow(input);
 }
 
@@ -71,7 +83,9 @@ const createCalendarEventFlow = ai.defineFlow(
     outputSchema: CreateCalendarEventOutputSchema,
   },
   async (input) => {
-    console.log('CALENDAR_CREATE_EVENT_FLOW: Initiating event creation for:', input);
+    console.log('CALENDAR_CREATE_EVENT_FLOW: Genkit flow execution started with input:', input);
+    console.log('CALENDAR_CREATE_EVENT_FLOW_ENV_CHECK: GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+    console.log('CALENDAR_CREATE_EVENT_FLOW_ENV_CHECK: GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
 
     const calendarId = process.env.GOOGLE_CALENDAR_ID;
     const credsFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -94,7 +108,7 @@ const createCalendarEventFlow = ai.defineFlow(
         eventTimes = getEventDateTime(input.date, input.time, restaurantConfig.bookingSlotDurationMinutes);
         console.log('CALENDAR_CREATE_EVENT_FLOW: Successfully parsed event date/time range:', eventTimes);
     } catch (error: any) {
-        console.error("CALENDAR_CREATE_EVENT_FLOW: Error processing event date/time:", error.message);
+        console.error("CALENDAR_CREATE_EVENT_FLOW: Error processing event date/time:", error.message, error.stack);
         return { success: false, errorKey: "landing:booking.error.invalidDateTime" };
     }
 
@@ -114,16 +128,25 @@ const createCalendarEventFlow = ai.defineFlow(
         dateTime: endTimeIso,
         timeZone: restaurantConfig.timeZone,
       },
+      // You might want to add attendees here if you want to invite the guest to the event
+      // attendees: [{ email: input.email }],
+      // reminders: {
+      //   useDefault: false,
+      //   overrides: [
+      //     { method: 'email', minutes: 24 * 60 }, // 24 hours before
+      //     { method: 'popup', minutes: 120 },    // 2 hours before
+      //   ],
+      // },
     };
 
     try {
       console.log('CALENDAR_CREATE_EVENT_FLOW: Initializing Google Auth...');
       const auth = new google.auth.GoogleAuth({
         scopes: ['https://www.googleapis.com/auth/calendar.events'],
-         // GOOGLE_APPLICATION_CREDENTIALS env var is used automatically if set correctly
+         // GOOGLE_APPLICATION_CREDENTIALS env var is used automatically by the library if set correctly
       });
       const authClient = await auth.getClient();
-      google.options({ auth: authClient });
+      google.options({ auth: authClient }); // Set auth options globally for googleapis
       console.log('CALENDAR_CREATE_EVENT_FLOW: Google Auth initialized successfully.');
 
       const calendar = google.calendar({ version: 'v3' });
@@ -146,7 +169,7 @@ const createCalendarEventFlow = ai.defineFlow(
         console.error('CALENDAR_CREATE_EVENT_FLOW: Event created but no ID returned from API. This is unexpected.');
         return {
           success: false,
-          errorKey: 'landing:booking.error.calendarError', // Or a more specific "eventCreationFailedNoId"
+          errorKey: 'landing:booking.error.calendarError', 
         };
       }
     } catch (error: any) {
@@ -162,3 +185,4 @@ const createCalendarEventFlow = ai.defineFlow(
   }
 );
 
+    

@@ -1,13 +1,16 @@
 
 "use server";
 
+import { config } from 'dotenv'; // Import dotenv
+config(); // Load environment variables
+
 import { aiSommelier, type AISommelierInput, type AISommelierOutput } from "@/ai/flows/ai-sommelier";
 import { checkCalendarAvailability, type CheckCalendarAvailabilityInput, type CheckCalendarAvailabilityOutput } from "@/ai/flows/check-calendar-availability-flow";
 import { createCalendarEvent, type CreateCalendarEventInput, type CreateCalendarEventOutput } from "@/ai/flows/create-calendar-event-flow";
 import { fetchMenuFromGoogleSheet } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import { z } from "zod";
-import restaurantConfig from "@/config/restaurant.config"; // For booking duration
+import restaurantConfig from "@/config/restaurant.config";
 
 // Validation schemas remain the same
 const SommelierRequestSchema = z.object({
@@ -39,11 +42,13 @@ export async function getAISommelierRecommendations(
   prevState: SommelierFormState | null,
   formData: FormData
 ): Promise<SommelierFormState> {
+  console.log("ACTIONS_AISOMMELIER: getAISommelierRecommendations called.");
   const validatedFields = SommelierRequestSchema.safeParse({
     tastePreferences: formData.get("tastePreferences"),
   });
 
   if (!validatedFields.success) {
+    console.warn("ACTIONS_AISOMMELIER: Validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       messageKey: "common:form.error.invalidInput",
       recommendations: null,
@@ -54,13 +59,16 @@ export async function getAISommelierRecommendations(
 
   let menuInformationString = "Menu information is currently unavailable.";
   try {
+    console.log("ACTIONS_AISOMMELIER: Fetching menu for AI Sommelier...");
     const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
     if (menuItems.length > 0) {
       menuInformationString = formatMenuForAI(menuItems);
+      console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted.");
+    } else {
+      console.warn("ACTIONS_AISOMMELIER: No menu items fetched for AI Sommelier.");
     }
   } catch (error) {
-    console.error("AI_SOMMELIER_ACTION: Failed to fetch menu for AI Sommelier:", error);
-    // Continue with potentially unavailable menu, AI might still give general advice
+    console.error("ACTIONS_AISOMMELIER: Failed to fetch menu for AI Sommelier:", error);
   }
 
 
@@ -70,7 +78,9 @@ export async function getAISommelierRecommendations(
   };
 
   try {
+    console.log("ACTIONS_AISOMMELIER: Calling aiSommelier flow with input:", input);
     const result: AISommelierOutput = await aiSommelier(input);
+    console.log("ACTIONS_AISOMMELIER: aiSommelier flow result:", result);
     if (result.dishRecommendations) {
       return {
         messageKey: "landing:aiSommelier.toast.successDescriptionKey",
@@ -80,23 +90,22 @@ export async function getAISommelierRecommendations(
       };
     } else {
       return {
-        messageKey: "landing:aiSommelier.toast.errorDescriptionKey", // Consider a more specific key if AI returns no recommendation
+        messageKey: "landing:aiSommelier.toast.errorDescriptionKey",
         recommendations: null,
         errors: null,
         messageParams: null,
       };
     }
   } catch (error) {
-    console.error("AI_SOMMELIER_ACTION: AI Sommelier Flow Error:", error);
+    console.error("ACTIONS_AISOMMELIER: AI Sommelier Flow Error:", error);
     let errorMessageKey = "common:form.error.generic";
-    // Check if the error is a Genkit "NO_RESPONSE" type, if such a specific error can be identified
     if (error instanceof Error && (error.message.includes("NO_RESPONSE") || error.message.includes("generation error"))) {
         errorMessageKey = "landing:aiSommelier.error.couldNotGenerate";
     }
     return {
       messageKey: errorMessageKey,
       recommendations: null,
-      errors: null, // No form validation errors here, but an operational error
+      errors: null,
       messageParams: null,
     };
   }
@@ -106,8 +115,8 @@ const BookingSchema = z.object({
   name: z.string().min(1, "landing:booking.error.nameRequired"),
   email: z.string().email("landing:booking.error.emailInvalid"),
   phone: z.string().min(1, "landing:booking.error.phoneRequired"),
-  date: z.string().min(1, "landing:booking.error.dateRequired"), // Should be YYYY-MM-DD
-  time: z.string().min(1, "landing:booking.error.timeRequired"), // e.g., "5:00 PM"
+  date: z.string().min(1, "landing:booking.error.dateRequired"),
+  time: z.string().min(1, "landing:booking.error.timeRequired"),
   guests: z.coerce.number().int().min(1, "landing:booking.error.guestsRequired").max(restaurantConfig.bookingMaxGuestsPerSlot || 8, "landing:booking.error.guestsTooMany"),
   notes: z.string().optional(),
 });
@@ -124,7 +133,7 @@ export interface BookingFormState {
     time?: string[];
     guests?: string[];
     notes?: string[];
-    general?: string[]; // For errors not tied to a specific field
+    general?: string[];
   } | null;
 }
 
@@ -132,14 +141,15 @@ export async function submitBooking(
   prevState: BookingFormState | null,
   formData: FormData
 ): Promise<BookingFormState> {
-  console.log("SUBMIT_BOOKING_ACTION: Received form data:", Object.fromEntries(formData.entries()));
+  console.log("ACTIONS_BOOKING: submitBooking action initiated.");
+  console.log("ACTIONS_BOOKING: Raw form data:", Object.fromEntries(formData.entries()));
 
   const rawFormData = {
     name: formData.get("name"),
     email: formData.get("email"),
     phone: formData.get("phone"),
-    date: formData.get("date"), // Expecting "yyyy-MM-dd"
-    time: formData.get("time"), // Expecting "HH:MM PM/AM" or "HH:MM"
+    date: formData.get("date"),
+    time: formData.get("time"),
     guests: formData.get("guests"),
     notes: formData.get("notes") || undefined,
   };
@@ -147,7 +157,7 @@ export async function submitBooking(
   const validatedFields = BookingSchema.safeParse(rawFormData);
 
   if (!validatedFields.success) {
-    console.warn("SUBMIT_BOOKING_ACTION: Form validation failed:", validatedFields.error.flatten().fieldErrors);
+    console.warn("ACTIONS_BOOKING: Form validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       messageKey: "common:form.error.invalidInput",
       success: false,
@@ -155,23 +165,33 @@ export async function submitBooking(
       messageParams: null,
     };
   }
-  console.log("SUBMIT_BOOKING_ACTION: Form data validated successfully:", validatedFields.data);
+  console.log("ACTIONS_BOOKING: Form data validated successfully:", validatedFields.data);
 
   const { name, email, phone, date, time, guests, notes } = validatedFields.data;
 
   // 1. Check calendar availability
-  let availabilityResult: CheckCalendarAvailabilityOutput;
+  let availabilityResult: CheckCalendarAvailabilityOutput | undefined;
   try {
-    console.log("SUBMIT_BOOKING_ACTION: Checking calendar availability for:", { date, time, guests });
+    console.log("ACTIONS_BOOKING: Attempting to call checkCalendarAvailability flow...");
     const availabilityInput: CheckCalendarAvailabilityInput = { date, time, guests };
     availabilityResult = await checkCalendarAvailability(availabilityInput);
-    console.log("SUBMIT_BOOKING_ACTION: Availability check result:", availabilityResult);
+    console.log("ACTIONS_BOOKING: checkCalendarAvailability flow response:", availabilityResult);
+
+    if (!availabilityResult || typeof availabilityResult.isAvailable === 'undefined') {
+        console.error("ACTIONS_BOOKING: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
+        return {
+            messageKey: "landing:booking.error.calendarCheckFailed",
+            success: false,
+            errors: { general: ["landing:booking.error.calendarCheckFailed"] },
+            messageParams: null,
+        };
+    }
 
     if (!availabilityResult.isAvailable) {
-      const messageParams = availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests' || availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable'
+      const messageParams = availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests'
         ? { time, date, guests: String(guests), maxGuestsForSlot: String(availabilityResult.maxGuestsForSlot) }
         : { time, date };
-      console.warn("SUBMIT_BOOKING_ACTION: Slot not available.", availabilityResult);
+      console.warn("ACTIONS_BOOKING: Slot not available according to checkCalendarAvailability flow.", availabilityResult);
       return {
         messageKey: availabilityResult.reasonKey || "landing:booking.error.slotUnavailable",
         success: false,
@@ -180,9 +200,9 @@ export async function submitBooking(
       };
     }
   } catch (error: any) {
-    console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability flow EXECUTION (unexpected error from flow):", error.message, error.stack);
+    console.error("ACTIONS_BOOKING: CRITICAL - Error EXECUTING checkCalendarAvailability flow:", error.message, error.stack);
     return {
-      messageKey: "landing:booking.error.calendarCheckFailed", // This is a general fallback
+      messageKey: "landing:booking.error.calendarCheckFailed",
       success: false,
       errors: { general: ["landing:booking.error.calendarCheckFailed"] },
       messageParams: null,
@@ -190,15 +210,25 @@ export async function submitBooking(
   }
 
   // 2. Create calendar event
+  let eventResult: CreateCalendarEventOutput | undefined;
   try {
-    console.log("SUBMIT_BOOKING_ACTION: Creating calendar event with input:", { name, email, phone, date, time, guests, notes });
+    console.log("ACTIONS_BOOKING: Attempting to call createCalendarEvent flow...");
     const eventInput: CreateCalendarEventInput = { name, email, phone, date, time, guests, notes };
-    const eventResult: CreateCalendarEventOutput = await createCalendarEvent(eventInput);
-    console.log("SUBMIT_BOOKING_ACTION: Calendar event creation result:", eventResult);
+    eventResult = await createCalendarEvent(eventInput);
+    console.log("ACTIONS_BOOKING: createCalendarEvent flow response:", eventResult);
 
+    if (!eventResult || typeof eventResult.success === 'undefined') {
+        console.error("ACTIONS_BOOKING: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
+        return {
+            messageKey: "landing:booking.error.calendarError",
+            success: false,
+            errors: { general: ["landing:booking.error.calendarError"] },
+            messageParams: null,
+        };
+    }
 
     if (!eventResult.success) {
-      console.warn("SUBMIT_BOOKING_ACTION: Failed to create calendar event.", eventResult);
+      console.warn("ACTIONS_BOOKING: Failed to create calendar event according to createCalendarEvent flow.", eventResult);
       return {
         messageKey: eventResult.errorKey || "landing:booking.error.calendarError",
         success: false,
@@ -207,7 +237,7 @@ export async function submitBooking(
       };
     }
 
-    console.log("SUBMIT_BOOKING_ACTION: Booking successful. Event ID:", eventResult.eventId);
+    console.log("ACTIONS_BOOKING: Booking successful. Event ID:", eventResult.eventId);
     return {
       messageKey: "landing:booking.successMessage",
       messageParams: {
@@ -221,9 +251,9 @@ export async function submitBooking(
     };
 
   } catch (error: any) {
-    console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent flow EXECUTION (unexpected error from flow):", error.message, error.stack);
+    console.error("ACTIONS_BOOKING: CRITICAL - Error EXECUTING createCalendarEvent flow:", error.message, error.stack);
     return {
-      messageKey: "landing:booking.error.calendarError", // This is a general fallback
+      messageKey: "landing:booking.error.calendarError",
       success: false,
       errors: { general: ["landing:booking.error.calendarError"] },
       messageParams: null,
@@ -231,11 +261,4 @@ export async function submitBooking(
   }
 }
 
-// Add to restaurant config an option for max guests per slot
-declare module '@/config/restaurant.config' {
-  interface RestaurantConfig {
-    bookingMaxGuestsPerSlot?: number;
-  }
-}
-restaurantConfig.bookingMaxGuestsPerSlot = 8; // Example: max 8 guests per slot
-
+    

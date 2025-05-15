@@ -14,6 +14,10 @@ import restaurantConfig from '@/config/restaurant.config';
 import { google } from 'googleapis';
 import { addMinutes, parse, formatISO } from 'date-fns';
 
+console.log('CALENDAR_CHECK_AVAIL_FLOW_LOAD: Flow file loaded.');
+console.log('CALENDAR_CHECK_AVAIL_FLOW_LOAD: Initial GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+console.log('CALENDAR_CHECK_AVAIL_FLOW_LOAD: Initial GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
+
 const CheckCalendarAvailabilityInputSchema = z.object({
   date: z.string().describe('The desired date for the booking (YYYY-MM-DD).'),
   time: z.string().describe('The desired time for the booking (e.g., "5:00 PM").'),
@@ -30,24 +34,28 @@ export type CheckCalendarAvailabilityOutput = z.infer<typeof CheckCalendarAvaila
 
 // Helper to parse time string and combine with date
 const getEventDateTimeRange = (dateStr: string, timeStr: string, durationMinutes: number) => {
+  console.log(`CALENDAR_CHECK_AVAIL_HELPER_DTR: Parsing date '${dateStr}' and time '${timeStr}' with duration ${durationMinutes} mins.`);
   let parsedDate: Date;
   try {
     parsedDate = parse(`${dateStr} ${timeStr}`, 'yyyy-MM-dd h:mm a', new Date());
     if (isNaN(parsedDate.getTime())) {
+      console.log(`CALENDAR_CHECK_AVAIL_HELPER_DTR: First parse (h:mm a) resulted in NaN. Trying HH:mm.`);
       parsedDate = parse(`${dateStr} ${timeStr}`, 'yyyy-MM-dd HH:mm', new Date());
     }
-  } catch (e) {
-     console.error(`CALENDAR_CHECK_AVAIL_HELPER: Error parsing date/time string: ${dateStr} ${timeStr}`, e);
+  } catch (e: any) {
+     console.error(`CALENDAR_CHECK_AVAIL_HELPER_DTR: Error parsing date/time string: ${dateStr} ${timeStr}`, e.message, e.stack);
      throw new Error("Invalid date/time format for event.");
   }
 
   if (isNaN(parsedDate.getTime())) {
-      console.error(`CALENDAR_CHECK_AVAIL_HELPER: Parsed date is invalid for ${dateStr} ${timeStr}`);
+      console.error(`CALENDAR_CHECK_AVAIL_HELPER_DTR: Parsed date is invalid for ${dateStr} ${timeStr} after all attempts.`);
       throw new Error("Invalid date/time format for event after parsing attempts.");
   }
+  console.log(`CALENDAR_CHECK_AVAIL_HELPER_DTR: Successfully parsed to Date object:`, parsedDate.toISOString());
 
   const timeMin = formatISO(parsedDate);
   const timeMax = formatISO(addMinutes(parsedDate, durationMinutes));
+  console.log(`CALENDAR_CHECK_AVAIL_HELPER_DTR: ISO range: timeMin=${timeMin}, timeMax=${timeMax}`);
   return { timeMin, timeMax };
 };
 
@@ -55,26 +63,33 @@ const getEventDateTimeRange = (dateStr: string, timeStr: string, durationMinutes
 const parseGuestsFromEvent = (event: any): number => {
   const summary = event.summary || '';
   const description = event.description || '';
+  console.log(`CALENDAR_CHECK_AVAIL_HELPER_PGE: Parsing guests from event. Summary: "${summary}"`);
 
   const combinedText = `${summary} ${description}`;
-  // Example: "Booking for John (4 guests)", "Reserva para Maria (2 comensales)"
   const guestsMatch = combinedText.match(/\((\d+)\s*(guest|guests|comensal|comensales)\)/i);
 
   if (guestsMatch && guestsMatch[1]) {
-    return parseInt(guestsMatch[1], 10);
+    const count = parseInt(guestsMatch[1], 10);
+    console.log(`CALENDAR_CHECK_AVAIL_HELPER_PGE: Found ${count} guests via regex.`);
+    return count;
   }
-  // Attempt to parse from the custom marker if the regex fails
+
   const customMarkerMatch = description.match(/GuestCount:\s*(\d+)/i);
    if (customMarkerMatch && customMarkerMatch[1]) {
-    return parseInt(customMarkerMatch[1], 10);
+    const count = parseInt(customMarkerMatch[1], 10);
+    console.log(`CALENDAR_CHECK_AVAIL_HELPER_PGE: Found ${count} guests via custom marker.`);
+    return count;
   }
-  console.warn(`CALENDAR_CHECK_AVAIL_HELPER: Could not parse guest count from event: "${summary}". Defaulting to 0. Description: "${description}"`);
-  return 0; // Default if not found
+  console.warn(`CALENDAR_CHECK_AVAIL_HELPER_PGE: Could not parse guest count from event: "${summary}". Description: "${description}". Defaulting to 0.`);
+  return 0;
 };
 
 
 // Exported wrapper function
 export async function checkCalendarAvailability(input: CheckCalendarAvailabilityInput): Promise<CheckCalendarAvailabilityOutput> {
+  console.log('CALENDAR_CHECK_AVAIL_FLOW: Wrapper function called with input:', input);
+  console.log('CALENDAR_CHECK_AVAIL_FLOW: Using GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+  console.log('CALENDAR_CHECK_AVAIL_FLOW: Using GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   return checkCalendarAvailabilityFlow(input);
 }
 
@@ -85,7 +100,10 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
     outputSchema: CheckCalendarAvailabilityOutputSchema,
   },
   async (input) => {
-    console.log('CALENDAR_CHECK_AVAIL_FLOW: Initiating availability check for:', input);
+    console.log('CALENDAR_CHECK_AVAIL_FLOW: Genkit flow execution started with input:', input);
+    console.log('CALENDAR_CHECK_AVAIL_FLOW_ENV_CHECK: GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+    console.log('CALENDAR_CHECK_AVAIL_FLOW_ENV_CHECK: GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
+
 
     const calendarId = process.env.GOOGLE_CALENDAR_ID;
     const credsFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -109,7 +127,7 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
         eventDateTime = getEventDateTimeRange(input.date, input.time, restaurantConfig.bookingSlotDurationMinutes);
         console.log('CALENDAR_CHECK_AVAIL_FLOW: Successfully parsed event date/time range:', eventDateTime);
     } catch (error: any) {
-        console.error("CALENDAR_CHECK_AVAIL_FLOW: Error processing event date/time:", error.message);
+        console.error("CALENDAR_CHECK_AVAIL_FLOW: Error processing event date/time:", error.message, error.stack);
         return { isAvailable: false, reasonKey: "landing:booking.error.invalidDateTime" };
     }
     const { timeMin, timeMax } = eventDateTime;
@@ -118,10 +136,10 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
       console.log('CALENDAR_CHECK_AVAIL_FLOW: Initializing Google Auth...');
       const auth = new google.auth.GoogleAuth({
         scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
-        // GOOGLE_APPLICATION_CREDENTIALS env var is used automatically if set correctly
+        // GOOGLE_APPLICATION_CREDENTIALS env var is used automatically by the library if set correctly
       });
       const authClient = await auth.getClient();
-      google.options({ auth: authClient });
+      google.options({ auth: authClient }); // Set auth options globally for googleapis
       console.log('CALENDAR_CHECK_AVAIL_FLOW: Google Auth initialized successfully.');
 
       const calendar = google.calendar({ version: 'v3' });
@@ -150,7 +168,7 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
         console.log('CALENDAR_CHECK_AVAIL_FLOW: No existing events found in this slot.');
       }
 
-      const maxGuestsAllowed = restaurantConfig.bookingMaxGuestsPerSlot || 8;
+      const maxGuestsAllowed = restaurantConfig.bookingMaxGuestsPerSlot || 8; // Default to 8 if not set
       const remainingCapacity = maxGuestsAllowed - totalGuestsInSlot;
 
       if (input.guests > remainingCapacity) {
@@ -186,3 +204,4 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
   }
 );
 
+    
