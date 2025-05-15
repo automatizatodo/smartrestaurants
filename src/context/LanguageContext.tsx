@@ -61,26 +61,29 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Locale>('en');
-  const [currentTranslations, setCurrentTranslations] = useState<Translations>(translationsData.en);
+  // Set Catalan as the initial default language
+  const [language, setLanguage] = useState<Locale>('ca');
+  const [currentTranslations, setCurrentTranslations] = useState<Translations>(translationsData.ca);
 
   useEffect(() => {
-    const browserLang = navigator.language.split('-')[0] as Locale;
-    if (browserLang === 'es' && translationsData.es) {
-      setLanguage('es');
-      setCurrentTranslations(translationsData.es);
-    } else if (browserLang === 'ca' && translationsData.ca) {
-      setLanguage('ca');
-      setCurrentTranslations(translationsData.ca);
+    // This effect runs once on component mount to set the initial language based on browser settings
+    // Priority: Spanish > English > Catalan (application default)
+    if (typeof navigator !== 'undefined') {
+      const browserLang = navigator.language.split('-')[0] as Locale;
+
+      if (browserLang === 'es' && translationsData.es) {
+        setLanguage('es');
+      } else if (browserLang === 'en' && translationsData.en) {
+        setLanguage('en');
+      }
+      // If browserLang is 'ca' or any other language,
+      // it will remain 'ca' due to the initial useState default.
     }
-    else {
-      setLanguage('en');
-      setCurrentTranslations(translationsData.en);
-    }
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   useEffect(() => {
-    setCurrentTranslations(translationsData[language] || translationsData.en);
+    // This effect updates translations whenever the language state changes
+    setCurrentTranslations(translationsData[language] || translationsData.ca); // Fallback to Catalan translations
   }, [language]);
 
   const t = useCallback(
