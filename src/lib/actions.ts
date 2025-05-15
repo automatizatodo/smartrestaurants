@@ -146,6 +146,7 @@ export async function submitBooking(
   const validatedFields = BookingSchema.safeParse(rawFormData);
 
   if (!validatedFields.success) {
+    console.warn("SUBMIT_BOOKING_ACTION: Form validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       messageKey: "common:form.error.invalidInput",
       success: false,
@@ -157,16 +158,18 @@ export async function submitBooking(
   const { name, email, phone, date, time, guests, notes } = validatedFields.data;
 
   // 1. Check calendar availability
+  let availabilityResult: CheckCalendarAvailabilityOutput;
   try {
-    console.log("SUBMIT_BOOKING_ACTION: Checking calendar availability...");
+    console.log("SUBMIT_BOOKING_ACTION: Checking calendar availability for:", { date, time, guests });
     const availabilityInput: CheckCalendarAvailabilityInput = { date, time, guests };
-    const availabilityResult: CheckCalendarAvailabilityOutput = await checkCalendarAvailability(availabilityInput);
+    availabilityResult = await checkCalendarAvailability(availabilityInput);
     console.log("SUBMIT_BOOKING_ACTION: Availability check result:", availabilityResult);
 
     if (!availabilityResult.isAvailable) {
       const messageParams = availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests' || availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable'
         ? { time, date, guests: String(guests), maxGuestsForSlot: String(availabilityResult.maxGuestsForSlot) }
         : { time, date };
+      console.warn("SUBMIT_BOOKING_ACTION: Slot not available.", availabilityResult);
       return {
         messageKey: availabilityResult.reasonKey || "landing:booking.error.slotUnavailable",
         success: false,
@@ -174,10 +177,10 @@ export async function submitBooking(
         messageParams: messageParams,
       };
     }
-  } catch (error: any) { // Catch errors from checkCalendarAvailability flow itself
-    console.error("SUBMIT_BOOKING_ACTION: Error during calendar availability check flow:", error.message, error.stack);
+  } catch (error: any) {
+    console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability flow execution:", error.message, error.stack);
     return {
-      messageKey: "landing:booking.error.calendarCheckFailed", // Generic key if flow fails unexpectedly
+      messageKey: "landing:booking.error.calendarCheckFailed",
       success: false,
       errors: { general: ["landing:booking.error.calendarCheckFailed"] },
       messageParams: null,
@@ -186,18 +189,19 @@ export async function submitBooking(
 
   // 2. Create calendar event
   try {
-    console.log("SUBMIT_BOOKING_ACTION: Creating calendar event...");
+    console.log("SUBMIT_BOOKING_ACTION: Creating calendar event with input:", { name, email, phone, date, time, guests, notes });
     const eventInput: CreateCalendarEventInput = { name, email, phone, date, time, guests, notes };
     const eventResult: CreateCalendarEventOutput = await createCalendarEvent(eventInput);
     console.log("SUBMIT_BOOKING_ACTION: Calendar event creation result:", eventResult);
 
 
     if (!eventResult.success) {
+      console.warn("SUBMIT_BOOKING_ACTION: Failed to create calendar event.", eventResult);
       return {
         messageKey: eventResult.errorKey || "landing:booking.error.calendarError",
         success: false,
         errors: { general: [eventResult.errorKey || "landing:booking.error.calendarError"] },
-        messageParams: null, // No specific params needed for general calendar creation error
+        messageParams: null,
       };
     }
 
@@ -206,7 +210,7 @@ export async function submitBooking(
       messageKey: "landing:booking.successMessage",
       messageParams: {
         name: validatedFields.data.name,
-        guests: String(validatedFields.data.guests), // Ensure guests is a string for translations
+        guests: String(validatedFields.data.guests),
         date: validatedFields.data.date,
         time: validatedFields.data.time
       },
@@ -214,16 +218,17 @@ export async function submitBooking(
       errors: null,
     };
 
-  } catch (error: any) { // Catch errors from createCalendarEvent flow itself
-    console.error("SUBMIT_BOOKING_ACTION: Error during calendar event creation flow:", error.message, error.stack);
+  } catch (error: any) {
+    console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent flow execution:", error.message, error.stack);
     return {
-      messageKey: "landing:booking.error.calendarError", // Generic key if flow fails unexpectedly
+      messageKey: "landing:booking.error.calendarError",
       success: false,
       errors: { general: ["landing:booking.error.calendarError"] },
       messageParams: null,
     };
   }
 }
+
 // Add to restaurant config an option for max guests per slot
 declare module '@/config/restaurant.config' {
   interface RestaurantConfig {
