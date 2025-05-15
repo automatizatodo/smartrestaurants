@@ -23,8 +23,10 @@ interface RestaurantConfig {
   heroImageHint: string; // This could potentially be localized via a key
   bookingTimeSlots: string[];
   bookingSlotDurationMinutes: number; // New: Duration of a booking slot in minutes
+  timeZone: string; // New: IANA Time Zone for Google Calendar events
   theme: ThemeColors;
   showMenuItemImages: boolean;
+  bookingMaxGuestsPerSlot?: number;
 }
 
 // --- Configuration Object ---
@@ -40,18 +42,20 @@ const restaurantConfig: RestaurantConfig = {
     twitter: '#',
     youtube: '#',
   },
-  heroImageUrl: '/background_rest.jpg',
+  heroImageUrl: '/background_rest.jpg', // Path relative to public folder
   heroImageHint: 'restaurant interior dining',
   bookingTimeSlots: [
     "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM",
     "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM"
   ],
   bookingSlotDurationMinutes: 120, // e.g., 2 hours
+  timeZone: 'America/Los_Angeles', // Example: Change to your restaurant's time zone
   theme: {
     // Primary color HSL from globals.css: 51 100% 50% (Gold)
     primary: 'hsl(51, 100%, 50%)',
   },
-  showMenuItemImages: false,
+  showMenuItemImages: true, // Set to false if you don't have menu item images
+  bookingMaxGuestsPerSlot: 8,
 };
 
 export default restaurantConfig;

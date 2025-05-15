@@ -11,7 +11,8 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import restaurantConfig from '@/config/restaurant.config';
-import { addMinutes, parse, formatISO } from 'date-fns'; // Using date-fns for date manipulation
+import { addMinutes, parse, formatISO } from 'date-fns';
+import { google } from 'googleapis';
 
 // Define Zod schema for input
 const CreateCalendarEventInputSchema = z.object({
@@ -36,13 +37,10 @@ export type CreateCalendarEventOutput = z.infer<typeof CreateCalendarEventOutput
 
 // Helper to parse time string (e.g., "5:00 PM") and combine with date
 const getEventDateTime = (dateStr: string, timeStr: string, durationMinutes: number) => {
-  // Parse combined date and time string. Handles "h:mm a" (e.g., "5:00 PM") and "HH:mm" (e.g., "17:00")
   let parsedDate: Date;
   try {
-    // Attempt to parse with AM/PM first
     parsedDate = parse(`${dateStr} ${timeStr}`, 'yyyy-MM-dd h:mm a', new Date());
     if (isNaN(parsedDate.getTime())) {
-      // If AM/PM parse fails, try 24-hour format
       parsedDate = parse(`${dateStr} ${timeStr}`, 'yyyy-MM-dd HH:mm', new Date());
     }
   } catch (e) {
@@ -75,6 +73,8 @@ const createCalendarEventFlow = ai.defineFlow(
   async (input) => {
     console.log('CALENDAR_CREATE_EVENT: Attempting to create event for:', input);
 
+    const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
+
     let eventTimes;
     try {
         eventTimes = getEventDateTime(input.date, input.time, restaurantConfig.bookingSlotDurationMinutes);
@@ -85,35 +85,89 @@ const createCalendarEventFlow = ai.defineFlow(
     
     const { startTimeIso, endTimeIso } = eventTimes;
 
-    // !! IMPORTANT !!
-    // This is a placeholder. In a real application, you would:
-    // 1. Use the Google Calendar API (e.g., via 'googleapis' library).
-    // 2. Authenticate with Google (OAuth 2.0).
-    // 3. Construct an event object with:
-    //    - summary: `Booking for ${input.name} (${input.guests} guests)`
-    //    - description: `Email: ${input.email}\nPhone: ${input.phone}\nGuests: ${input.guests}\nNotes: ${input.notes || 'N/A'}`
-    //    - start: { dateTime: startTimeIso, timeZone: 'Your/Restaurant/TimeZone' } (e.g., 'America/New_York')
-    //    - end: { dateTime: endTimeIso, timeZone: 'Your/Restaurant/TimeZone' }
-    //    - attendees: [{ email: input.email }, { email: 'restaurant-bookings@example.com' }] (optional)
-    // 4. Insert the event into the primary calendar.
-    // 5. Handle API errors from Google.
+    // !! IMPORTANT: Google Calendar API Integration Placeholder !!
+    // You need to:
+    // 1. Ensure GOOGLE_APPLICATION_CREDENTIALS and GOOGLE_CALENDAR_ID are set in your .env.local.
+    // 2. The service account must have permissions to write to the calendar.
+    // 3. Adapt the event object below to your needs.
 
-    // Placeholder logic:
-    const isSimulatedError = false; // Math.random() < 0.1; // Simulate a 10% chance of error
+    const event = {
+      summary: `Reserva para ${input.name} (${input.guests} ${input.guests === 1 ? 'comensal' : 'comensales'})`,
+      description: `Reserva realizada a través del sitio web.\n\nNombre: ${input.name}\nEmail: ${input.email}\nTeléfono: ${input.phone}\nComensales: ${input.guests}\nNotas: ${input.notes || 'N/A'}`,
+      start: {
+        dateTime: startTimeIso,
+        timeZone: restaurantConfig.timeZone,
+      },
+      end: {
+        dateTime: endTimeIso,
+        timeZone: restaurantConfig.timeZone,
+      },
+      // Optional: Add attendees
+      // attendees: [
+      //   { email: input.email },
+      //   // { email: 'restaurant-booking-notifications@example.com' } // Your notification email
+      // ],
+      // Optional: Add reminders
+      // reminders: {
+      //   useDefault: false,
+      //   overrides: [
+      //     { method: 'email', minutes: 24 * 60 }, // 24 hours before
+      //     { method: 'popup', minutes: 60 },      // 1 hour before
+      //   ],
+      // },
+    };
 
-    if (isSimulatedError) {
-      console.error('CALENDAR_CREATE_EVENT: Simulated error creating calendar event.');
+    try {
+      // Initialize Google Auth (Service Account)
+      // const auth = new google.auth.GoogleAuth({
+      //   scopes: ['https://www.googleapis.com/auth/calendar.events'],
+      // });
+      // const authClient = await auth.getClient();
+      // google.options({ auth: authClient });
+
+      // const calendar = google.calendar({ version: 'v3' });
+
+      // const createdEvent = await calendar.events.insert({
+      //   calendarId: calendarId,
+      //   requestBody: event,
+      // });
+
+      // if (createdEvent.data.id) {
+      //   console.log(`CALENDAR_CREATE_EVENT: Successfully created event (ID: ${createdEvent.data.id}) from ${startTimeIso} to ${endTimeIso}.`);
+      //   return {
+      //     success: true,
+      //     eventId: createdEvent.data.id,
+      //   };
+      // } else {
+      //   console.error('CALENDAR_CREATE_EVENT: Event created but no ID returned from API.');
+      //   return {
+      //     success: false,
+      //     errorKey: 'landing:booking.error.calendarError',
+      //   };
+      // }
+
+      // Placeholder logic (remove or adapt when implementing real API calls):
+      const isSimulatedError = false; // Math.random() < 0.1; // Simulate a 10% chance of error
+      if (isSimulatedError) {
+        console.error('CALENDAR_CREATE_EVENT: Simulated error creating calendar event.');
+        return {
+          success: false,
+          errorKey: 'landing:booking.error.calendarError',
+        };
+      }
+      const simulatedEventId = `simulated_event_${Date.now()}`;
+      console.log(`CALENDAR_CREATE_EVENT: Successfully created simulated event (ID: ${simulatedEventId}) from ${startTimeIso} to ${endTimeIso}. Event details:`, event);
+      return {
+        success: true,
+        eventId: simulatedEventId,
+      };
+
+    } catch (error: any) {
+      console.error('CALENDAR_CREATE_EVENT: Error creating Google Calendar event:', error.message, error.stack);
       return {
         success: false,
-        errorKey: 'landing:booking.error.calendarError', // Generic calendar error key
+        errorKey: 'landing:booking.error.calendarError',
       };
     }
-
-    const simulatedEventId = `simulated_event_${Date.now()}`;
-    console.log(`CALENDAR_CREATE_EVENT: Successfully created simulated event (ID: ${simulatedEventId}) from ${startTimeIso} to ${endTimeIso}.`);
-    return {
-      success: true,
-      eventId: simulatedEventId,
-    };
   }
 );

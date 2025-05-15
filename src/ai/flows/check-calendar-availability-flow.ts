@@ -11,6 +11,8 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import restaurantConfig from '@/config/restaurant.config';
+import { google } from 'googleapis';
+import { addMinutes, parse, formatISO } from 'date-fns';
 
 const CheckCalendarAvailabilityInputSchema = z.object({
   date: z.string().describe('The desired date for the booking (YYYY-MM-DD).'),
@@ -26,6 +28,29 @@ const CheckCalendarAvailabilityOutputSchema = z.object({
 });
 export type CheckCalendarAvailabilityOutput = z.infer<typeof CheckCalendarAvailabilityOutputSchema>;
 
+// Helper to parse time string and combine with date
+const getEventDateTimeRange = (dateStr: string, timeStr: string, durationMinutes: number) => {
+  let parsedDate: Date;
+  try {
+    parsedDate = parse(`${dateStr} ${timeStr}`, 'yyyy-MM-dd h:mm a', new Date());
+    if (isNaN(parsedDate.getTime())) {
+      parsedDate = parse(`${dateStr} ${timeStr}`, 'yyyy-MM-dd HH:mm', new Date());
+    }
+  } catch (e) {
+     console.error(`CALENDAR_CHECK_AVAIL: Error parsing date/time: ${dateStr} ${timeStr}`, e);
+     throw new Error("Invalid date/time format for event.");
+  }
+  
+  if (isNaN(parsedDate.getTime())) {
+      console.error(`CALENDAR_CHECK_AVAIL: Parsed date is invalid for ${dateStr} ${timeStr}`);
+      throw new Error("Invalid date/time format for event after parsing attempts.");
+  }
+
+  const timeMin = formatISO(parsedDate);
+  const timeMax = formatISO(addMinutes(parsedDate, durationMinutes));
+  return { timeMin, timeMax };
+};
+
 // Exported wrapper function
 export async function checkCalendarAvailability(input: CheckCalendarAvailabilityInput): Promise<CheckCalendarAvailabilityOutput> {
   return checkCalendarAvailabilityFlow(input);
@@ -38,39 +63,83 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
     outputSchema: CheckCalendarAvailabilityOutputSchema,
   },
   async (input) => {
-    console.log('CALENDAR_CHECK: Checking availability for:', input);
-    // !! IMPORTANT !!
-    // This is a placeholder. In a real application, you would:
-    // 1. Construct the start and end ISO datetime strings from input.date, input.time, and restaurantConfig.bookingSlotDurationMinutes.
-    // 2. Use the Google Calendar API (e.g., via 'googleapis' library) to:
-    //    a. Authenticate with Google.
-    //    b. Query the primary calendar for events within the calculated time range.
-    //    c. Analyze existing events to determine if there's capacity for `input.guests`.
-    //    d. Consider restaurant's maximum capacity per slot, concurrent bookings, etc.
+    console.log('CALENDAR_CHECK_AVAIL: Checking availability for:', input);
 
-    // Placeholder logic:
-    // Example: Simulate a conflict for a specific popular time slot if too many guests
-    if (input.time === "7:00 PM" && input.guests > 4) {
-      console.log('CALENDAR_CHECK: Simulated conflict for 7:00 PM with > 4 guests.');
+    // !! IMPORTANT: Google Calendar API Integration Placeholder !!
+    // You need to:
+    // 1. Ensure GOOGLE_APPLICATION_CREDENTIALS and GOOGLE_CALENDAR_ID are set in your .env.local.
+    // 2. The service account must have permissions to read the calendar.
+    // 3. Implement robust logic to check for overlapping events and guest capacity.
+
+    const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
+
+    let eventDateTime;
+    try {
+        eventDateTime = getEventDateTimeRange(input.date, input.time, restaurantConfig.bookingSlotDurationMinutes);
+    } catch (error: any) {
+        console.error("CALENDAR_CHECK_AVAIL: Error processing event date/time:", error.message);
+        return { isAvailable: false, reasonKey: "landing:booking.error.invalidDateTime" };
+    }
+    const { timeMin, timeMax } = eventDateTime;
+
+    try {
+      // Initialize Google Auth (Service Account)
+      // const auth = new google.auth.GoogleAuth({
+      //   scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+      // });
+      // const authClient = await auth.getClient();
+      // google.options({ auth: authClient });
+
+      // const calendar = google.calendar({ version: 'v3' });
+
+      // const response = await calendar.events.list({
+      //   calendarId: calendarId,
+      //   timeMin: timeMin,
+      //   timeMax: timeMax,
+      //   singleEvents: true, // Important for expanding recurring events
+      //   orderBy: 'startTime',
+      //   // q: 'Booking for', // Optional: filter by event summary if you have a consistent naming
+      //   timeZone: restaurantConfig.timeZone,
+      // });
+
+      // const events = response.data.items;
+      // if (events && events.length > 0) {
+      //   // TODO: Implement logic to check total guests from existing events
+      //   // and compare against restaurantConfig.bookingMaxGuestsPerSlot
+      //   // For now, any event means it's booked.
+      //   console.log(`CALENDAR_CHECK_AVAIL: Found ${events.length} existing event(s) in this slot.`);
+      //   return {
+      //     isAvailable: false,
+      //     reasonKey: 'landing:booking.error.slotUnavailable.fullyBooked',
+      //   };
+      // }
+
+      // Placeholder logic (remove or adapt when implementing real API calls):
+      if (input.time === "7:00 PM" && input.guests > 4) {
+        console.log('CALENDAR_CHECK_AVAIL: Simulated conflict for 7:00 PM with > 4 guests.');
+        return {
+          isAvailable: false,
+          reasonKey: 'landing:booking.error.slotUnavailable.tooManyGuests',
+        };
+      }
+      if (input.date === "2024-12-25") {
+        console.log('CALENDAR_CHECK_AVAIL: Simulated fully booked for Christmas.');
+        return {
+          isAvailable: false,
+          reasonKey: 'landing:booking.error.slotUnavailable.fullyBooked',
+        };
+      }
+
+      console.log('CALENDAR_CHECK_AVAIL: Slot appears available (placeholder or no conflicts).');
+      return { isAvailable: true };
+
+    } catch (error: any) {
+      console.error('CALENDAR_CHECK_AVAIL: Error querying Google Calendar API:', error.message);
+      // Consider if this should be a user-facing error or just a log
       return {
-        isAvailable: false,
-        reasonKey: 'landing:booking.error.slotUnavailable.tooManyGuests', // Example specific reason
+        isAvailable: false, // Safer to assume not available if API call fails
+        reasonKey: 'landing:booking.error.calendarCheckFailed',
       };
     }
-    
-    // Example: Simulate a generally unavailable slot
-    if (input.date === "2024-12-25") { // Assuming Christmas is fully booked
-        console.log('CALENDAR_CHECK: Simulated fully booked for Christmas.');
-        return {
-            isAvailable: false,
-            reasonKey: 'landing:booking.error.slotUnavailable.fullyBooked',
-        };
-    }
-
-    console.log('CALENDAR_CHECK: Slot appears available (placeholder logic).');
-    // Default to available for placeholder
-    return {
-      isAvailable: true,
-    };
   }
 );
