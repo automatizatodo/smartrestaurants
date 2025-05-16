@@ -107,7 +107,7 @@ export default function TestimonialCarousel() {
             ))}
           </div>
 
-        <div className="mt-12 sm:mt-16 text-center space-y-4 sm:space-y-0 sm:flex sm:justify-center sm:space-x-4">
+        <div className="mt-12 sm:mt-16 text-center space-y-4 sm:space-y-0 sm:flex sm:justify-center sm:space-x-6"> {/* Changed sm:space-x-4 to sm:space-x-6 */}
           {restaurantConfig.googleReviewUrl && (
             <Link href={restaurantConfig.googleReviewUrl} target="_blank" rel="noopener noreferrer" passHref>
               <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto">
