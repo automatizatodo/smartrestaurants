@@ -8,12 +8,13 @@ export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
   let fullApiUrl = internalApiUrl;
 
   if (typeof window === 'undefined') {
+    // Server-side: construct the full URL
     // Prefer VERCEL_URL if available (common in Vercel deployments)
     // Prefer NEXT_PUBLIC_APP_URL if set (useful for local or other deployments)
-    // Fallback to 127.0.0.1 for local server-to-server calls
+    // Fallback to 127.0.0.1 with the dev server port from package.json (9003)
     const host = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : (process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9002'); // Use 127.0.0.1 for local
+      : (process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9003'); // Updated port to 9003
 
     fullApiUrl = `${host}${internalApiUrl}`;
     console.log(`SERVICE_FETCH_MENU: Running on server. Using full API URL: ${fullApiUrl}`);

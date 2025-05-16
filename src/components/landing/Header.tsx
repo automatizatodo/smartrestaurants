@@ -78,7 +78,7 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-2">
-             
+            {restaurantConfig.logoUrl ? (
               <Image
                 src={restaurantConfig.logoUrl}
                 alt={`${restaurantName} Logo`}
@@ -87,8 +87,11 @@ export default function Header() {
                 className="h-10 w-auto dark:filter dark:invert" // Invert colors in dark mode
                 priority
               />
+            ) : (
+              // Fallback if no logoUrl is provided, though we removed Wine icon
+              <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
+            )}
             
-            <span className="text-2xl font-serif font-bold text-foreground hidden sm:inline-block">{restaurantName}</span>
           </Link>
 
           {isMobile ? (
