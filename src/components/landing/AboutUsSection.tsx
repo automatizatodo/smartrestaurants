@@ -23,7 +23,7 @@ export default function AboutUsSection() {
       src: "/interior2.webp", // Interior
       altKey: "landing:aboutUs.imageAltInterior",
       hint: "restaurant interior dining",
-      customClass: "z-20 top-[-15%] right-[-10%] sm:top-[-10%] sm:right-[-15%] w-3/5 rotate-[10deg] group-hover:rotate-[5deg] group-hover:scale-110 border-4 border-background dark:border-secondary shadow-lg",
+      customClass: "z-20 bottom-[-20%] right-[-10%] sm:right-[-15%] w-3/5 rotate-[10deg] group-hover:rotate-[5deg] group-hover:scale-110 border-4 border-background dark:border-secondary shadow-lg",
       priority: false,
     },
     {
@@ -54,7 +54,7 @@ export default function AboutUsSection() {
 
 
   return (
-    <section id="about-us" className="py-10 sm:py-14 bg-background overflow-hidden"> {/* Reduced py further */}
+    <section id="about-us" className="py-10 sm:py-14 bg-background relative z-30"> {/* REMOVED overflow-hidden, ADDED relative z-30 */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
@@ -76,7 +76,7 @@ export default function AboutUsSection() {
           {/* Image Area: Conditional rendering based on screen size */}
           {/* Desktop Image Composition (hidden on small screens, visible on md and up) */}
           <div className="hidden md:flex md:col-span-1 order-1 md:order-2 items-center justify-center min-h-[200px] sm:min-h-[250px] md:min-h-[300px]"> {/* Reduced min-h further */}
-            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md group"> {/* Removed aspect-[4/5] */}
+            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md group">
               {/* Image 1: Exterior (Façana - Centered in the pseudo-stack) */}
               <div
                 className={cn(
@@ -95,12 +95,13 @@ export default function AboutUsSection() {
                 />
               </div>
 
-              {/* Image 2: Interior */}
+              {/* Image 2: Interior - This one will overlap */}
               <div
                 className={cn(
-                  "absolute aspect-square",
+                  "absolute aspect-square", // aspect-square might constrain it too much if we want it to extend downwards. Let's try aspect-[3/4] or remove aspect.
+                                  // Let's remove aspect-square to allow it to stretch if needed by its w-3/5 and positioning
                   "rounded-md overflow-hidden transition-all duration-500 ease-in-out",
-                  images[1].customClass
+                  images[1].customClass // Contains z-20, bottom-[-20%], right-[-10%], etc.
                 )}
               >
                 <Image
