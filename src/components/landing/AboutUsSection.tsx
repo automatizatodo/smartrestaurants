@@ -67,7 +67,7 @@ export default function AboutUsSection() {
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Text Column */}
-          <div className="space-y-6 text-foreground/90 order-2 md:order-1 flex flex-col justify-center relative z-10"> {/* Added relative z-10 */}
+          <div className="space-y-6 text-foreground/90 order-2 md:order-1 flex flex-col justify-center"> {/* Removed relative z-10 */}
             <p className="text-base sm:text-lg leading-relaxed">
               {t('landing:aboutUs.paragraph1', { restaurantName })}
             </p>
@@ -194,5 +194,3 @@ export default function AboutUsSection() {
     </section>
   );
 }
-
-    
