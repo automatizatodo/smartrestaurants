@@ -1,8 +1,8 @@
 
 {
-  "starters": "Menu Starters",
-  "mainCourses": "Menu Main Courses",
-  "desserts": "Menu Desserts",
+  "starters": "Starters",
+  "mainCourses": "Main Courses",
+  "desserts": "Desserts",
   "drinks": "Drinks",
   "other": "Other",
   "menuDelDia.title": "Menu of the Day",
@@ -12,3 +12,5 @@
   "chefsSuggestion": "Chef's Suggestion",
   "allergensTitle": "Allergens:"
 }
+
+    

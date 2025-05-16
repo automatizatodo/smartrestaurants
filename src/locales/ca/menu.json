@@ -1,8 +1,8 @@
 
 {
-  "starters": "Entrants del Menú",
-  "mainCourses": "Plats Principals del Menú",
-  "desserts": "Postres del Menú",
+  "starters": "Entrants",
+  "mainCourses": "Plats Principals",
+  "desserts": "Postres",
   "drinks": "Begudes",
   "other": "Altres",
   "menuDelDia.title": "Menú del Dia",
@@ -12,3 +12,5 @@
   "chefsSuggestion": "Suggeriment del Xef",
   "allergensTitle": "Al·lèrgens:"
 }
+
+    

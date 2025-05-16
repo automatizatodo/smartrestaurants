@@ -1,8 +1,8 @@
 
 {
-  "starters": "Entrantes del Menú",
-  "mainCourses": "Platos Principales del Menú",
-  "desserts": "Postres del Menú",
+  "starters": "Entrantes",
+  "mainCourses": "Platos Principales",
+  "desserts": "Postres",
   "drinks": "Bebidas",
   "other": "Otros",
   "menuDelDia.title": "Menú del Día",
@@ -12,3 +12,5 @@
   "chefsSuggestion": "Sugerencia del Chef",
   "allergensTitle": "Alérgenos:"
 }
+
+    

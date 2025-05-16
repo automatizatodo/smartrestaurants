@@ -3,16 +3,10 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
-// !!! IMPORTANT: Replace this URL with your *NEW* Google Sheet "Publish to web" CSV URL !!!
-// To get this URL for your sheet (https://docs.google.com/spreadsheets/d/1dq0-Ig75IqiacQvoJk-BnCz0Xgv8sebSj5pQZYJiIDU/edit):
-// 1. Open your Google Sheet.
-// 2. Go to File > Share > Publish to web.
-// 3. Select the sheet named "Menú" (or your main menu sheet).
-// 4. Choose "Comma-separated values (.csv)" as the format.
-// 5. Click "Publish" and copy the generated URL here.
-const GOOGLE_SHEET_CSV_URL = 'YOUR_NEW_GOOGLE_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
 
 // Column names from the Google Sheet structure
+const VISIBLE_COL = "Visible";
 const CATEGORIA_ES_COL = "Categoría (ES)";
 const CATEGORY_EN_COL = "Category (EN)";
 const NOMBRE_ES_COL = "Nombre (ES)";
@@ -20,16 +14,18 @@ const NAME_EN_COL = "Name (EN)";
 const DESCRIPCION_ES_COL = "Descripción (ES)";
 const DESCRIPTION_EN_COL = "Description (EN)";
 const PRECIO_COL = "Precio (€)";
-const ALERGENOS_COL = "Alérgenos"; // New column for allergens
-const SUGERENCIA_COL = "Sugerencia del Chef"; // New column for chef's suggestion
+const LINK_IMAGEN_COL = "Link Imagen";
+const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
+const ALERGENOS_COL = "Alergenos";
 
 // Expected headers for validation
 const EXPECTED_HEADERS = [
+  VISIBLE_COL,
   CATEGORIA_ES_COL, CATEGORY_EN_COL,
   NOMBRE_ES_COL, NAME_EN_COL,
   DESCRIPCION_ES_COL, DESCRIPTION_EN_COL,
   PRECIO_COL,
-  ALERGENOS_COL, SUGERENCIA_COL // Added new expected headers
+  LINK_IMAGEN_COL, SUGERENCIA_CHEF_COL, ALERGENOS_COL
 ];
 
 // Helper to map English category names from sheet to consistent categoryKeys
@@ -37,17 +33,13 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters':
-    case 'entrantes': // Adding Spanish variant
       return 'starters';
     case 'main courses':
-    case 'platos principales': // Adding Spanish variant
       return 'mainCourses';
     case 'desserts':
-    case 'postres': // Adding Spanish variant
       return 'desserts';
     case 'beverages':
     case 'drinks':
-    case 'bebidas': // Adding Spanish variant
       return 'drinks';
     default:
       console.warn(`API_ROUTE_MAP_CATEGORY: Unknown category encountered: '${categoryEN}'. Defaulting to '${lowerCategory.replace(/\s+/g, '') || 'other'}'.`);
@@ -87,6 +79,7 @@ function parseCSV(csvText: string): Record<string, string>[] {
       console.log(`API_ROUTE_PARSE_CSV: Skipping empty line at index ${i}`);
       continue;
     }
+    // Split by comma, but not if comma is inside quotes
     const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(value => value.trim().replace(/^"|"$/g, ''));
 
     if (values.length === headersFromSheet.length) {
@@ -103,6 +96,16 @@ function parseCSV(csvText: string): Record<string, string>[] {
   return jsonData;
 }
 
+function isValidHttpUrl(string: string) {
+  let url;
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;  
+  }
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
 export async function GET() {
   console.log("API_ROUTE_GET_MENU: /api/menu GET handler called.");
   const googleSheetCsvUrl = GOOGLE_SHEET_CSV_URL;
@@ -112,7 +115,6 @@ export async function GET() {
     return NextResponse.json({ error: "Menu data source not configured" }, { status: 500 });
   }
   console.log(`API_ROUTE_GET_MENU: Fetching menu from URL: ${googleSheetCsvUrl}`);
-
 
   let allMenuItems: MenuItemData[] = [];
   let parsedData: Record<string, string>[] = []; 
@@ -138,54 +140,64 @@ export async function GET() {
     console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV.`);
 
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
+      const visibleString = item[VISIBLE_COL] || "TRUE";
+      if (visibleString.toUpperCase() === "FALSE" || visibleString === "0") {
+        console.log(`API_ROUTE_GET_MENU: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as not visible. Skipping.`);
+        return null;
+      }
+
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
-      const categoryEN = item[CATEGORY_EN_COL]; // Using English category for consistent key mapping
+      const categoryEN = item[CATEGORY_EN_COL];
       let price = item[PRECIO_COL];
-      const allergensString = item[ALERGENOS_COL] || "";
-      const chefSuggestionString = item[SUGERENCIA_COL] || "FALSE";
+      const linkImagen = item[LINK_IMAGEN_COL];
+      const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
+      const alergenosString = item[ALERGENOS_COL] || "";
 
       if (!nameES || !nameEN || !categoryEN) {
         console.warn(`API_ROUTE_GET_MENU: Item at row ${index + 2} is missing essential data (Name ES/EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
         return null;
       }
 
-      if (price === undefined || price === null || price.trim() === "") {
-        price = undefined; 
-      } else {
+      let finalImageUrl = `https://placehold.co/400x300.png`;
+      if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && isValidHttpUrl(linkImagen)) {
+        finalImageUrl = linkImagen;
+      }
+
+      let formattedPrice: string | undefined = undefined;
+      if (price !== undefined && price !== null && price.trim() !== "") {
         const numericPrice = parseFloat(price.replace(',', '.'));
         if (!isNaN(numericPrice)) {
-            price = `€${numericPrice.toFixed(2)}`; // Keep price formatting if present
+            formattedPrice = `€${numericPrice.toFixed(2)}`;
         } else {
-            price = undefined; 
             console.warn(`API_ROUTE_GET_MENU: Item '${nameEN}' (row ${index + 2}) has unparseable price: '${item[PRECIO_COL]}'. Setting to undefined.`);
         }
       }
       
-      const allergens = allergensString.split(',')
+      const allergens = alergenosString.split(',')
         .map(a => a.trim().toLowerCase())
         .filter(a => a.length > 0);
 
-      const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1'].includes(chefSuggestionString.toLowerCase());
+      const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE'].includes(sugerenciaChefString.toLowerCase());
 
       const categoryKey = mapCategoryToKey(categoryEN);
-      const nameENForHint = nameEN || "food item"; 
-
-      let imageHint = nameENForHint.toLowerCase().split(' ').slice(0, 2).join(' ');
+      
+      let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
       if (!imageHint || imageHint === "food item") {
-        imageHint = categoryEN.toLowerCase() || "food plate";
+        imageHint = (categoryEN || "food plate").toLowerCase();
       }
 
+
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`,
+        id: `${categoryKey}-${index}-${Date.now()}`, // More unique ID
         name: { en: nameEN.trim(), es: nameES.trim() },
         description: {
           en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(),
           es: (item[DESCRIPCION_ES_COL] || "Descripción no disponible.").trim()
         },
-        price: price, 
+        price: formattedPrice, 
         categoryKey: categoryKey,
-        imageUrl: `https://placehold.co/400x300.png`,
+        imageUrl: finalImageUrl,
         imageHint: imageHint,
         allergens: allergens.length > 0 ? allergens : undefined,
         isChefSuggestion: isChefSuggestion,
@@ -201,9 +213,11 @@ export async function GET() {
 
   console.log(`API_ROUTE_GET_MENU: Total menu items processed: ${allMenuItems.length}. Sending response.`);
   if (allMenuItems.length === 0 && parsedData.length > 0) {
-    console.warn("API_ROUTE_GET_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency.");
+    console.warn("API_ROUTE_GET_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency, especially the 'Visible' column.");
   } else if (allMenuItems.length === 0) {
     console.warn("API_ROUTE_GET_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
   }
   return NextResponse.json(allMenuItems, { status: 200 });
 }
+
+    
