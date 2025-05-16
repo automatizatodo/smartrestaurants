@@ -32,15 +32,15 @@ export default function ServicesSection() {
       {/* Background Image and Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://placehold.co/1920x1080.png"
-          alt={t('landing:services.sectionTitle')} // Generic alt for background
-          data-ai-hint="culinary preparation kitchen"
+          src="https://placehold.co/1920x1080.png" 
+          alt={t('landing:services.sectionTitle')} 
+          data-ai-hint="restaurant kitchen food preparation"
           layout="fill"
           objectFit="cover"
-          quality={70}
-          priority={false}
+          quality={70} 
+          priority={false} 
         />
-        <div className="absolute inset-0 bg-background/80 dark:bg-background/90"></div> {/* Overlay */}
+        <div className="absolute inset-0 bg-background/60 dark:bg-background/75"></div> {/* Reduced opacity here */}
       </div>
 
       {/* Content */}
