@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -11,8 +12,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['var(--font-geist-sans)'],
-        mono: ['var(--font-geist-mono)'],
-        serif: ['var(--font-lora)'], // Added Lora font
+        serif: ['var(--font-playfair-display)'], // Changed from Lora to Playfair Display
       },
   		colors: {
   			background: 'hsl(var(--background))',

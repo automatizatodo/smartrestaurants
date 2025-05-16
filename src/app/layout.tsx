@@ -1,7 +1,7 @@
 
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { Lora } from 'next/font/google';
+import { Geist } from 'next/font/google';
+import { Playfair_Display } from 'next/font/google'; // Changed from Lora
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -12,15 +12,11 @@ const geistSans = Geist({
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+// Changed Lora to Playfair_Display for headings
+const playfairDisplay = Playfair_Display({
+  variable: '--font-playfair-display',
   subsets: ['latin'],
-});
-
-const lora = Lora({
-  variable: '--font-lora',
-  subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400', '700', '900'], // Added more weights for headings
 });
 
 export const metadata: Metadata = {
@@ -46,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body 
-        className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}
+        className={`${geistSans.variable} ${playfairDisplay.variable} antialiased`} // Updated to include playfairDisplay
         suppressHydrationWarning={true}
       >
         <LanguageProvider>
@@ -58,4 +54,3 @@ export default function RootLayout({
     </html>
   );
 }
-
