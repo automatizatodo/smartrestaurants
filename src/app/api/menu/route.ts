@@ -3,8 +3,14 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
-// Use the more stable "Publish to web" CSV URL
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
+// !!! IMPORTANT: Replace this URL with your *NEW* Google Sheet "Publish to web" CSV URL !!!
+// To get this URL for your sheet (https://docs.google.com/spreadsheets/d/1dq0-Ig75IqiacQvoJk-BnCz0Xgv8sebSj5pQZYJiIDU/edit):
+// 1. Open your Google Sheet.
+// 2. Go to File > Share > Publish to web.
+// 3. Select the sheet named "Menú" (or your main menu sheet).
+// 4. Choose "Comma-separated values (.csv)" as the format.
+// 5. Click "Publish" and copy the generated URL here.
+const GOOGLE_SHEET_CSV_URL = 'YOUR_NEW_GOOGLE_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
 
 // Column names from the Google Sheet structure
 const CATEGORIA_ES_COL = "Categoría (ES)";
@@ -100,7 +106,13 @@ function parseCSV(csvText: string): Record<string, string>[] {
 export async function GET() {
   console.log("API_ROUTE_GET_MENU: /api/menu GET handler called.");
   const googleSheetCsvUrl = GOOGLE_SHEET_CSV_URL;
+
+  if (googleSheetCsvUrl === 'YOUR_NEW_GOOGLE_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE' || !googleSheetCsvUrl) {
+    console.error("API_ROUTE_GET_MENU: CRITICAL - GOOGLE_SHEET_CSV_URL is not configured or is still the placeholder. Please update it in src/app/api/menu/route.ts with your actual 'Publish to web' CSV URL.");
+    return NextResponse.json({ error: "Menu data source not configured" }, { status: 500 });
+  }
   console.log(`API_ROUTE_GET_MENU: Fetching menu from URL: ${googleSheetCsvUrl}`);
+
 
   let allMenuItems: MenuItemData[] = [];
   let parsedData: Record<string, string>[] = []; 
@@ -139,8 +151,7 @@ export async function GET() {
       }
 
       if (price === undefined || price === null || price.trim() === "") {
-        // For Menu del Dia, individual prices might not be relevant, but we parse if present
-        price = undefined; // Or some default like 'N/A' if you still want to store it
+        price = undefined; 
       } else {
         const numericPrice = parseFloat(price.replace(',', '.'));
         if (!isNaN(numericPrice)) {
@@ -172,7 +183,7 @@ export async function GET() {
           en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(),
           es: (item[DESCRIPCION_ES_COL] || "Descripción no disponible.").trim()
         },
-        price: price, // Price is optional now
+        price: price, 
         categoryKey: categoryKey,
         imageUrl: `https://placehold.co/400x300.png`,
         imageHint: imageHint,
