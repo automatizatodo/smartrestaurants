@@ -16,14 +16,14 @@ export default function AboutUsSection() {
       src: "/façana.webp", // Façana
       altKey: "landing:aboutUs.imageAltExterior",
       hint: "restaurant exterior facade",
-      desktopClass: "z-10 w-full aspect-[4/3] shadow-2xl rounded-lg transform group-hover:scale-105 transition-all duration-500 ease-in-out",
+      desktopClass: "relative z-10 w-11/12 md:w-10/12 aspect-[4/3] shadow-xl rounded-lg transform group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-500 ease-in-out rotate-[-1deg]",
       priority: true,
     },
     {
       src: "/interior2.webp", // Interior
       altKey: "landing:aboutUs.imageAltInterior",
       hint: "restaurant interior dining",
-      desktopClass: "z-20 absolute top-[5%] right-[5%] w-3/5 sm:w-1/2 aspect-[5/4] rotate-[7deg] group-hover:rotate-[2deg] group-hover:scale-105 transition-all duration-500 ease-in-out border-4 border-background dark:border-card shadow-xl rounded-md",
+      desktopClass: "absolute z-20 top-[-5%] right-[-5%] w-3/5 sm:w-7/12 aspect-[5/4] rotate-[6deg] group-hover:rotate-[2deg] group-hover:scale-105 transition-all duration-500 ease-in-out border-4 border-background dark:border-card shadow-2xl rounded-md",
       priority: false,
     },
     {
@@ -54,7 +54,7 @@ export default function AboutUsSection() {
 
 
   return (
-    <section id="about-us" className="py-10 sm:py-14 bg-background relative z-30"> {/* z-index per permetre la superposició */}
+    <section id="about-us" className="py-10 sm:py-12 bg-background relative z-30"> {/* z-index per permetre la superposició */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
@@ -76,13 +76,13 @@ export default function AboutUsSection() {
           {/* Àrea d'imatges: Condicional segons mida de pantalla */}
           
           {/* Composició d'imatges per a escriptori (md i superiors) */}
-          <div className="hidden md:flex md:col-span-1 order-1 md:order-2 items-center justify-center min-h-[350px] lg:min-h-[400px]">
-            <div className="relative w-full max-w-md lg:max-w-lg group">
+          <div className="hidden md:flex md:col-span-1 order-1 md:order-2 items-center justify-center min-h-[300px] lg:min-h-[350px]">
+            <div className="relative w-full max-w-sm lg:max-w-md group"> {/* Reduït max-w per a millor control */}
               {/* Imatge 1: Exterior (Façana) - Base */}
               <div
                 className={cn(
-                  "relative", // Canviat d'absolute per ser el flux normal dins del group
-                  componentImages[0].desktopClass
+                  componentImages[0].desktopClass,
+                  "mx-auto" // Centrar la imatge base si és més petita que el contenidor
                 )}
               >
                 <Image
@@ -101,12 +101,6 @@ export default function AboutUsSection() {
                 className={cn(
                   componentImages[1].desktopClass
                 )}
-                style={{
-                  // Assegura que aquesta imatge pugui "penjar" una mica per sota
-                  // si és necessari per a l'efecte de superposició amb la secció següent.
-                  // La secció pare té z-30, aquesta té z-20.
-                  transform: 'translateY(5%)', // Ajusta segons sigui necessari per a la superposició
-                }}
               >
                 <Image
                   src={componentImages[1].src}
