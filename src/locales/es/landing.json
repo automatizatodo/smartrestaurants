@@ -82,9 +82,7 @@
   "testimonials.leaveTripAdvisorReview": "Dejar Reseña en TripAdvisor",
   "aboutUs.title": "Nuestra Historia",
   "aboutUs.introduction": "En Can Fanals cocinamos con pasión, combinando la mejor brasa y la tradición catalana con productos de proximidad. Nuestra cocina es 100% sin gluten, para que todos puedan disfrutar sin límites.",
-  "aboutUs.paragraph1": "Fundado en 2005 por el aclamado Chef Elena Soler, nuestro restaurante nació de un sueño: crear un espacio donde cada plato contara una historia, donde los ingredientes frescos y de temporada fueran los protagonistas y donde cada comensal se sintiera como en casa. Desde nuestros humildes comienzos en un pequeño local del barrio Gótico, hemos crecido gracias a la dedicación de nuestro equipo y la fidelidad de nuestros clientes.",
-  "aboutUs.paragraph2": "Con el paso de los años, hemos perfeccionado nuestras técnicas, explorado nuevos sabores y ampliado nuestros horizontes, siempre manteniendo la esencia de la cocina tradicional con un toque innovador. Nuestro compromiso con la excelencia nos ha llevado a ser reconocidos con diversos premios gastronómicos, pero nuestra mayor satisfacción sigue siendo ver las sonrisas de quienes nos visitan.",
-  "aboutUs.paragraph3": "Hoy, {restaurantName} no es solo un restaurante, sino un punto de encuentro para los amantes de la buena comida, un lugar para celebrar momentos especiales y para descubrir la magia de una experiencia culinaria única. Les invitamos a formar parte de nuestra historia.",
+  "aboutUs.paragraph1": "Desde nuestros inicios, hemos evolucionado para ofrecer una experiencia culinaria única, donde cada plato cuenta una historia de ingredientes frescos y de temporada. Nuestro compromiso es con la excelencia y la satisfacción de cada comensal, haciendo de {restaurantName} un punto de encuentro para los amantes de la buena comida y las celebraciones especiales. Os invitamos a descubrir nuestra esencia.",
   "aboutUs.imageAlt": "Interior acogedor del restaurante Can Fanals",
   "contactMap.sectionTitle": "Dónde Encontrarnos",
   "contactMap.sectionDescription": "Visítanos para una experiencia gastronómica inolvidable. Estamos convenientemente ubicados y esperamos darle la bienvenida. Disfruta de nuestro ambiente rústico y acogedor.",
@@ -102,3 +100,5 @@
   "contactMap.hours.mon": "Lunes",
   "contactMap.hours.closed": "Cerrado"
 }
+
+    

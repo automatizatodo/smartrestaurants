@@ -80,9 +80,7 @@
   "testimonials.leaveTripAdvisorReview": "Leave a Review on TripAdvisor",
   "aboutUs.title": "Our Story",
   "aboutUs.introduction": "At Can Fanals we cook with passion, combining the best grill and Catalan tradition with local products. Our cuisine is 100% gluten-free, so everyone can enjoy it without limits.",
-  "aboutUs.paragraph1": "Founded in 2005 by acclaimed Chef Elena Soler, our restaurant was born from a dream: to create a space where every dish tells a story, where fresh, seasonal ingredients are the protagonists, and where every diner feels at home. From our humble beginnings in a small Gòtic quarter venue, we have grown thanks to the dedication of our team and the loyalty of our customers.",
-  "aboutUs.paragraph2": "Over the years, we have perfected our techniques, explored new flavors, and expanded our horizons, always maintaining the essence of traditional cuisine with an innovative touch. Our commitment to excellence has led us to be recognized with several gastronomic awards, but our greatest satisfaction continues to be seeing the smiles of those who visit us.",
-  "aboutUs.paragraph3": "Today, {restaurantName} is not just a restaurant, but a meeting point for lovers of good food, a place to celebrate special moments, and to discover the magic of a unique culinary experience. We invite you to be part of our story.",
+  "aboutUs.paragraph1": "Since our beginnings, we have evolved to offer a unique culinary experience, where each dish tells a story of fresh, seasonal ingredients. Our commitment is to excellence and the satisfaction of every diner, making {restaurantName} a meeting point for lovers of good food and special celebrations. We invite you to discover our essence.",
   "aboutUs.imageAlt": "Cozy interior of Can Fanals restaurant",
   "contactMap.sectionTitle": "Where to Find Us",
   "contactMap.sectionDescription": "Visit us for an unforgettable dining experience. We are conveniently located and look forward to welcoming you. Enjoy our rustic and cozy atmosphere.",
@@ -100,3 +98,5 @@
   "contactMap.hours.mon": "Monday",
   "contactMap.hours.closed": "Closed"
 }
+
+    

@@ -36,15 +36,11 @@ export default function AboutUsSection() {
             <p className="text-base sm:text-lg leading-relaxed">
               {t('landing:aboutUs.paragraph1', { restaurantName })}
             </p>
-            <p className="text-base sm:text-lg leading-relaxed">
-              {t('landing:aboutUs.paragraph2')}
-            </p>
-            <p className="text-base sm:text-lg leading-relaxed">
-              {t('landing:aboutUs.paragraph3', { restaurantName })}
-            </p>
           </div>
         </div>
       </div>
     </section>
   );
 }
+
+    

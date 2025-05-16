@@ -74,7 +74,7 @@
   "booking.error.calendarCheckFailed": "No s'ha pogut verificar la disponibilitat del calendari. Si us plau, torna-ho a provar més tard.",
   "booking.error.invalidDateTime": "La data o hora seleccionada no és vàlida. Si us plau, verifica i torna-ho a provar.",
   "booking.error.calendarConfigError": "Hi ha un problema amb la configuració del calendari. Si us plau, contacta amb suport.",
-  "booking.error.whatsappConfigError": "La reserva per WhatsApp no està configurada correctament. Si us plau, contacta amb el restaurant.",
+  "booking.error.whatsappConfigError": "La reserva per WhatsApp no està configurada correctament. Si us plau, contacta con el restaurant.",
   "booking.error.unknownMethod": "Mètode de reserva desconegut configurat. Si us plau, contacta con suport.",
   "testimonials.sectionTitle": "Paraules Dels Nostres Clients",
   "testimonials.sectionDescription": "Escolta el que els nostres clients diuen sobre la seva experiència a {restaurantName}.",
@@ -82,9 +82,7 @@
   "testimonials.leaveTripAdvisorReview": "Deixar Ressenya a TripAdvisor",
   "aboutUs.title": "La Nostra Història",
   "aboutUs.introduction": "A Can Fanals cuinem amb passió, combinant la millor brasa i la tradició catalana amb productes de proximitat. La nostra cuina és 100% sense gluten, perquè tothom pugui gaudir-ne sense límits.",
-  "aboutUs.paragraph1": "Fundat el 2005 per l'aclamat xef Joan Roca, el nostre restaurant va néixer d'un somni: crear un espai on cada plat expliqués una història, on els ingredients frescos i de temporada fossin els protagonistes i on cada comensal se sentís como a casa. Des dels nostres humils inicis en un petit local del barri Gòtic, hem crescut gràcies a la dedicació del nostre equip i la fidelitat dels nostres clients.",
-  "aboutUs.paragraph2": "Amb el pas dels anys, hem perfeccionat les nostres tècniques, explorat nous sabors i ampliat els nostres horitzons, sempre mantenint l'essència de la cuina tradicional amb un toc innovador. El nostre compromís amb l'excel·lència ens ha portat a ser reconeguts amb diversos premis gastronòmics, però la nostra major satisfacció continua sent veure els somriures dels qui ens visiten.",
-  "aboutUs.paragraph3": "Avui, {restaurantName} no és només un restaurant, sinó un punt de trobada per als amants del bon menjar, un lloc per celebrar moments especials i per descobrir la màgia d'una experiència culinària única. Us convidem a formar part de la nostra història.",
+  "aboutUs.paragraph1": "Des dels nostres inicis, hem evolucionat per oferir una experiència culinària única, on cada plat explica una història d'ingredients frescos i de temporada. El nostre compromís és amb l'excel·lència i la satisfacció de cada comensal, fent de {restaurantName} un punt de trobada per als amants del bon menjar i les celebracions especials. Us convidem a descobrir la nostra essència.",
   "aboutUs.imageAlt": "Interior acollidor del restaurant Can Fanals",
   "contactMap.sectionTitle": "On Trobar-nos",
   "contactMap.sectionDescription": "Visita'ns per a una experiència gastronòmica inoblidable. Estem convenientment ubicats i esperem donar-te la benvinguda. Gaudeix del nostre ambient rústic i acollidor.",
@@ -102,3 +100,5 @@
   "contactMap.hours.mon": "Dilluns",
   "contactMap.hours.closed": "Tancat"
 }
+
+    
