@@ -12,6 +12,8 @@ import Footer from '@/components/landing/Footer';
 import { fetchMenuFromGoogleSheet } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 
+export const dynamic = 'force-dynamic'; // Ensures the page is always server-rendered
+
 export default async function HomePage() {
   const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
   console.log("HOMEPAGE_LOG: Received menuItems in HomePage:", JSON.stringify(menuItems, null, 2));

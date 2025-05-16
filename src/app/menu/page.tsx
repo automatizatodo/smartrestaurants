@@ -5,6 +5,8 @@ import { fetchMenuFromGoogleSheet } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import MenuPageClientContent from './MenuPageClientContent'; // New client component for UI logic
 
+export const dynamic = 'force-dynamic'; // Ensures the page is always server-rendered
+
 // Metadata can be generated here if needed (static or using fetched data)
 // import type { Metadata } from 'next';
 // import enCommon from '@/locales/en/common.json';
