@@ -10,6 +10,7 @@
   "nav.aboutUs": "About Us",
   "nav.services": "Services",
   "nav.contact": "Contact & Map",
+  "nav.mobileMenuTitle": "Navigation Menu",
   "button.bookNow": "Book Now",
   "button.viewFullMenu": "View Full Menu",
   "footer.quickLinks": "Quick Links",
@@ -37,3 +38,4 @@
   "page.menu.description": "Explore the full range of culinary delights offered at {restaurantName}. Each dish crafted with passion and artistry.",
   "allCategories": "All"
 }
+

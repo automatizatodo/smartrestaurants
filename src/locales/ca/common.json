@@ -10,6 +10,7 @@
   "nav.aboutUs": "Sobre Nosaltres",
   "nav.services": "Serveis",
   "nav.contact": "Contacte i Mapa",
+  "nav.mobileMenuTitle": "Menú de Navegació",
   "button.bookNow": "Reservar Ara",
   "button.viewFullMenu": "Veure Menú Complet",
   "footer.quickLinks": "Enllaços Ràpids",
@@ -37,3 +38,4 @@
   "page.menu.description": "Explora la gamma completa de delícies culinàries ofertes a {restaurantName}. Cada plat elaborat amb passió i art.",
   "allCategories": "Totes"
 }
+
