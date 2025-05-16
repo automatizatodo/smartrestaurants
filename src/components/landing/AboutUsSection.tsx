@@ -54,7 +54,7 @@ export default function AboutUsSection() {
 
 
   return (
-    <section id="about-us" className="py-16 sm:py-24 bg-background overflow-hidden">
+    <section id="about-us" className="py-12 sm:py-20 bg-background overflow-hidden"> {/* Reduced py */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
@@ -75,7 +75,7 @@ export default function AboutUsSection() {
 
           {/* Image Area: Conditional rendering based on screen size */}
           {/* Desktop Image Composition (hidden on small screens, visible on md and up) */}
-          <div className="hidden md:flex md:col-span-1 order-1 md:order-2 items-center justify-center min-h-[300px] sm:min-h-[450px] md:min-h-[500px]">
+          <div className="hidden md:flex md:col-span-1 order-1 md:order-2 items-center justify-center min-h-[250px] sm:min-h-[350px] md:min-h-[400px]"> {/* Reduced min-h */}
             <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg aspect-[4/5] group">
               {/* Image 1: Exterior (Façana - Centered in the pseudo-stack) */}
               <div
@@ -196,3 +196,4 @@ export default function AboutUsSection() {
     </section>
   );
 }
+
