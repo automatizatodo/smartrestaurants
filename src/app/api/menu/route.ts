@@ -19,7 +19,7 @@ const LINK_IMAGEN_COL = "Link Imagen";
 const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
 const ALERGENOS_COL = "Alergenos";
 
-// Expected headers for validation
+// Expected headers for validation - These are REQUIRED.
 const EXPECTED_HEADERS = [
   VISIBLE_COL,
   CATEGORIA_ES_COL, CATEGORY_EN_COL,
@@ -60,12 +60,15 @@ function parseCSV(csvText: string): Record<string, string>[] {
 
   const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, '')); // Trim and remove quotes from headers
   console.log(`API_ROUTE_PARSE_CSV: Headers found in sheet: [${headersFromSheet.join(", ")}]`);
-  console.log(`API_ROUTE_PARSE_CSV: Expected headers: [${EXPECTED_HEADERS.join(", ")}]`);
+  console.log(`API_ROUTE_PARSE_CSV: Expected headers (must be present): [${EXPECTED_HEADERS.join(", ")}]`);
 
   // Validate headers
   const missingHeaders = EXPECTED_HEADERS.filter(eh => !headersFromSheet.includes(eh));
   if (missingHeaders.length > 0) {
-    console.error(`API_ROUTE_PARSE_CSV: Critical header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
+    console.error(`API_ROUTE_PARSE_CSV: CRITICAL header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Actual sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
+    if (missingHeaders.includes(VISIBLE_COL)) {
+        console.error(`API_ROUTE_PARSE_CSV: The critical "Visible" column is missing or misspelled in your Google Sheet's published CSV. Please ensure it's the first column and named exactly "Visible".`);
+    }
     return []; // Stop processing if critical headers are missing
   }
 
@@ -93,11 +96,12 @@ function parseCSV(csvText: string): Record<string, string>[] {
       console.warn(`API_ROUTE_PARSE_CSV: Skipping malformed CSV line ${i + 1}. Expected ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
     }
   }
-  console.log(`API_ROUTE_PARSE_CSV: Parsed ${jsonData.length} data rows.`);
+  console.log(`API_ROUTE_PARSE_CSV: Parsed ${jsonData.length} data rows from CSV (before filtering).`);
   return jsonData;
 }
 
 function isValidHttpUrl(string: string) {
+  if (!string) return false;
   let url;
   try {
     url = new URL(string);
@@ -121,7 +125,7 @@ export async function GET() {
   let parsedData: Record<string, string>[] = []; 
 
   try {
-    const response = await fetch(googleSheetCsvUrl, { cache: 'no-store' }); // Use no-store for testing to ensure fresh data
+    const response = await fetch(googleSheetCsvUrl, { cache: 'no-store' });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -138,81 +142,73 @@ export async function GET() {
     }
 
     parsedData = parseCSV(csvText);
-    console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV.`);
+    console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV (this is the number of rows after header, before any filtering).`);
 
     if (parsedData.length === 0) {
-        console.warn("API_ROUTE_GET_MENU: No data rows parsed from CSV. Check CSV structure, headers, and content in Google Sheet.");
+        console.warn("API_ROUTE_GET_MENU: No data rows parsed from CSV. This likely means there was a CRITICAL header mismatch or the CSV content was not structured as expected (e.g., less than 2 lines). Review earlier logs from API_ROUTE_PARSE_CSV.");
     }
 
     let visibleItemsCount = 0;
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
-      // Log raw item data for each row
-      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
+      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Row ${index + 2} RAW_DATA: ${JSON.stringify(item)}`);
 
-      // Check visibility first
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty, and trim
-      if (visibleString.toUpperCase() === "FALSE" || visibleString === "0") {
-        console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE. Skipping.`);
-        return null; // Skip this item if not visible
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
+      if (visibleString.toUpperCase() === "FALSE" || visibleString === "0" || visibleString.toUpperCase() === "NO") {
+        console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE (Value: "${item[VISIBLE_COL]}"). Skipping.`);
+        return null; 
       }
       visibleItemsCount++;
-      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' IS VISIBLE.`);
+      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' IS VISIBLE (Value: "${item[VISIBLE_COL]}").`);
 
-      // Essential data checks
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
       const categoryEN = item[CATEGORY_EN_COL];
-      let price = item[PRECIO_COL];
+      const price = item[PRECIO_COL];
       const linkImagen = item[LINK_IMAGEN_COL];
       const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
       const alergenosString = item[ALERGENOS_COL] || "";
 
       if (!nameES || !nameEN || !categoryEN) {
-        console.warn(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item at row ${index + 2} (Visible) is MISSING ESSENTIAL DATA (Name ES/EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
+        console.warn(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' (Visible) is MISSING ESSENTIAL DATA (Name ES/EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
         return null;
       }
 
-      // Image URL processing
-      let finalImageUrl = `https://placehold.co/400x300.png`; // Default placeholder
-      if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && isValidHttpUrl(linkImagen)) {
-        finalImageUrl = linkImagen;
+      let finalImageUrl = `https://placehold.co/400x300.png`;
+      let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
+      if (!imageHint || imageHint === "food item") {
+        imageHint = (categoryEN || "food plate").toLowerCase();
       }
       
-      // Generate image hint (prefers Name EN, then Category EN)
-      let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
-      if (!imageHint || imageHint === "food item") { // if nameEN was empty or just generic
-        imageHint = (categoryEN || "food plate").toLowerCase(); // fallback to category if name is not descriptive
+      if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && isValidHttpUrl(linkImagen)) {
+        finalImageUrl = linkImagen;
+        console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' using provided image URL: ${finalImageUrl}`);
+      } else {
+        console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' using placeholder. Original Link Imagen: '${linkImagen}'. Hint: '${imageHint}'`);
       }
-      if (finalImageUrl.includes('placehold.co')) {
-        console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' using placeholder. Hint: '${imageHint}'`);
-      }
-
-
-      // Price processing
+      
       let formattedPrice: string | undefined = undefined;
       if (price !== undefined && price !== null && price.trim() !== "" && price.toUpperCase() !== "FALSE" && price.toUpperCase() !== "N/A") {
-        // Replace comma with dot for decimal conversion, then parse
         const numericPrice = parseFloat(price.replace(',', '.'));
         if (!isNaN(numericPrice)) {
             formattedPrice = `€${numericPrice.toFixed(2)}`;
         } else {
             console.warn(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' (row ${index + 2}) has unparseable price: '${item[PRECIO_COL]}'. Setting to undefined.`);
         }
+      } else {
+         console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' (row ${index + 2}) has no valid price provided: '${item[PRECIO_COL]}'. Setting to undefined.`);
       }
       
-      // Allergens processing
       const allergens = alergenosString.split(',')
         .map(a => a.trim().toLowerCase())
         .filter(a => a.length > 0);
 
-      // Chef's Suggestion processing
-      const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE'].includes(sugerenciaChefString.toLowerCase());
-
+      const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE', 'YES'].includes(sugerenciaChefString.trim().toLowerCase());
+      
       const categoryKey = mapCategoryToKey(categoryEN);
       
-      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Successfully processed item '${nameEN}'.`);
+      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Successfully processed item '${nameEN}'. CategoryKey: ${categoryKey}, Price: ${formattedPrice}, ChefSuggestion: ${isChefSuggestion}, Allergens: ${allergens.join('/') || 'none'}.`);
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`, // More unique ID
+        id: `${categoryKey}-${index}-${Date.now()}`,
         name: { en: nameEN.trim(), es: nameES.trim() },
         description: {
           en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(),
@@ -221,12 +217,13 @@ export async function GET() {
         price: formattedPrice, 
         categoryKey: categoryKey,
         imageUrl: finalImageUrl,
-        imageHint: imageHint, // Ensure imageHint is always present
+        imageHint: imageHint,
         allergens: allergens.length > 0 ? allergens : undefined,
         isChefSuggestion: isChefSuggestion,
       };
-    }).filter(item => item !== null) as MenuItemData[]; // Filter out nulls from invisible/invalid items
-    console.log(`API_ROUTE_GET_MENU: Total items marked as visible: ${visibleItemsCount}`);
+    }).filter(item => item !== null) as MenuItemData[];
+    
+    console.log(`API_ROUTE_GET_MENU: Total items marked as visible during mapping: ${visibleItemsCount}`);
     console.log(`API_ROUTE_GET_MENU: Mapped to ${allMenuItems.length} valid MenuItemData objects after filtering invisible and invalid items.`);
 
   } catch (error: any) {
@@ -238,9 +235,7 @@ export async function GET() {
   if (allMenuItems.length === 0 && parsedData.length > 0) {
     console.warn("API_ROUTE_GET_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency, especially the 'Visible' column and essential fields like names/categories.");
   } else if (allMenuItems.length === 0) {
-    // This condition is hit if GOOGLE_SHEET_CSV_URL is bad, sheet is empty, or headers are completely mismatched.
-    console.warn("API_ROUTE_GET_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
+    console.warn("API_ROUTE_GET_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet. The most common issue is the 'Visible' column missing or all items being marked as not visible, or a mismatch in EXPECTED_HEADERS.");
   }
   return NextResponse.json(allMenuItems, { status: 200 });
 }
-
