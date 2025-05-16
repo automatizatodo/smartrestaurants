@@ -6,7 +6,7 @@ import Image from 'next/image'; // Import next/image
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu as MenuIcon, X as XIcon } from 'lucide-react'; // Wine removed
+import { Menu as MenuIcon, X as XIcon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -82,13 +82,12 @@ export default function Header() {
               <Image
                 src={restaurantConfig.logoUrl}
                 alt={`${restaurantName} Logo`}
-                width={120} // Adjust width as needed, or use height and w-auto
-                height={40} // Set a height
-                className="h-10 w-auto dark:filter dark:invert" // Invert colors in dark mode
+                width={150} // Increased width
+                height={50}  // Increased height
+                className="h-12 w-auto dark:filter dark:invert" // Adjusted height class if needed
                 priority
               />
             ) : (
-              // Fallback if no logoUrl is provided, though we removed Wine icon
               <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
             )}
             
@@ -110,14 +109,14 @@ export default function Header() {
                           <Image
                             src={restaurantConfig.logoUrl}
                             alt={`${restaurantName} Logo`}
-                            width={100}
-                            height={32}
-                            className="h-8 w-auto dark:filter dark:invert"
+                            width={120} // Adjusted for mobile sheet, can be different
+                            height={40}
+                            className="h-10 w-auto dark:filter dark:invert"
                           />
                         ) : (
                            <span className="text-xl font-serif font-bold text-foreground">{restaurantName}</span>
                         )}
-                         <span className="text-xl font-serif font-bold text-foreground">{restaurantName}</span>
+                         {/* Removed redundant restaurantName span if logo is present */}
                       </Link>
                       <Button variant="ghost" size="icon" onClick={() => setIsSheetOpen(false)}>
                           <XIcon className="h-6 w-6" />

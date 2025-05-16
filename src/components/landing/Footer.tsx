@@ -2,7 +2,7 @@
 "use client";
 import Link from 'next/link';
 import Image from 'next/image'; // Import next/image
-import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react'; // Wine removed
+import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -22,14 +22,17 @@ export default function Footer() {
                   <Image
                     src={restaurantConfig.logoUrl}
                     alt={`${restaurantName} Logo`}
-                    width={100} // Adjust as needed
-                    height={32}  // Adjust as needed
-                    className="h-8 w-auto dark:filter dark:invert" // Invert colors in dark mode
+                    width={120} // Increased width
+                    height={40}  // Increased height
+                    className="h-10 w-auto dark:filter dark:invert" // Adjusted height class if needed
                   />
                 ) : (
                   <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
                 )}
-                <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
+                {/* Conditionally render the text name if no logo URL or if you want both */}
+                {/* {!restaurantConfig.logoUrl && (
+                  <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
+                )} */}
             </Link>
             <p className="text-sm">
               {tagline}
