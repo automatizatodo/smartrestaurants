@@ -83,7 +83,9 @@
   "aboutUs.title": "La Nostra Història",
   "aboutUs.introduction": "A Can Fanals cuinem amb passió, combinant la millor brasa i la tradició catalana amb productes de proximitat. La nostra cuina és 100% sense gluten, perquè tothom pugui gaudir-ne sense límits.",
   "aboutUs.paragraph1": "Des dels nostres inicis, hem evolucionat per oferir una experiència culinària única, on cada plat explica una història d'ingredients frescos i de temporada. El nostre compromís és amb l'excel·lència i la satisfacció de cada comensal, fent de {restaurantName} un punt de trobada per als amants del bon menjar i les celebracions especials. Us convidem a descobrir la nostra essència.",
-  "aboutUs.imageAlt": "Interior acollidor del restaurant Can Fanals",
+  "aboutUs.imageAltExterior": "Exterior del restaurant Can Fanals",
+  "aboutUs.imageAltInterior": "Interior acollidor del restaurant Can Fanals",
+  "aboutUs.imageAltTerrace": "Terrassa del restaurant Can Fanals",
   "contactMap.sectionTitle": "On Trobar-nos",
   "contactMap.sectionDescription": "Visita'ns per a una experiència gastronòmica inoblidable. Estem convenientment ubicats i esperem donar-te la benvinguda. Gaudeix del nostre ambient rústic i acollidor.",
   "contactMap.contactDetailsTitle": "Detalls de Contacte",
@@ -100,5 +102,3 @@
   "contactMap.hours.mon": "Dilluns",
   "contactMap.hours.closed": "Tancat"
 }
-
-    

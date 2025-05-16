@@ -81,7 +81,9 @@
   "aboutUs.title": "Our Story",
   "aboutUs.introduction": "At Can Fanals we cook with passion, combining the best grill and Catalan tradition with local products. Our cuisine is 100% gluten-free, so everyone can enjoy it without limits.",
   "aboutUs.paragraph1": "Since our beginnings, we have evolved to offer a unique culinary experience, where each dish tells a story of fresh, seasonal ingredients. Our commitment is to excellence and the satisfaction of every diner, making {restaurantName} a meeting point for lovers of good food and special celebrations. We invite you to discover our essence.",
-  "aboutUs.imageAlt": "Cozy interior of Can Fanals restaurant",
+  "aboutUs.imageAltExterior": "Exterior of Can Fanals restaurant",
+  "aboutUs.imageAltInterior": "Cozy interior of Can Fanals restaurant",
+  "aboutUs.imageAltTerrace": "Terrace of Can Fanals restaurant",
   "contactMap.sectionTitle": "Where to Find Us",
   "contactMap.sectionDescription": "Visit us for an unforgettable dining experience. We are conveniently located and look forward to welcoming you. Enjoy our rustic and cozy atmosphere.",
   "contactMap.contactDetailsTitle": "Contact Details",
@@ -98,5 +100,3 @@
   "contactMap.hours.mon": "Monday",
   "contactMap.hours.closed": "Closed"
 }
-
-    
