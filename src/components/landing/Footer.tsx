@@ -22,17 +22,13 @@ export default function Footer() {
                   <Image
                     src={restaurantConfig.logoUrl}
                     alt={`${restaurantName} Logo`}
-                    width={120} // Increased width
-                    height={40}  // Increased height
-                    className="h-10 w-auto dark:filter dark:invert" // Adjusted height class if needed
+                    width={144} // Increased width
+                    height={48}  // Increased height
+                    className="h-12 w-auto dark:filter dark:invert" // Increased height class
                   />
                 ) : (
                   <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
                 )}
-                {/* Conditionally render the text name if no logo URL or if you want both */}
-                {/* {!restaurantConfig.logoUrl && (
-                  <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
-                )} */}
             </Link>
             <p className="text-sm">
               {tagline}
