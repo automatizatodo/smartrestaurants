@@ -32,9 +32,9 @@ export default function ServicesSection() {
       {/* Background Image and Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://placehold.co/1920x1080.png" 
+          src="/carnebrasa.jpg" 
           alt={t('landing:services.sectionTitle')} 
-          data-ai-hint="restaurant kitchen food preparation"
+          data-ai-hint="grilled meat barbecue"
           layout="fill"
           objectFit="cover"
           quality={70} 
@@ -68,3 +68,4 @@ export default function ServicesSection() {
     </section>
   );
 }
+
