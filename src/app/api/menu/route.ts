@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
+// IMPORTANT: Replace with your actual "Publish to web" CSV URL for the menu sheet.
+// Example: https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID/pub?gid=YOUR_GID&single=true&output=csv
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
 
 // Column names from the Google Sheet structure
@@ -129,7 +131,7 @@ export async function GET() {
     }
 
     const csvText = await response.text();
-    console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV. Length: ${csvText.length}`);
+    console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV. Length: ${csvText.length}. Preview (first 500 chars): ${csvText.substring(0,500)}`);
 
     if (!csvText.trim()) {
       console.warn(`API_ROUTE_GET_MENU: Fetched CSV is empty. URL: ${googleSheetCsvUrl}. Ensure sheet is published and has content.`);
@@ -139,12 +141,14 @@ export async function GET() {
     parsedData = parseCSV(csvText);
     console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV.`);
 
+    let visibleItemsCount = 0;
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
-      const visibleString = item[VISIBLE_COL] || "TRUE";
+      const visibleString = item[VISIBLE_COL] || "TRUE"; // Default to TRUE if column is missing or empty
       if (visibleString.toUpperCase() === "FALSE" || visibleString === "0") {
         console.log(`API_ROUTE_GET_MENU: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as not visible. Skipping.`);
         return null;
       }
+      visibleItemsCount++;
 
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
@@ -159,13 +163,23 @@ export async function GET() {
         return null;
       }
 
-      let finalImageUrl = `https://placehold.co/400x300.png`;
+      let finalImageUrl = `https://placehold.co/400x300.png`; // Default placeholder
       if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && isValidHttpUrl(linkImagen)) {
         finalImageUrl = linkImagen;
       }
+      
+      let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
+      if (!imageHint || imageHint === "food item") {
+        imageHint = (categoryEN || "food plate").toLowerCase();
+      }
+      if (finalImageUrl.includes('placehold.co')) {
+        console.log(`API_ROUTE_GET_MENU: Item '${nameEN}' using placeholder. Hint: '${imageHint}'`);
+      }
+
 
       let formattedPrice: string | undefined = undefined;
-      if (price !== undefined && price !== null && price.trim() !== "") {
+      if (price !== undefined && price !== null && price.trim() !== "" && price.toUpperCase() !== "FALSE" && price.toUpperCase() !== "N/A") {
+        // Replace comma with dot for decimal conversion, then parse
         const numericPrice = parseFloat(price.replace(',', '.'));
         if (!isNaN(numericPrice)) {
             formattedPrice = `€${numericPrice.toFixed(2)}`;
@@ -182,12 +196,6 @@ export async function GET() {
 
       const categoryKey = mapCategoryToKey(categoryEN);
       
-      let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
-      if (!imageHint || imageHint === "food item") {
-        imageHint = (categoryEN || "food plate").toLowerCase();
-      }
-
-
       return {
         id: `${categoryKey}-${index}-${Date.now()}`, // More unique ID
         name: { en: nameEN.trim(), es: nameES.trim() },
@@ -198,13 +206,13 @@ export async function GET() {
         price: formattedPrice, 
         categoryKey: categoryKey,
         imageUrl: finalImageUrl,
-        imageHint: imageHint,
+        imageHint: imageHint, // Ensure imageHint is always present
         allergens: allergens.length > 0 ? allergens : undefined,
         isChefSuggestion: isChefSuggestion,
       };
     }).filter(item => item !== null) as MenuItemData[];
-
-    console.log(`API_ROUTE_GET_MENU: Mapped to ${allMenuItems.length} valid MenuItemData objects.`);
+    console.log(`API_ROUTE_GET_MENU: Total items marked as visible: ${visibleItemsCount}`);
+    console.log(`API_ROUTE_GET_MENU: Mapped to ${allMenuItems.length} valid MenuItemData objects after filtering invisible and invalid items.`);
 
   } catch (error: any) {
     console.error(`API_ROUTE_GET_MENU: Unhandled error fetching/parsing menu: ${error.message}`, error.stack);
@@ -213,11 +221,10 @@ export async function GET() {
 
   console.log(`API_ROUTE_GET_MENU: Total menu items processed: ${allMenuItems.length}. Sending response.`);
   if (allMenuItems.length === 0 && parsedData.length > 0) {
-    console.warn("API_ROUTE_GET_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency, especially the 'Visible' column.");
+    console.warn("API_ROUTE_GET_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency, especially the 'Visible' column and essential fields like names/categories.");
   } else if (allMenuItems.length === 0) {
     console.warn("API_ROUTE_GET_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
   }
   return NextResponse.json(allMenuItems, { status: 200 });
 }
-
     
