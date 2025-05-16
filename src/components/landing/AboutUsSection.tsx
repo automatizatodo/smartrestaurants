@@ -112,7 +112,7 @@ export default function AboutUsSection() {
                 />
               </div>
 
-              {/* Image 3: Terrace */}
+              {/* Image 3: Terrace - Removed from desktop view 
               <div
                 className={cn(
                   "absolute aspect-[5/4]",
@@ -128,6 +128,7 @@ export default function AboutUsSection() {
                   objectFit="cover"
                 />
               </div>
+              */}
             </div>
           </div>
 
