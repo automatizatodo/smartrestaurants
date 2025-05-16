@@ -1,4 +1,3 @@
-
 'use server';
 
 import type { MenuItemData } from '@/data/menu';
@@ -35,32 +34,42 @@ export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
 
   try {
     const response = await fetch(fullApiUrl, {
-      next: { revalidate: 3600 } // Revalidate every hour for calls made via Next.js patched fetch
+      // next: { revalidate: 3600 }, // Previous revalidate setting
+      cache: 'no-store', // Ensure no caching for this fetch
     });
 
+    console.log(`SERVICE_FETCH_MENU: Response status from ${fullApiUrl}: ${response.status} ${response.statusText}`);
+
     if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`SERVICE_FETCH_MENU: Failed to fetch menu from ${fullApiUrl}. Status: ${response.status} ${response.statusText}. Body: ${errorBody.substring(0, 500)}`);
+      // Try to get error body text without breaking JSON parsing for ok responses
+      let errorBody = 'Could not read error body';
+      try {
+        errorBody = await response.text();
+      } catch (e) {
+        // Ignore error if body is already read or not readable
+      }
+      console.error(`SERVICE_FETCH_MENU: Failed to fetch menu. Status: ${response.status} ${response.statusText}. URL: ${fullApiUrl}. Body: ${errorBody.substring(0, 500)}`);
       return [];
     }
 
-    const menuItems: MenuItemData[] = await response.json();
-
-    if (!Array.isArray(menuItems)) {
-      console.error(`SERVICE_FETCH_MENU: Data received from ${fullApiUrl} is not an array. Received:`, menuItems);
-      return [];
+    // Attempt to parse the response as JSON directly
+    const menuItems: MenuItemData[] = await response.json(); 
+    
+    console.log(`SERVICE_FETCH_MENU: Successfully parsed JSON from ${fullApiUrl}. Items count: ${menuItems.length}`);
+    
+    if (menuItems.length > 0) {
+        console.log(`SERVICE_FETCH_MENU: First item preview:`, JSON.stringify(menuItems[0], null, 2));
+    } else {
+        console.log(`SERVICE_FETCH_MENU: Parsed data is an empty array.`);
     }
-
-    console.log(`SERVICE_FETCH_MENU: Successfully fetched and parsed ${menuItems.length} menu items from ${fullApiUrl}.`);
     return menuItems;
 
   } catch (error: any) {
-    console.error(`SERVICE_FETCH_MENU: Error fetching or parsing menu from ${fullApiUrl}. Error Message:`, error.message);
+    console.error(`SERVICE_FETCH_MENU: Error during fetch or JSON parsing from ${fullApiUrl}. Error Type: ${error.name}, Message:`, error.message);
     if (error.cause) {
         console.error(`SERVICE_FETCH_MENU: Fetch error cause:`, error.cause);
     }
-    // Logging the full error object can sometimes give more clues, especially with undici/Node fetch
-    console.error(`SERVICE_FETCH_MENU: Full error object for fetch to ${fullApiUrl}:`, JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    console.error(`SERVICE_FETCH_MENU: Full error stack (if available):`, error.stack);
     return [];
   }
 }
