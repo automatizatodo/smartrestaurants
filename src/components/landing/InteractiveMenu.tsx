@@ -10,6 +10,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { UtensilsCrossed, AlertTriangle } from 'lucide-react'; 
+import restaurantConfig from '@/config/restaurant.config';
 
 interface InteractiveMenuProps {
   menuItems: MenuItemData[];
@@ -20,13 +21,17 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
 
   const availableCategoryKeys = Array.from(new Set(menuItems.map(item => item.categoryKey).filter(Boolean)));
   
-  // Filter and sort categories based on predefined order and availability
   const sortedCategories = menuCategories
     .filter(cat => availableCategoryKeys.includes(cat.key))
     .sort((a, b) => a.order - b.order);
 
   const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all';
   const [activeTab, setActiveTab] = useState<string>(defaultCategory);
+
+  const menuDelDiaPrice = restaurantConfig.menuDelDia?.price;
+  const menuDelDiaPriceDescription = restaurantConfig.menuDelDia?.priceDescriptionKey 
+    ? t(restaurantConfig.menuDelDia.priceDescriptionKey) 
+    : "";
   
   if (!menuItems || menuItems.length === 0) {
     return (
@@ -35,6 +40,14 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
             {t('landing:menu.sectionTitle')}
           </h2>
+           {menuDelDiaPrice && (
+            <div className="mb-8">
+              <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
+              {menuDelDiaPriceDescription && (
+                <p className="text-sm text-muted-foreground mt-1">{menuDelDiaPriceDescription}</p>
+              )}
+            </div>
+          )}
            <div className="flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
             <AlertTriangle className="w-12 h-12 mb-4 text-destructive" />
             <p className="text-lg mb-2">{t('landing:menu.loadingErrorTitle')}</p>
@@ -60,6 +73,14 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
             {t('landing:menu.sectionTitle')}
           </h2>
+          {menuDelDiaPrice && (
+            <div className="mb-8">
+              <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
+              {menuDelDiaPriceDescription && (
+                <p className="text-sm text-muted-foreground mt-1">{menuDelDiaPriceDescription}</p>
+              )}
+            </div>
+          )}
            <div className="flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
             <AlertTriangle className="w-16 h-16 mb-6 text-primary" />
             <p className="text-lg mb-2">{t('landing:menu.noCategoriesTitle')}</p>
@@ -82,22 +103,30 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   return (
     <section id="menu" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
+        <div className="text-center mb-8"> {/* Reduced mb from 12/16 to 8 */}
+          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4">
             {t('landing:menu.sectionTitle')}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          {menuDelDiaPrice && (
+            <div className="mb-6"> {/* Reduced mb from 8 to 6 */}
+              <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
+               {menuDelDiaPriceDescription && (
+                <p className="text-sm text-muted-foreground mt-1">{menuDelDiaPriceDescription}</p>
+              )}
+            </div>
+          )}
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12"> {/* Reduced bottom margin for description */}
             {t('landing:menu.sectionDescription')}
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full flex items-center justify-start overflow-x-auto scrollbar-hide mb-10 sm:flex-wrap sm:justify-center sm:overflow-x-visible">
+          <TabsList className="w-full flex items-center justify-start overflow-x-auto scrollbar-hide mb-10 sm:mb-12 sm:flex-wrap sm:justify-center sm:overflow-x-visible"> {/* Adjusted mb */}
             {sortedCategories.map((category) => (
               <TabsTrigger 
                 key={category.key} 
                 value={category.key} 
-                className="flex-shrink-0 text-sm md:text-base sm:flex-shrink mx-1" // Added mx-1 for some spacing between tabs
+                className="flex-shrink-0 text-sm md:text-base sm:flex-shrink mx-1"
               >
                 {t(`menu:${category.key}`)} 
               </TabsTrigger>
@@ -109,7 +138,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
                 {menuItems
                   .filter(item => item.categoryKey === category.key)
-                  .slice(0, 3) // Show only first 3 items for interactive menu preview
+                  .slice(0, 3) 
                   .map((item, index) => (
                     <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                       <MenuItemCard item={item} />
