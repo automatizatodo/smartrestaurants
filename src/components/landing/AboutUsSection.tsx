@@ -11,50 +11,50 @@ export default function AboutUsSection() {
   const { t, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
 
-  const images = [
+  const componentImages = [
     {
       src: "/façana.webp", // Façana
       altKey: "landing:aboutUs.imageAltExterior",
       hint: "restaurant exterior facade",
-      customClass: "z-10 transform group-hover:rotate-[-2deg] group-hover:scale-105",
+      desktopClass: "z-10 w-full aspect-[4/3] shadow-2xl rounded-lg transform group-hover:scale-105 transition-all duration-500 ease-in-out",
       priority: true,
     },
     {
       src: "/interior2.webp", // Interior
       altKey: "landing:aboutUs.imageAltInterior",
       hint: "restaurant interior dining",
-      customClass: "z-20 bottom-[-20%] right-[-10%] sm:right-[-15%] w-3/5 rotate-[10deg] group-hover:rotate-[5deg] group-hover:scale-110 border-4 border-background dark:border-secondary shadow-lg",
+      desktopClass: "z-20 absolute top-[5%] right-[5%] w-3/5 sm:w-1/2 aspect-[5/4] rotate-[7deg] group-hover:rotate-[2deg] group-hover:scale-105 transition-all duration-500 ease-in-out border-4 border-background dark:border-card shadow-xl rounded-md",
       priority: false,
     },
     {
-      src: "/terrassa1.webp", // Terrassa
+      src: "/terrassa1.webp", // Terrassa - Usada només en el carrusel mòbil
       altKey: "landing:aboutUs.imageAltTerrace",
       hint: "restaurant terrace patio",
-      customClass: "z-0 bottom-[-15%] left-[-10%] sm:bottom-[-10%] sm:left-[-15%] w-3/5 rotate-[-8deg] group-hover:rotate-[-3deg] group-hover:scale-110 border-4 border-background dark:border-secondary shadow-lg",
+      desktopClass: "", // No s'usa en escriptori
       priority: false,
     },
   ];
 
-  // For mobile carousel
+  // Per al carrusel mòbil
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
+    setCurrentIndex((prevIndex) => (prevIndex === 0 ? componentImages.length - 1 : prevIndex - 1));
   };
 
   const nextSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
-  }, [images.length]);
+    setCurrentIndex((prevIndex) => (prevIndex === componentImages.length - 1 ? 0 : prevIndex + 1));
+  }, [componentImages.length]);
 
-  // Optional: auto-play for mobile carousel (uncomment if desired)
   // useEffect(() => {
-  //   const timer = setTimeout(nextSlide, 7000); // Change slide every 7 seconds
+  //   if (componentImages.length <=1) return;
+  //   const timer = setTimeout(nextSlide, 7000);
   //   return () => clearTimeout(timer);
-  // }, [currentIndex, nextSlide]);
+  // }, [currentIndex, nextSlide, componentImages.length]);
 
 
   return (
-    <section id="about-us" className="py-10 sm:py-14 bg-background relative z-30">
+    <section id="about-us" className="py-10 sm:py-14 bg-background relative z-30"> {/* z-index per permetre la superposició */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
@@ -66,75 +66,64 @@ export default function AboutUsSection() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          {/* Text Column */}
-          <div className="space-y-6 text-foreground/90 order-2 md:order-1 flex flex-col justify-center"> {/* Removed relative z-10 */}
+          {/* Columna de text */}
+          <div className="space-y-6 text-foreground/90 order-2 md:order-1 flex flex-col justify-center">
             <p className="text-base sm:text-lg leading-relaxed">
               {t('landing:aboutUs.paragraph1', { restaurantName })}
             </p>
           </div>
 
-          {/* Image Area: Conditional rendering based on screen size */}
-          {/* Desktop Image Composition (hidden on small screens, visible on md and up) */}
-          <div className="hidden md:flex md:col-span-1 order-1 md:order-2 items-center justify-center min-h-[200px] sm:min-h-[250px] md:min-h-[300px]">
-            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md group">
-              {/* Image 1: Exterior (Façana - Centered in the pseudo-stack) */}
+          {/* Àrea d'imatges: Condicional segons mida de pantalla */}
+          
+          {/* Composició d'imatges per a escriptori (md i superiors) */}
+          <div className="hidden md:flex md:col-span-1 order-1 md:order-2 items-center justify-center min-h-[350px] lg:min-h-[400px]">
+            <div className="relative w-full max-w-md lg:max-w-lg group">
+              {/* Imatge 1: Exterior (Façana) - Base */}
               <div
                 className={cn(
-                  "absolute w-[75%] sm:w-[70%] aspect-[4/3] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-                  "rounded-lg overflow-hidden shadow-2xl transition-all duration-500 ease-in-out",
-                  images[0].customClass // Contains z-10
+                  "relative", // Canviat d'absolute per ser el flux normal dins del group
+                  componentImages[0].desktopClass
                 )}
               >
                 <Image
-                  src={images[0].src}
-                  alt={t(images[0].altKey)}
-                  data-ai-hint={images[0].hint}
+                  src={componentImages[0].src}
+                  alt={t(componentImages[0].altKey)}
+                  data-ai-hint={componentImages[0].hint}
                   layout="fill"
                   objectFit="cover"
-                  priority={images[0].priority}
+                  priority={componentImages[0].priority}
+                  className="rounded-lg"
                 />
               </div>
 
-              {/* Image 2: Interior - This one will overlap */}
+              {/* Imatge 2: Interior - Superposada */}
               <div
                 className={cn(
-                  "absolute rounded-md overflow-hidden transition-all duration-500 ease-in-out",
-                  images[1].customClass // Contains z-20, bottom-[-20%], right-[-10%], etc.
+                  componentImages[1].desktopClass
                 )}
+                style={{
+                  // Assegura que aquesta imatge pugui "penjar" una mica per sota
+                  // si és necessari per a l'efecte de superposició amb la secció següent.
+                  // La secció pare té z-30, aquesta té z-20.
+                  transform: 'translateY(5%)', // Ajusta segons sigui necessari per a la superposició
+                }}
               >
                 <Image
-                  src={images[1].src}
-                  alt={t(images[1].altKey)}
-                  data-ai-hint={images[1].hint}
+                  src={componentImages[1].src}
+                  alt={t(componentImages[1].altKey)}
+                  data-ai-hint={componentImages[1].hint}
                   layout="fill"
                   objectFit="cover"
+                  className="rounded-md"
                 />
               </div>
-
-              {/* Image 3: Terrace - Commented out for desktop view
-              <div
-                className={cn(
-                  "absolute aspect-[5/4]",
-                  "rounded-md overflow-hidden transition-all duration-500 ease-in-out",
-                  images[2].customClass
-                )}
-              >
-                <Image
-                  src={images[2].src}
-                  alt={t(images[2].altKey)}
-                  data-ai-hint={images[2].hint}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
-              */}
             </div>
           </div>
 
-          {/* Mobile Carousel (visible on small screens, hidden on md and up) */}
+          {/* Carrusel per a mòbils (visible en pantalles petites) */}
           <div className="md:hidden order-1 md:order-2">
             <div className="relative w-full max-w-md mx-auto aspect-[16/10] overflow-hidden rounded-lg shadow-xl group">
-              {images.map((image, index) => (
+              {componentImages.map((image, index) => (
                 <div
                   key={image.src}
                   className={cn(
@@ -149,12 +138,12 @@ export default function AboutUsSection() {
                     layout="fill"
                     objectFit="cover"
                     className="rounded-lg"
-                    priority={index === 0 && image.priority}
+                    priority={index === 0 && image.priority} // Priority per a la primera imatge del carrusel
                   />
                 </div>
               ))}
-              {/* Carousel Controls */}
-              {images.length > 1 && (
+              {/* Controls del Carrusel */}
+              {componentImages.length > 1 && (
                 <>
                   <button
                     onClick={prevSlide}
@@ -170,9 +159,9 @@ export default function AboutUsSection() {
                   >
                     <ChevronRight size={20} />
                   </button>
-                  {/* Dots Indicator */}
+                  {/* Indicadors de Punts */}
                   <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1.5 z-20">
-                    {images.map((_, index) => (
+                    {componentImages.map((_, index) => (
                       <button
                         key={index}
                         onClick={() => setCurrentIndex(index)}
