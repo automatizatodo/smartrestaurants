@@ -9,17 +9,25 @@ export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
 
   if (typeof window === 'undefined') {
     // Server-side: construct the full URL
-    // Prefer VERCEL_URL if available (common in Vercel deployments)
-    // Prefer NEXT_PUBLIC_APP_URL if set (useful for local or other deployments)
-    // Fallback to 127.0.0.1 with the dev server port from package.json (9003)
+    const devPort = process.env.PORT || '9003'; // Get port from env or default to 9003
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+    // For Cloud Workstations or similar, process.env.NEXT_PUBLIC_APP_URL might be set to the external URL.
+    // For local development, we typically want 127.0.0.1 or localhost.
+    let defaultHost = `${protocol}://127.0.0.1:${devPort}`;
+    
+    // If NEXT_PUBLIC_APP_URL is set and we are in development, it might be the proxied URL.
+    // However, for server-to-server internal API calls, 127.0.0.1 is usually more reliable if NEXT_PUBLIC_APP_URL points to an external address.
+    // If VERCEL_URL is present, it's a Vercel deployment, use it.
     const host = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : (process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:9003'); // Updated port to 9003
+      : (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes('localhost') && !process.env.NEXT_PUBLIC_APP_URL.includes('127.0.0.1')
+          ? process.env.NEXT_PUBLIC_APP_URL // Use if it's a non-local public URL
+          : defaultHost); // Otherwise, default to local for server-side fetch
 
     fullApiUrl = `${host}${internalApiUrl}`;
-    console.log(`SERVICE_FETCH_MENU: Running on server. Using full API URL: ${fullApiUrl}`);
+    console.log(`SERVICE_FETCH_MENU: Running on server. Using full API URL for internal fetch: ${fullApiUrl}. (Dev port from env/default: ${devPort})`);
   } else {
-    // Client-side, use relative path
+    // Client-side, use relative path which is fine.
     console.log(`SERVICE_FETCH_MENU: Running on client. Using relative API URL: ${fullApiUrl}`);
   }
 
@@ -47,11 +55,12 @@ export async function fetchMenuFromGoogleSheet(): Promise<MenuItemData[]> {
     return menuItems;
 
   } catch (error: any) {
-    // Log the full error object for more details, especially for TypeError
-    console.error(`SERVICE_FETCH_MENU: Error fetching or parsing menu from ${fullApiUrl}:`, error);
-    if (error.cause) { // Node.js fetch often includes a 'cause' property for TypeErrors
+    console.error(`SERVICE_FETCH_MENU: Error fetching or parsing menu from ${fullApiUrl}. Error Message:`, error.message);
+    if (error.cause) {
         console.error(`SERVICE_FETCH_MENU: Fetch error cause:`, error.cause);
     }
+    // Logging the full error object can sometimes give more clues, especially with undici/Node fetch
+    console.error(`SERVICE_FETCH_MENU: Full error object for fetch to ${fullApiUrl}:`, JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return [];
   }
 }
