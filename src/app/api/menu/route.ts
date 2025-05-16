@@ -113,23 +113,26 @@ function isValidHttpUrl(string: string) {
 
 export async function GET() {
   console.log("API_ROUTE_GET_MENU: /api/menu GET handler called.");
-  const googleSheetCsvUrl = GOOGLE_SHEET_CSV_URL;
+  const googleSheetCsvUrlBase = GOOGLE_SHEET_CSV_URL;
 
-  if (googleSheetCsvUrl === 'YOUR_NEW_GOOGLE_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE' || !googleSheetCsvUrl) {
+  if (googleSheetCsvUrlBase === 'YOUR_NEW_GOOGLE_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE' || !googleSheetCsvUrlBase) {
     console.error("API_ROUTE_GET_MENU: CRITICAL - GOOGLE_SHEET_CSV_URL is not configured. Please update it in src/app/api/menu/route.ts.");
     return NextResponse.json({ error: "Menu service not configured" }, { status: 500 });
   }
-  console.log(`API_ROUTE_GET_MENU: Fetching menu from URL: ${googleSheetCsvUrl}`);
+
+  // Append a timestamp for cache busting
+  const cacheBustingUrl = `${googleSheetCsvUrlBase}&timestamp=${Date.now()}`;
+  console.log(`API_ROUTE_GET_MENU: Fetching menu from URL (with cache busting): ${cacheBustingUrl}`);
 
   let allMenuItems: MenuItemData[] = [];
   let parsedData: Record<string, string>[] = []; 
 
   try {
-    const response = await fetch(googleSheetCsvUrl, { cache: 'no-store' });
+    const response = await fetch(cacheBustingUrl, { cache: 'no-store' }); // 'no-store' to prevent Next.js server-side caching
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`API_ROUTE_GET_MENU: Failed to fetch CSV. Status: ${response.status} ${response.statusText}. URL: ${googleSheetCsvUrl}. Response: ${errorText.substring(0, 500)}...`);
+      console.error(`API_ROUTE_GET_MENU: Failed to fetch CSV. Status: ${response.status} ${response.statusText}. URL: ${cacheBustingUrl}. Response: ${errorText.substring(0, 500)}...`);
       return NextResponse.json({ error: "Failed to fetch menu data", details: errorText.substring(0,200) }, { status: response.status });
     }
 
@@ -137,7 +140,7 @@ export async function GET() {
     console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV. Length: ${csvText.length}. Preview (first 500 chars): ${csvText.substring(0,500)}`);
 
     if (!csvText.trim()) {
-      console.warn(`API_ROUTE_GET_MENU: Fetched CSV is empty. URL: ${googleSheetCsvUrl}. Ensure sheet is published and has content.`);
+      console.warn(`API_ROUTE_GET_MENU: Fetched CSV is empty. URL: ${cacheBustingUrl}. Ensure sheet is published and has content.`);
       return NextResponse.json({ error: "Fetched menu data is empty" }, { status: 500 });
     }
 
@@ -152,7 +155,7 @@ export async function GET() {
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
       console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Row ${index + 2} RAW_DATA: ${JSON.stringify(item)}`);
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing for a row, but header check should catch missing column
       if (visibleString.toUpperCase() === "FALSE" || visibleString === "0" || visibleString.toUpperCase() === "NO") {
         console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE (Value: "${item[VISIBLE_COL]}"). Skipping.`);
         return null; 
@@ -208,7 +211,7 @@ export async function GET() {
       
       console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Successfully processed item '${nameEN}'. CategoryKey: ${categoryKey}, Price: ${formattedPrice}, ChefSuggestion: ${isChefSuggestion}, Allergens: ${allergens.join('/') || 'none'}.`);
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`,
+        id: `${categoryKey}-${index}-${Date.now()}`, // More unique ID
         name: { en: nameEN.trim(), es: nameES.trim() },
         description: {
           en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(),
@@ -239,3 +242,5 @@ export async function GET() {
   }
   return NextResponse.json(allMenuItems, { status: 200 });
 }
+
+    
