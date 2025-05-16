@@ -1,45 +1,67 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+.pnp.js
 
-# testing
+# Testing
 /coverage
 
-# next.js
+# Next.js build output
 /.next/
 /out/
 
-# production
+# Production
 /build
 
-# misc
+# Misc
 .DS_Store
 *.pem
 
-# debug
+# Debug log from npm
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+pnpm-debug.log*
 
-# vercel
-.vercel
+# Local environment variables
+.env*.local
+!/.env.example
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Editor directories and files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-.genkit/*
-.env*
+# System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# firebase
+# Firebase
+.firebase
 firebase-debug.log
-firestore-debug.log
+*.firebase.*.log # Firebase CLI debug logs
+firebase.json # Often generated and can contain project-specific IDs
+database-debug.log
+
+# Google Cloud / Service Account Keys
+# IMPORTANT: Never commit service account keys or other sensitive credential files!
+*.json # Broad rule, be careful if you have other non-sensitive JSON
+gastronomic-canvas-credentials.json # If you named it this
+gastronomic-canvas-credentials.json.json # Your specific file
+*credentials*.json # Common naming pattern
+
+# Firebase App Hosting (sensitive if it contains secrets, though typically used for config)
+# apphosting.yaml # Better to keep this in repo if it only references secrets, not actual secrets.
+# Commenting out apphosting.yaml from .gitignore for now, as it's configuration.
+# If you ever put secrets directly in it (not recommended), then ignore it.

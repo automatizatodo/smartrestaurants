@@ -1,0 +1,29 @@
+# apphosting.yaml
+
+# Specifies the version of the App Hosting YAML schema.
+# Required.
+schemaVersion: v1alpha1
+
+# buildConfig:
+  # Optional. If not specified, App Hosting will attempt to build
+  # your app using npm run build or a framework-specific build command.
+  # buildCommand: "npm run build" # Your package.json already has this
+
+runConfig:
+  # Optional. Specifies the port that your application listens on.
+  # Defaults to 3000. App Hosting will map this to 80/443.
+  # port: 3000 # Your start script "next start" defaults to 3000
+
+  # Environment variables available to your application at runtime.
+  environmentVariables:
+    GOOGLE_CALENDAR_ID: "primary" # <-- !!! IMPORTANT: Replace with your actual Calendar ID if not 'primary'
+    NEXT_PUBLIC_APP_URL: "https://YOUR_APP_HOSTNAME" # <-- !!! IMPORTANT: Replace with your Firebase Hosting URL (e.g., https://your-project-id.web.app)
+    # This tells the application to read the Google service account JSON
+    # from the secret named 'GOOGLE_SERVICE_ACCOUNT_JSON_CONTENT' in Google Secret Manager.
+    GOOGLE_CREDENTIALS_JSON:
+      secret: GOOGLE_SERVICE_ACCOUNT_JSON_CONTENT # <-- !!! IMPORTANT: This MUST match the secret name you created in Secret Manager
+
+# Specifies that this is a Next.js backend.
+# An empty backend: {} block is often sufficient for Next.js apps.
+# App Hosting will use your package.json scripts "build" and "start".
+backend: {}
