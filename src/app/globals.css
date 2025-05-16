@@ -119,6 +119,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Custom scrollbar for a more modern feel */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px; /* Added for horizontal scrollbars */
 }
 ::-webkit-scrollbar-track {
   background: hsl(var(--background) / 0.5);
@@ -137,4 +138,15 @@ h1, h2, h3, h4, h5, h6 {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+/* Utility to hide scrollbars */
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 }

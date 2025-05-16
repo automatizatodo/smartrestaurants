@@ -25,7 +25,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     .filter(cat => availableCategoryKeys.includes(cat.key))
     .sort((a, b) => a.order - b.order);
 
-  const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all'; // 'all' might not be used if categories exist
+  const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all';
   const [activeTab, setActiveTab] = useState<string>(defaultCategory);
   
   if (!menuItems || menuItems.length === 0) {
@@ -61,7 +61,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
             {t('landing:menu.sectionTitle')}
           </h2>
            <div className="flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
-            <AlertTriangle className="w-12 h-12 mb-4 text-primary" /> 
+            <AlertTriangle className="w-16 h-16 mb-6 text-primary" />
             <p className="text-lg mb-2">{t('landing:menu.noCategoriesTitle')}</p>
             <p className="text-sm">{t('landing:menu.noCategoriesError')}</p>
           </div>
@@ -92,9 +92,13 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap justify-center mb-10">
+          <TabsList className="w-full flex items-center justify-start overflow-x-auto scrollbar-hide mb-10 sm:flex-wrap sm:justify-center sm:overflow-x-visible">
             {sortedCategories.map((category) => (
-              <TabsTrigger key={category.key} value={category.key} className="text-sm md:text-base">
+              <TabsTrigger 
+                key={category.key} 
+                value={category.key} 
+                className="flex-shrink-0 text-sm md:text-base sm:flex-shrink mx-1" // Added mx-1 for some spacing between tabs
+              >
                 {t(`menu:${category.key}`)} 
               </TabsTrigger>
             ))}
