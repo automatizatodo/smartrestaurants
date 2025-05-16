@@ -3,7 +3,8 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import ServiceCard from './ServiceCard';
-import { Coffee, ClipboardList, ChefHat } from 'lucide-react'; // Changed Flame to ChefHat for merged
+import { Coffee, ClipboardList, ChefHat } from 'lucide-react';
+import Image from 'next/image';
 
 const servicesList = [
   {
@@ -17,7 +18,7 @@ const servicesList = [
     descriptionKey: "landing:services.setMenus.description"
   },
   {
-    icon: ChefHat, // Using ChefHat for the combined service
+    icon: ChefHat,
     titleKey: "landing:services.traditionalAndGrilled.title",
     descriptionKey: "landing:services.traditionalAndGrilled.description"
   }
@@ -27,8 +28,23 @@ export default function ServicesSection() {
   const { t } = useLanguage();
 
   return (
-    <section id="services" className="py-16 sm:py-24 bg-secondary">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="services" className="relative py-16 sm:py-24 overflow-hidden">
+      {/* Background Image and Overlay */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://placehold.co/1920x1080.png"
+          alt={t('landing:services.sectionTitle')} // Generic alt for background
+          data-ai-hint="culinary preparation kitchen"
+          layout="fill"
+          objectFit="cover"
+          quality={70}
+          priority={false}
+        />
+        <div className="absolute inset-0 bg-background/80 dark:bg-background/90"></div> {/* Overlay */}
+      </div>
+
+      {/* Content */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
             {t('landing:services.sectionTitle')}
@@ -37,7 +53,7 @@ export default function ServicesSection() {
             {t('landing:services.sectionDescription')}
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"> {/* Adjusted grid for 3 items */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {servicesList.map((service, index) => (
             <ServiceCard 
               key={service.titleKey} 
