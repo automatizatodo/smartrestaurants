@@ -62,7 +62,7 @@ function SubmitButton() {
 export default function BookingSection() {
   const { t, language, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(undefined); // Initialize to undefined
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
   const { toast } = useToast();
@@ -74,6 +74,11 @@ export default function BookingSection() {
   else if (language === 'ca') dateLocale = ca;
   else dateLocale = en;
 
+  // Set initial date on client mount to avoid hydration mismatch
+  useEffect(() => {
+    setDate(new Date());
+  }, []);
+
 
   const initialState: BookingFormState = {
     messageKey: null,
@@ -83,39 +88,39 @@ export default function BookingSection() {
   };
   const [state, formAction] = useActionState(submitBooking, initialState);
 
-  // Effect for displaying toasts
+  // Effect for displaying toasts based on form action state
   useEffect(() => {
-    if (state?.messageKey) {
+    if (state?.messageKey && state.messageKey !== processedSuccessKeyRef.current) {
       toast({
         title: state.success ? t('landing:booking.toast.successTitle') : t('landing:booking.toast.errorTitle'),
         description: t(state.messageKey, state.messageParams || undefined),
         variant: state.success ? "default" : "destructive",
       });
-    }
-  }, [state?.messageKey, state?.success, state?.messageParams, toast, t]);
-
-  useEffect(() => {
-    if (state?.success && state.messageKey) {
-      if (processedSuccessKeyRef.current !== state.messageKey) {
-        if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
-          const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
-          console.log("CLIENT_BOOKING: Opening WhatsApp URL for new submission:", whatsappUrl);
-          window.open(whatsappUrl, '_blank');
-        }
-
-        formRef.current?.reset();
-        setDate(new Date());
-        setSelectedTime(undefined);
-        setSelectedGuests(undefined);
-
-        processedSuccessKeyRef.current = state.messageKey;
+      if (state.success) {
+        processedSuccessKeyRef.current = state.messageKey; // Mark as processed for toast
+      } else {
+        processedSuccessKeyRef.current = null; // Clear if it's an error message
       }
-    } else if (!state?.success && state?.messageKey) {
-      processedSuccessKeyRef.current = null;
-    } else if (!state?.messageKey) {
-      processedSuccessKeyRef.current = null;
     }
-  }, [state]);
+  }, [state, toast, t]);
+
+
+  // Effect for handling successful WhatsApp redirect and form reset
+   useEffect(() => {
+    if (state?.success && state.messageKey) { // Check if there's a success message
+      if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
+        console.log("CLIENT_BOOKING: Opening WhatsApp URL for submission:", state.messageKey);
+        const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
+        window.open(whatsappUrl, '_blank');
+      }
+      // Reset form fields on any success
+      formRef.current?.reset();
+      setDate(new Date()); // Reset date to today after successful submission
+      setSelectedTime(undefined);
+      setSelectedGuests(undefined);
+      // Important: Do not re-set processedSuccessKeyRef here as it's for toast
+    }
+  }, [state?.success, state?.messageKey, state?.bookingMethod, state?.whatsappNumber, state?.whatsappMessage]);
 
 
   return (
