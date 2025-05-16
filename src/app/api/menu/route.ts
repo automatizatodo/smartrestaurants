@@ -1,9 +1,9 @@
+
 import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
-// IMPORTANT: Replace this with your actual "Publish to web" CSV URL for the menu sheet
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
 
 // Column names from the Google Sheet structure (ensure these EXACTLY match your sheet headers)
 const VISIBLE_COL = "Visible";
@@ -101,32 +101,38 @@ function isValidHttpUrl(string: string) {
   try {
     url = new URL(string);
   } catch (_) {
-    return false;  
+    return false;
   }
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
 export async function GET() {
-  console.log("API_ROUTE_GET_MENU: /api/menu GET handler called.");
-  const googleSheetCsvUrl = GOOGLE_SHEET_CSV_URL;
-
-  console.log(`API_ROUTE_GET_MENU: Fetching menu from URL: ${googleSheetCsvUrl}`);
+  console.log("API_ROUTE_GET_MENU: /api/menu GET handler INVOKED.");
+  const googleSheetCsvUrlWithCacheBust = `${GOOGLE_SHEET_CSV_URL}&timestamp=${Date.now()}`;
+  console.log(`API_ROUTE_GET_MENU: Fetching menu from URL: ${googleSheetCsvUrlWithCacheBust}`);
 
   let allMenuItems: MenuItemData[] = [];
-  let parsedData: Record<string, string>[] = []; 
+  let parsedData: Record<string, string>[] = [];
 
   try {
-    const response = await fetch(googleSheetCsvUrl, { cache: 'no-store' }); // Use no-store for testing to ensure fresh data
+    const response = await fetch(googleSheetCsvUrlWithCacheBust, {
+      cache: 'no-store', // Ensure fresh data from Google Sheets
+      next: { revalidate: 0 } // Also try to ensure no Next.js caching for this specific fetch
+    });
+
+    console.log(`API_ROUTE_GET_MENU: Response status from Google Sheets: ${response.status} ${response.statusText}`);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`API_ROUTE_GET_MENU: Failed to fetch CSV. Status: ${response.status} ${response.statusText}. URL: ${googleSheetCsvUrl}. Response: ${errorText.substring(0, 500)}...`);
-      return NextResponse.json({ error: "Failed to fetch menu data", details: errorText.substring(0,200) }, { status: response.status });
+      console.error(`API_ROUTE_GET_MENU: Failed to fetch CSV. Status: ${response.status} ${response.statusText}. URL: ${googleSheetCsvUrlWithCacheBust}. Response: ${errorText.substring(0, 500)}...`);
+      return NextResponse.json({ error: "Failed to fetch menu data", details: errorText.substring(0,200) }, {
+        status: response.status,
+        headers: { 'Cache-Control': 'no-store, max-age=0' }
+      });
     }
 
     const csvText = await response.text();
     console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV. Length: ${csvText.length}. Preview (first 500 chars): ${csvText.substring(0,500)}`);
-    // ADDED LOG: Log the full CSV text if it's short, or a longer preview
     if (csvText.length < 2000) {
       console.log(`API_ROUTE_GET_MENU: Full fetched CSV content:\\n${csvText}`);
     } else {
@@ -134,34 +140,34 @@ export async function GET() {
     }
 
     if (!csvText.trim()) {
-      console.warn(`API_ROUTE_GET_MENU: Fetched CSV is empty. URL: ${googleSheetCsvUrl}. Ensure sheet is published and has content.`);
-      return NextResponse.json({ error: "Fetched menu data is empty" }, { status: 500 });
+      console.warn(`API_ROUTE_GET_MENU: Fetched CSV is empty. URL: ${googleSheetCsvUrlWithCacheBust}. Ensure sheet is published and has content.`);
+      return NextResponse.json({ error: "Fetched menu data is empty" }, {
+        status: 500,
+        headers: { 'Cache-Control': 'no-store, max-age=0' }
+      });
     }
 
     parsedData = parseCSV(csvText);
     console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV.`);
-    // ADDED LOG: Log the parsed data itself
     console.log(`API_ROUTE_GET_MENU: Parsed data output from parseCSV:`, JSON.stringify(parsedData, null, 2));
 
+
     if (parsedData.length === 0) {
-        console.warn("API_ROUTE_GET_MENU: No data rows parsed from CSV. Check CSV structure, headers, and content in Google Sheet.");
+        console.warn("API_ROUTE_GET_MENU: No data rows parsed from CSV. Check CSV structure, headers, and content in Google Sheet. Most likely, the 'Visible' column is FALSE for all items or headers are mismatched.");
     }
 
     let visibleItemsCount = 0;
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
-      // Log raw item data for each row
       console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
 
-      // Check visibility first
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty, and trim
-      if (visibleString.toUpperCase() === "FALSE" || visibleString === "0") {
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
+      if (visibleString.toUpperCase() === "FALSE" || visibleString === "0" || visibleString.toUpperCase() === "NO") {
         console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE. Skipping.`);
-        return null; // Skip this item if not visible
+        return null;
       }
       visibleItemsCount++;
       console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' IS VISIBLE.`);
 
-      // Essential data checks
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
       const categoryEN = item[CATEGORY_EN_COL];
@@ -175,26 +181,21 @@ export async function GET() {
         return null;
       }
 
-      // Image URL processing
-      let finalImageUrl = `https://placehold.co/400x300.png`; // Default placeholder
+      let finalImageUrl = `https://placehold.co/400x300.png`;
       if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && isValidHttpUrl(linkImagen)) {
         finalImageUrl = linkImagen;
       }
-      
-      // Generate image hint (prefers Name EN, then Category EN)
+
       let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
-      if (!imageHint || imageHint === "food item") { // if nameEN was empty or just generic
-        imageHint = (categoryEN || "food plate").toLowerCase(); // fallback to category if name is not descriptive
+      if (!imageHint || imageHint === "food item") {
+        imageHint = (categoryEN || "food plate").toLowerCase();
       }
       if (finalImageUrl.includes('placehold.co')) {
         console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' using placeholder. Hint: '${imageHint}'`);
       }
 
-
-      // Price processing
       let formattedPrice: string | undefined = undefined;
       if (price !== undefined && price !== null && price.trim() !== "" && price.toUpperCase() !== "FALSE" && price.toUpperCase() !== "N/A") {
-        // Replace comma with dot for decimal conversion, then parse
         const numericPrice = parseFloat(price.replace(',', '.'));
         if (!isNaN(numericPrice)) {
             formattedPrice = `€${numericPrice.toFixed(2)}`;
@@ -202,49 +203,53 @@ export async function GET() {
             console.warn(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' (row ${index + 2}) has unparseable price: '${item[PRECIO_COL]}'. Setting to undefined.`);
         }
       }
-      
-      // Allergens processing
+
       const allergens = alergenosString.split(',')
         .map(a => a.trim().toLowerCase())
         .filter(a => a.length > 0);
 
-      // Chef's Suggestion processing
-      const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE'].includes(sugerenciaChefString.toLowerCase());
+      const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE', 'YES'].includes(sugerenciaChefString.toLowerCase().trim());
 
       const categoryKey = mapCategoryToKey(categoryEN);
-      
+
       console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Successfully processed item '${nameEN}'.`);
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`, // More unique ID
+        id: `${categoryKey}-${index}-${Date.now()}`,
         name: { en: nameEN.trim(), es: nameES.trim() },
         description: {
           en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(),
           es: (item[DESCRIPCION_ES_COL] || "Descripción no disponible.").trim()
         },
-        price: formattedPrice, 
+        price: formattedPrice,
         categoryKey: categoryKey,
         imageUrl: finalImageUrl,
-        imageHint: imageHint, // Ensure imageHint is always present
+        imageHint: imageHint,
         allergens: allergens.length > 0 ? allergens : undefined,
         isChefSuggestion: isChefSuggestion,
       };
-    }).filter(item => item !== null) as MenuItemData[]; // Filter out nulls from invisible/invalid items
+    }).filter(item => item !== null) as MenuItemData[];
     console.log(`API_ROUTE_GET_MENU: Total items marked as visible: ${visibleItemsCount}`);
     console.log(`API_ROUTE_GET_MENU: Mapped to ${allMenuItems.length} valid MenuItemData objects after filtering invisible and invalid items.`);
 
   } catch (error: any) {
-    console.error(`API_ROUTE_GET_MENU: Unhandled error fetching/parsing menu: ${error.message}`, error.stack);
-    return NextResponse.json({ error: "Internal server error while fetching menu", details: error.message }, { status: 500 });
+    console.error(`API_ROUTE_GET_MENU: UNHANDLED ERROR in /api/menu GET handler: ${error.message}`, error.stack);
+    return NextResponse.json({ error: "Internal server error while fetching or processing menu", details: error.message }, {
+      status: 500,
+      headers: { 'Cache-Control': 'no-store, max-age=0' }
+    });
   }
 
   console.log(`API_ROUTE_GET_MENU: Total menu items processed: ${allMenuItems.length}. Sending response.`);
-  // ADDED LOG: Log allMenuItems before sending response
   console.log(`API_ROUTE_GET_MENU: Final allMenuItems before NextResponse.json:`, JSON.stringify(allMenuItems, null, 2));
   if (allMenuItems.length === 0 && parsedData.length > 0) {
     console.warn("API_ROUTE_GET_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency, especially the 'Visible' column and essential fields like names/categories.");
   } else if (allMenuItems.length === 0) {
-    // This condition is hit if GOOGLE_SHEET_CSV_URL is bad, sheet is empty, or headers are completely mismatched.
     console.warn("API_ROUTE_GET_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
   }
-  return NextResponse.json(allMenuItems, { status: 200 });
+  return NextResponse.json(allMenuItems, {
+    status: 200,
+    headers: { 'Cache-Control': 'no-store, max-age=0' }
+  });
 }
+
+    
