@@ -16,7 +16,7 @@ export default function AboutUsSection() {
       src: "/façana.webp", // Façana
       altKey: "landing:aboutUs.imageAltExterior",
       hint: "restaurant exterior facade",
-      desktopClass: "relative z-10 w-11/12 md:w-10/12 aspect-[4/3] shadow-xl rounded-lg transform group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-500 ease-in-out rotate-[-1deg]",
+      desktopClass: "relative z-10 w-10/12 md:w-9/12 aspect-[4/3] shadow-xl rounded-lg transform group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-500 ease-in-out rotate-[-1deg] mx-auto",
       priority: true,
     },
     {
@@ -81,8 +81,7 @@ export default function AboutUsSection() {
               {/* Imatge 1: Exterior (Façana) - Base */}
               <div
                 className={cn(
-                  componentImages[0].desktopClass,
-                  "mx-auto" // Centrar la imatge base si és més petita que el contenidor
+                  componentImages[0].desktopClass
                 )}
               >
                 <Image
