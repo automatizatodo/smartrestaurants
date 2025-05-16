@@ -10,19 +10,19 @@ export default function AboutUsSection() {
 
   const images = [
     {
-      src: "https://placehold.co/600x400.png",
+      src: "/restaurant-exterior.jpg", // Updated path
       altKey: "landing:aboutUs.imageAltExterior",
       hint: "restaurant exterior facade",
       delay: "0.1s",
     },
     {
-      src: "https://placehold.co/600x400.png",
+      src: "/restaurant-interior.jpg", // Updated path
       altKey: "landing:aboutUs.imageAltInterior",
       hint: "restaurant interior dining",
       delay: "0.2s",
     },
     {
-      src: "https://placehold.co/600x400.png",
+      src: "/restaurant-terrace.jpg", // Updated path
       altKey: "landing:aboutUs.imageAltTerrace",
       hint: "restaurant terrace patio",
       delay: "0.3s",
@@ -57,6 +57,7 @@ export default function AboutUsSection() {
                   layout="fill"
                   objectFit="cover"
                   className="transition-transform duration-500 ease-in-out group-hover:scale-105"
+                  priority // Consider adding priority to the largest/first image if it's LCP
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-300"></div>
               </div>

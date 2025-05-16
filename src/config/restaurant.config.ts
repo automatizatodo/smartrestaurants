@@ -68,7 +68,7 @@ const restaurantConfig: RestaurantConfig = {
   theme: {
     primary: 'hsl(51, 100%, 50%)',
   },
-  showMenuItemImages: true,
+  showMenuItemImages: false,
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp', // or 'calendar'
   whatsappBookingNumber: '+34600000000', // Example, replace with actual number
