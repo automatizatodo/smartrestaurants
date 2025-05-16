@@ -1,8 +1,14 @@
 
 {
-  "starters": "Starters",
-  "mainCourses": "Main Courses",
-  "desserts": "Desserts",
+  "starters": "Menu Starters",
+  "mainCourses": "Menu Main Courses",
+  "desserts": "Menu Desserts",
   "drinks": "Drinks",
-  "other": "Other"
+  "other": "Other",
+  "menuDelDia.title": "Menu of the Day",
+  "menuDelDia.priceTitle": "Menu Price",
+  "menuDelDia.priceIncludes": "VAT included. Bread, drink and dessert or coffee.",
+  "menuDelDia.notes": "Available Tuesday to Friday midday, excluding holidays.",
+  "chefsSuggestion": "Chef's Suggestion",
+  "allergensTitle": "Allergens:"
 }

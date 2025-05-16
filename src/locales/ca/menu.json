@@ -1,8 +1,14 @@
 
 {
-  "starters": "Entrants",
-  "mainCourses": "Plats Principals",
-  "desserts": "Postres",
+  "starters": "Entrants del Menú",
+  "mainCourses": "Plats Principals del Menú",
+  "desserts": "Postres del Menú",
   "drinks": "Begudes",
-  "other": "Altres"
+  "other": "Altres",
+  "menuDelDia.title": "Menú del Dia",
+  "menuDelDia.priceTitle": "Preu del Menú",
+  "menuDelDia.priceIncludes": "IVA inclòs. Pa, beguda i postre o cafè.",
+  "menuDelDia.notes": "Disponible de dimarts a divendres al migdia, excepte festius.",
+  "chefsSuggestion": "Suggeriment del Xef",
+  "allergensTitle": "Al·lèrgens:"
 }

@@ -1,8 +1,14 @@
 
 {
-  "starters": "Entrantes",
-  "mainCourses": "Platos Principales",
-  "desserts": "Postres",
+  "starters": "Entrantes del Menú",
+  "mainCourses": "Platos Principales del Menú",
+  "desserts": "Postres del Menú",
   "drinks": "Bebidas",
-  "other": "Otros"
+  "other": "Otros",
+  "menuDelDia.title": "Menú del Día",
+  "menuDelDia.priceTitle": "Precio del Menú",
+  "menuDelDia.priceIncludes": "IVA incluido. Pan, bebida y postre o café.",
+  "menuDelDia.notes": "Disponible de martes a viernes a mediodía, excepto festivos.",
+  "chefsSuggestion": "Sugerencia del Chef",
+  "allergensTitle": "Alérgenos:"
 }

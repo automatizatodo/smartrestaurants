@@ -14,13 +14,16 @@ const NAME_EN_COL = "Name (EN)";
 const DESCRIPCION_ES_COL = "Descripción (ES)";
 const DESCRIPTION_EN_COL = "Description (EN)";
 const PRECIO_COL = "Precio (€)";
+const ALERGENOS_COL = "Alérgenos"; // New column for allergens
+const SUGERENCIA_COL = "Sugerencia del Chef"; // New column for chef's suggestion
 
 // Expected headers for validation
 const EXPECTED_HEADERS = [
   CATEGORIA_ES_COL, CATEGORY_EN_COL,
   NOMBRE_ES_COL, NAME_EN_COL,
   DESCRIPCION_ES_COL, DESCRIPTION_EN_COL,
-  PRECIO_COL
+  PRECIO_COL,
+  ALERGENOS_COL, SUGERENCIA_COL // Added new expected headers
 ];
 
 // Helper to map English category names from sheet to consistent categoryKeys
@@ -28,20 +31,23 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters':
+    case 'entrantes': // Adding Spanish variant
       return 'starters';
     case 'main courses':
+    case 'platos principales': // Adding Spanish variant
       return 'mainCourses';
     case 'desserts':
+    case 'postres': // Adding Spanish variant
       return 'desserts';
     case 'beverages':
     case 'drinks':
+    case 'bebidas': // Adding Spanish variant
       return 'drinks';
     default:
       console.warn(`API_ROUTE_MAP_CATEGORY: Unknown category encountered: '${categoryEN}'. Defaulting to '${lowerCategory.replace(/\s+/g, '') || 'other'}'.`);
       return lowerCategory.replace(/\s+/g, '') || 'other';
   }
 }
-
 
 function parseCSV(csvText: string): Record<string, string>[] {
   console.log(`API_ROUTE_PARSE_CSV: Received CSV text length: ${csvText.length}`);
@@ -97,7 +103,7 @@ export async function GET() {
   console.log(`API_ROUTE_GET_MENU: Fetching menu from URL: ${googleSheetCsvUrl}`);
 
   let allMenuItems: MenuItemData[] = [];
-  let parsedData: Record<string, string>[] = []; // Define parsedData here to check its length later
+  let parsedData: Record<string, string>[] = []; 
 
   try {
     const response = await fetch(googleSheetCsvUrl, { cache: 'no-store' });
@@ -111,20 +117,21 @@ export async function GET() {
     const csvText = await response.text();
     console.log(`API_ROUTE_GET_MENU: Successfully fetched CSV. Length: ${csvText.length}`);
 
-
     if (!csvText.trim()) {
       console.warn(`API_ROUTE_GET_MENU: Fetched CSV is empty. URL: ${googleSheetCsvUrl}. Ensure sheet is published and has content.`);
       return NextResponse.json({ error: "Fetched menu data is empty" }, { status: 500 });
     }
 
-    parsedData = parseCSV(csvText); // Assign to the outer scope variable
+    parsedData = parseCSV(csvText);
     console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV.`);
 
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
-      const categoryEN = item[CATEGORY_EN_COL];
+      const categoryEN = item[CATEGORY_EN_COL]; // Using English category for consistent key mapping
       let price = item[PRECIO_COL];
+      const allergensString = item[ALERGENOS_COL] || "";
+      const chefSuggestionString = item[SUGERENCIA_COL] || "FALSE";
 
       if (!nameES || !nameEN || !categoryEN) {
         console.warn(`API_ROUTE_GET_MENU: Item at row ${index + 2} is missing essential data (Name ES/EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
@@ -132,27 +139,31 @@ export async function GET() {
       }
 
       if (price === undefined || price === null || price.trim() === "") {
-        console.warn(`API_ROUTE_GET_MENU: Item '${nameEN}' (row ${index + 2}) is missing price. Setting to 'N/A'.`);
-        price = 'N/A';
+        // For Menu del Dia, individual prices might not be relevant, but we parse if present
+        price = undefined; // Or some default like 'N/A' if you still want to store it
       } else {
         const numericPrice = parseFloat(price.replace(',', '.'));
         if (!isNaN(numericPrice)) {
-            price = `€${numericPrice.toFixed(2)}`;
+            price = `€${numericPrice.toFixed(2)}`; // Keep price formatting if present
         } else {
-            price = `€ N/A`;
-            console.warn(`API_ROUTE_GET_MENU: Item '${nameEN}' (row ${index + 2}) has unparseable price: '${item[PRECIO_COL]}'. Setting to '€ N/A'.`);
+            price = undefined; 
+            console.warn(`API_ROUTE_GET_MENU: Item '${nameEN}' (row ${index + 2}) has unparseable price: '${item[PRECIO_COL]}'. Setting to undefined.`);
         }
       }
+      
+      const allergens = allergensString.split(',')
+        .map(a => a.trim().toLowerCase())
+        .filter(a => a.length > 0);
+
+      const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1'].includes(chefSuggestionString.toLowerCase());
 
       const categoryKey = mapCategoryToKey(categoryEN);
-      const nameENForHint = nameEN || "food item"; // Fallback for hint
+      const nameENForHint = nameEN || "food item"; 
 
-      // Create a more specific image hint using the English name or category
       let imageHint = nameENForHint.toLowerCase().split(' ').slice(0, 2).join(' ');
       if (!imageHint || imageHint === "food item") {
         imageHint = categoryEN.toLowerCase() || "food plate";
       }
-
 
       return {
         id: `${categoryKey}-${index}-${Date.now()}`,
@@ -161,10 +172,12 @@ export async function GET() {
           en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(),
           es: (item[DESCRIPCION_ES_COL] || "Descripción no disponible.").trim()
         },
-        price: price,
+        price: price, // Price is optional now
         categoryKey: categoryKey,
-        imageUrl: `https://placehold.co/400x300.png`, // Using placehold.co
-        imageHint: imageHint, // Using the generated hint
+        imageUrl: `https://placehold.co/400x300.png`,
+        imageHint: imageHint,
+        allergens: allergens.length > 0 ? allergens : undefined,
+        isChefSuggestion: isChefSuggestion,
       };
     }).filter(item => item !== null) as MenuItemData[];
 
