@@ -22,8 +22,11 @@ export default function HeroSection() {
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
       <div
-        className="absolute inset-0 z-0"
-        style={{ transform: `translateY(${offsetY * 0.3}px)` }}
+        className="absolute inset-0 z-0 parallax-bg"
+        style={{ 
+          backgroundImage: `url(${restaurantConfig.heroImageUrl})`,
+          backgroundPositionY: `${offsetY * 0.3}px` 
+        }}
       >
         <Image
           src={restaurantConfig.heroImageUrl}
@@ -33,8 +36,9 @@ export default function HeroSection() {
           style={{ objectFit: 'cover' }}
           quality={80}
           priority
-          className="brightness-75" 
+          className="opacity-0 pointer-events-none" // Keep for LCP, hide visually if parallax-bg handles it
         />
+         <div className="absolute inset-0 bg-black/50"></div> {/* Overlay for better text readability */}
       </div>
 
       <div className="relative z-10 p-4 sm:p-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -44,14 +48,14 @@ export default function HeroSection() {
         <p className="text-xl sm:text-2xl md:text-3xl text-gray-200 mb-10 max-w-3xl mx-auto font-sans shadow-text">
           {t('landing:hero.tagline')}
         </p>
-        <div className="space-x-4">
+        <div className="flex flex-col space-y-4 items-center sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
           <Link href="/#menu" passHref>
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105">
+            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105 w-full sm:w-auto">
               {t('landing:hero.viewMenuButton')}
             </Button>
           </Link>
           <Link href="#booking" passHref>
-            <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary/10 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105">
+            <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary/10 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105 w-full sm:w-auto">
               {t('landing:hero.bookTableButton')}
             </Button>
           </Link>
@@ -65,3 +69,4 @@ export default function HeroSection() {
     </section>
   );
 }
+
