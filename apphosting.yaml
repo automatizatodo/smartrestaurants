@@ -18,12 +18,55 @@ runConfig:
   environmentVariables:
     GOOGLE_CALENDAR_ID: "primary" # <-- !!! IMPORTANT: Replace with your actual Calendar ID if not 'primary'
     NEXT_PUBLIC_APP_URL: "https://YOUR_APP_HOSTNAME" # <-- !!! IMPORTANT: Replace with your Firebase Hosting URL (e.g., https://your-project-id.web.app)
+
+    # --- UNSAFE METHOD: FOR TESTING/NON-CRITICAL ENVIRONMENTS ONLY ---
+    # If you absolutely cannot use Google Secret Manager and understand the security risks,
+    # you can embed the JSON content here.
+    #
+    # 1. Open your service account JSON key file (e.g., gastronomic-canvas-credentials.json.json).
+    # 2. Copy ALL of its content.
+    # 3. Paste the entire JSON content below, replacing the placeholder.
+    # 4. Ensure the indentation and formatting are correct for YAML multi-line strings (using `|`).
+    #
+    # WARNING: This is NOT recommended for production as it embeds sensitive credentials
+    # directly in your configuration file. Use Google Secret Manager for production.
+    #
+    # If you use this method, your application code (check-calendar-availability-flow.ts
+    # and create-calendar-event-flow.ts) will attempt to parse this JSON string.
+    # The `GOOGLE_APPLICATION_CREDENTIALS` variable pointing to a file path will be ignored
+    # by the flows if `GOOGLE_CREDENTIALS_JSON` is set and parsed successfully.
+    #
+    # REMOVE THE `secret: GOOGLE_SERVICE_ACCOUNT_JSON_CONTENT` LINE FOR `GOOGLE_CREDENTIALS_JSON` BELOW
+    # IF YOU CHOOSE THIS UNSAFE METHOD. CHOOSE ONE METHOD, NOT BOTH.
+    #
+    # GOOGLE_CREDENTIALS_JSON: |
+    #   {
+    #     "type": "service_account",
+    #     "project_id": "YOUR_PROJECT_ID",
+    #     "private_key_id": "YOUR_PRIVATE_KEY_ID",
+    #     "private_key": "-----BEGIN PRIVATE KEY-----\nYOUR_ACTUAL_PRIVATE_KEY_CONTENT_HERE\n-----END PRIVATE KEY-----\n",
+    #     "client_email": "YOUR_SERVICE_ACCOUNT_EMAIL@YOUR_PROJECT_ID.iam.gserviceaccount.com",
+    #     "client_id": "YOUR_CLIENT_ID",
+    #     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    #     "token_uri": "https://oauth2.googleapis.com/token",
+    #     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    #     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/YOUR_SERVICE_ACCOUNT_EMAIL_ENCODED%40YOUR_PROJECT_ID.iam.gserviceaccount.com"
+    #   }
+
+    # --- RECOMMENDED SECURE METHOD (using Google Secret Manager) ---
     # This tells the application to read the Google service account JSON
     # from the secret named 'GOOGLE_SERVICE_ACCOUNT_JSON_CONTENT' in Google Secret Manager.
-    GOOGLE_CREDENTIALS_JSON:
+    # The application code will use GOOGLE_CREDENTIALS_JSON if set, otherwise it will
+    # look for GOOGLE_APPLICATION_CREDENTIALS (which Secret Manager sets effectively).
+    # For App Hosting, it's best to let it handle this via the 'secret' field.
+    # The flow files are set up to parse GOOGLE_CREDENTIALS_JSON first.
+    # If using this method, ensure GOOGLE_CREDENTIALS_JSON above is COMMENTED OUT or REMOVED.
+    GOOGLE_CREDENTIALS_JSON: # This variable name matches what the flow code checks.
       secret: GOOGLE_SERVICE_ACCOUNT_JSON_CONTENT # <-- !!! IMPORTANT: This MUST match the secret name you created in Secret Manager
 
 # Specifies that this is a Next.js backend.
 # An empty backend: {} block is often sufficient for Next.js apps.
 # App Hosting will use your package.json scripts "build" and "start".
 backend: {}
+
+    
