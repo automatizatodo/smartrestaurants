@@ -1,29 +1,79 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Geist } from 'next/font/google';
-import { Playfair_Display } from 'next/font/google'; // Changed from Lora
+import { Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
 import AppInitializer from '@/components/AppInitializer';
+import caCommon from '@/locales/ca/common.json'; // For default metadata
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
 });
 
-// Changed Lora to Playfair_Display for headings
 const playfairDisplay = Playfair_Display({
   variable: '--font-playfair-display',
   subsets: ['latin'],
-  weight: ['400', '700', '900'], // Added more weights for headings
+  weight: ['400', '700', '900'],
 });
 
+// Default metadata, primarily in Catalan as it's the default language
 export const metadata: Metadata = {
-  // Title and description can be set dynamically if needed, or statically here.
-  // Example:
-  // title: "Restaurant Title",
-  // description: "Restaurant Description"
+  title: {
+    default: `${caCommon.restaurantName} | ${caCommon.seo.defaultTitleSuffix}`,
+    template: `%s | ${caCommon.restaurantName}`,
+  },
+  description: caCommon.seo.defaultDescription,
+  keywords: ['restaurant a Sabadell', 'cuina catalana', 'brasa', 'sense gluten', 'Can Fanals Sabadell', 'menjar a Sabadell'],
+  authors: [{ name: 'Can Fanals', url: process.env.NEXT_PUBLIC_APP_URL }],
+  openGraph: {
+    title: `${caCommon.restaurantName} | ${caCommon.seo.defaultTitleSuffix}`,
+    description: caCommon.seo.defaultDescription,
+    url: process.env.NEXT_PUBLIC_APP_URL,
+    siteName: caCommon.restaurantName,
+    // images: [ // Add a good default OG image later
+    //   {
+    //     url: `${process.env.NEXT_PUBLIC_APP_URL}/og-image.png`, // Example
+    //     width: 1200,
+    //     height: 630,
+    //   },
+    // ],
+    locale: 'ca_ES', // Default locale
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${caCommon.restaurantName} | ${caCommon.seo.defaultTitleSuffix}`,
+    description: caCommon.seo.defaultDescription,
+    // images: [`${process.env.NEXT_PUBLIC_APP_URL}/twitter-image.png`], // Example
+    // site: '@yourTwitterHandle', // Add if you have one
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  // Verification (add your IDs if you use these services)
+  // verification: {
+  //   google: 'YOUR_GOOGLE_SITE_VERIFICATION_ID',
+  //   yandex: 'YOUR_YANDEX_VERIFICATION_ID',
+  // },
+  // alternates: { // If you have different language versions fully set up for SEO
+  //   canonical: process.env.NEXT_PUBLIC_APP_URL,
+  //   languages: {
+  //     'ca-ES': `${process.env.NEXT_PUBLIC_APP_URL}/ca`,
+  //     'es-ES': `${process.env.NEXT_PUBLIC_APP_URL}/es`,
+  //     'en-US': `${process.env.NEXT_PUBLIC_APP_URL}/en`,
+  //   },
+  // },
 };
 
 export const viewport: Viewport = {
@@ -40,13 +90,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body 
-        className={`${geistSans.variable} ${playfairDisplay.variable} antialiased`} // Updated to include playfairDisplay
+    <html lang="ca" className="dark"> {/* Default lang set to Catalan */}
+      <body
+        className={`${geistSans.variable} ${playfairDisplay.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <LanguageProvider>
-          <AppInitializer /> {/* Runs client-side effects like setting lang */}
+          <AppInitializer />
           {children}
           <Toaster />
         </LanguageProvider>

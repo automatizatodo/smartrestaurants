@@ -1,7 +1,7 @@
 
 {
   "restaurantName": "Can Fanals",
-  "tagline": "Brasa, Tradició i Sabor Sense Gluten",
+  "tagline": "Brasa, Tradició i Sabor Sense Gluten a Sabadell",
   "nav.ourMenu": "El Nostre Menú",
   "nav.aiSommelier": "Sommelier IA",
   "nav.bookTable": "Reservar Taula",
@@ -25,6 +25,7 @@
   "footer.copyright": "© {year} {restaurantName}. Tots els drets reservats. Dissenyat amb passió.",
   "footer.managedByText": "Lloc web gestionat per",
   "footer.managedByBrand": "automatizatodo.com",
+  "footer.seoText": "{restaurantName} - El teu restaurant a Sabadell per a brasa i cuina tradicional.",
   "form.error.generic": "S'ha produït un error inesperat. Si us plau, torna-ho a provar més tard.",
   "form.error.invalidInput": "Entrada invàlida. Si us plau, revisa les teves dades.",
   "languageSelector.label": "Selecciona idioma",
@@ -35,7 +36,10 @@
   "guestSingular": "comensal",
   "guestsPlural": "comensals",
   "page.menu.title": "El Nostre Menú Exquisit",
-  "page.menu.description": "Explora la gamma completa de delícies culinàries ofertes a {restaurantName}. Cada plat elaborat amb passió i art.",
-  "allCategories": "Totes"
+  "page.menu.description": "Explora la gamma completa de delícies culinàries ofertes a {restaurantName}, el teu restaurant de referència a Sabadell. Cada plat elaborat amb passió i art.",
+  "allCategories": "Totes",
+  "seo": {
+    "defaultTitleSuffix": "Restaurant a Sabadell - Brasa i Cuina Tradicional",
+    "defaultDescription": "Descobreix Can Fanals, el teu restaurant a Sabadell especialitzat en carns a la brasa, cuina tradicional catalana i opcions sense gluten. Reserva la teva taula!"
+  }
 }
-

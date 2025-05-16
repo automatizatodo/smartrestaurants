@@ -4,13 +4,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
-import restaurantConfig from '@/config/restaurant.config'; // For heroImageUrl, imageHint
+import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function HeroSection() {
   const [offsetY, setOffsetY] = useState(0);
   const { t, translations } = useLanguage();
-  const restaurantName = translations.common.restaurantName; 
+  const restaurantName = translations.common.restaurantName;
 
   const handleScroll = () => setOffsetY(window.pageYOffset);
 
@@ -23,22 +23,22 @@ export default function HeroSection() {
     <section id="hero" className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
       <div
         className="absolute inset-0 z-0 parallax-bg"
-        style={{ 
+        style={{
           backgroundImage: `url(${restaurantConfig.heroImageUrl})`,
-          backgroundPositionY: `${offsetY * 0.3}px` 
+          backgroundPositionY: `${offsetY * 0.3}px`
         }}
       >
         <Image
           src={restaurantConfig.heroImageUrl}
-          alt={t('landing:hero.title')} 
+          alt={t('landing:hero.altText', { restaurantName })}
           data-ai-hint={restaurantConfig.heroImageHint}
           fill
           style={{ objectFit: 'cover' }}
           quality={80}
           priority
-          className="opacity-0 pointer-events-none" // Keep for LCP, hide visually if parallax-bg handles it
+          className="opacity-0 pointer-events-none"
         />
-         <div className="absolute inset-0 bg-black/50"></div> {/* Overlay for better text readability */}
+         <div className="absolute inset-0 bg-black/50"></div>
       </div>
 
       <div className="relative z-10 p-4 sm:p-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -69,4 +69,3 @@ export default function HeroSection() {
     </section>
   );
 }
-

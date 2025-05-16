@@ -1,7 +1,7 @@
 
 "use client";
 import Link from 'next/link';
-import Image from 'next/image'; 
+import Image from 'next/image';
 import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from '@/context/LanguageContext';
@@ -21,10 +21,11 @@ export default function Footer() {
                 {restaurantConfig.logoUrl ? (
                   <Image
                     src={restaurantConfig.logoUrl}
-                    alt={`${restaurantName} Logo`}
-                    width={432} 
-                    height={144}  
-                    className="h-36 w-auto dark:filter dark:invert" 
+                    alt={`${restaurantName} Logo - ${t('footer.seoText', { restaurantName })}`}
+                    width={432}
+                    height={144}
+                    className="h-36 w-auto dark:filter dark:invert"
+                    style={{ objectFit: 'contain' }}
                   />
                 ) : (
                   <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
@@ -93,6 +94,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-border/50 pt-8 text-center text-sm">
+          <p className="mb-2">{t('common:footer.seoText', { restaurantName })}</p>
           <p>{t('common:footer.copyright', { year: currentYear, restaurantName: restaurantName })}</p>
           <p className="mt-2 text-xs">
             {t('common:footer.managedByText')}{' '}
