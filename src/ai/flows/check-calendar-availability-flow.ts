@@ -17,6 +17,9 @@ import { addMinutes, parse, formatISO } from 'date-fns';
 console.log('CALENDAR_CHECK_AVAIL_FLOW_LOAD: Flow file loaded.');
 console.log('CALENDAR_CHECK_AVAIL_FLOW_LOAD: Initial GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
 console.log('CALENDAR_CHECK_AVAIL_FLOW_LOAD: Initial GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
+console.log('CALENDAR_CHECK_AVAIL_FLOW_LOAD: VERCEL env var:', process.env.VERCEL);
+console.log('CALENDAR_CHECK_AVAIL_FLOW_LOAD: GOOGLE_CREDENTIALS_JSON env var (first 50 chars):', process.env.GOOGLE_CREDENTIALS_JSON?.substring(0, 50));
+
 
 const CheckCalendarAvailabilityInputSchema = z.object({
   date: z.string().describe('The desired date for the booking (YYYY-MM-DD).'),
@@ -88,7 +91,8 @@ const parseGuestsFromEvent = (event: any): number => {
 // Exported wrapper function
 export async function checkCalendarAvailability(input: CheckCalendarAvailabilityInput): Promise<CheckCalendarAvailabilityOutput> {
   console.log('CALENDAR_CHECK_AVAIL_FLOW: Wrapper function called with input:', input);
-  console.log('CALENDAR_CHECK_AVAIL_FLOW: Using GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+  console.log('CALENDAR_CHECK_AVAIL_FLOW: Using GOOGLE_APPLICATION_CREDENTIALS (local):', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+  console.log('CALENDAR_CHECK_AVAIL_FLOW: Using GOOGLE_CREDENTIALS_JSON (Vercel - first 50 chars):', process.env.GOOGLE_CREDENTIALS_JSON?.substring(0,50));
   console.log('CALENDAR_CHECK_AVAIL_FLOW: Using GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   return checkCalendarAvailabilityFlow(input);
 }
@@ -101,12 +105,14 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
   },
   async (input) => {
     console.log('CALENDAR_CHECK_AVAIL_FLOW: Genkit flow execution started with input:', input);
-    console.log('CALENDAR_CHECK_AVAIL_FLOW_ENV_CHECK: GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+    console.log('CALENDAR_CHECK_AVAIL_FLOW_ENV_CHECK: GOOGLE_APPLICATION_CREDENTIALS (local):', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+    console.log('CALENDAR_CHECK_AVAIL_FLOW_ENV_CHECK: GOOGLE_CREDENTIALS_JSON (Vercel - first 50 chars):', process.env.GOOGLE_CREDENTIALS_JSON?.substring(0,50));
     console.log('CALENDAR_CHECK_AVAIL_FLOW_ENV_CHECK: GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
 
 
     const calendarId = process.env.GOOGLE_CALENDAR_ID;
-    const credsFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    const googleCredentialsJson = process.env.GOOGLE_CREDENTIALS_JSON; // For Vercel
+    const googleAppCredentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS; // For local dev
 
     if (!calendarId) {
         console.error('CALENDAR_CHECK_AVAIL_FLOW: CRITICAL - GOOGLE_CALENDAR_ID is not set in environment variables.');
@@ -114,11 +120,27 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
     }
     console.log('CALENDAR_CHECK_AVAIL_FLOW: GOOGLE_CALENDAR_ID found:', calendarId);
 
-    if (!credsFile) {
-      console.error('CALENDAR_CHECK_AVAIL_FLOW: CRITICAL - GOOGLE_APPLICATION_CREDENTIALS is not set in environment variables.');
-      return { isAvailable: false, reasonKey: 'landing:booking.error.calendarConfigError' };
+    let authOptions: any = {
+      scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+    };
+
+    if (googleCredentialsJson) { // Prioritize JSON content for Vercel/production
+        try {
+            const credentials = JSON.parse(googleCredentialsJson);
+            authOptions.credentials = credentials;
+            console.log('CALENDAR_CHECK_AVAIL_FLOW: Using GOOGLE_CREDENTIALS_JSON for auth.');
+        } catch (e: any) {
+            console.error('CALENDAR_CHECK_AVAIL_FLOW: CRITICAL - Failed to parse GOOGLE_CREDENTIALS_JSON:', e.message, e.stack);
+            console.error('CALENDAR_CHECK_AVAIL_FLOW: GOOGLE_CREDENTIALS_JSON (first 100 chars):', googleCredentialsJson.substring(0,100));
+            return { isAvailable: false, reasonKey: 'landing:booking.error.calendarConfigError' };
+        }
+    } else if (googleAppCredentialsPath) { // Fallback to path for local dev
+        authOptions.keyFile = googleAppCredentialsPath;
+        console.log('CALENDAR_CHECK_AVAIL_FLOW: Using GOOGLE_APPLICATION_CREDENTIALS path for auth.');
+    } else {
+        console.error('CALENDAR_CHECK_AVAIL_FLOW: CRITICAL - Neither GOOGLE_CREDENTIALS_JSON nor GOOGLE_APPLICATION_CREDENTIALS is set.');
+        return { isAvailable: false, reasonKey: 'landing:booking.error.calendarConfigError' };
     }
-    console.log('CALENDAR_CHECK_AVAIL_FLOW: GOOGLE_APPLICATION_CREDENTIALS path found:', credsFile);
 
 
     let eventDateTime;
@@ -133,11 +155,8 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
     const { timeMin, timeMax } = eventDateTime;
 
     try {
-      console.log('CALENDAR_CHECK_AVAIL_FLOW: Initializing Google Auth...');
-      const auth = new google.auth.GoogleAuth({
-        scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
-        // GOOGLE_APPLICATION_CREDENTIALS env var is used automatically by the library if set correctly
-      });
+      console.log('CALENDAR_CHECK_AVAIL_FLOW: Initializing Google Auth with options:', authOptions.credentials ? {...authOptions, credentials: '***REDACTED***'} : authOptions);
+      const auth = new google.auth.GoogleAuth(authOptions);
       const authClient = await auth.getClient();
       google.options({ auth: authClient }); // Set auth options globally for googleapis
       console.log('CALENDAR_CHECK_AVAIL_FLOW: Google Auth initialized successfully.');
@@ -193,7 +212,7 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
 
     } catch (error: any) {
       console.error('CALENDAR_CHECK_AVAIL_FLOW: ERROR during Google Calendar API interaction.');
-      console.error('CALENDAR_CHECK_AVAIL_FLOW: Ensure GOOGLE_APPLICATION_CREDENTIALS points to a valid service account JSON file.');
+      console.error('CALENDAR_CHECK_AVAIL_FLOW: Ensure GOOGLE_CREDENTIALS_JSON (Vercel) or GOOGLE_APPLICATION_CREDENTIALS (local) is set correctly.');
       console.error('CALENDAR_CHECK_AVAIL_FLOW: Ensure the service account has permissions on the calendar and Calendar API is enabled.');
       console.error('CALENDAR_CHECK_AVAIL_FLOW: Detailed error:', error.response?.data || error.message, error.stack);
       return {
@@ -203,5 +222,5 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
     }
   }
 );
-
-    
+        
+        
