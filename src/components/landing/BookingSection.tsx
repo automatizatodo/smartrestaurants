@@ -40,10 +40,10 @@ function SubmitButton() {
 
   if (restaurantConfig.bookingMethod === 'whatsapp') {
     return (
-      <Button 
-        type="submit" 
-        disabled={pending} 
-        className="w-full bg-[#25D366] text-white hover:bg-[#1DA851] focus:ring-2 focus:ring-offset-2 focus:ring-[#25D366]/50"
+      <Button
+        type="submit"
+        disabled={pending}
+        className="w-full bg-[#25D366] text-white hover:bg-[#1DA851] focus:ring-2 focus:ring-offset-2 focus:ring-[#25D366]/50 py-3"
       >
         {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <WhatsAppIcon />}
         {t('landing:booking.buttonTextWhatsapp')}
@@ -52,7 +52,7 @@ function SubmitButton() {
   }
 
   return (
-    <Button type="submit" disabled={pending} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+    <Button type="submit" disabled={pending} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
       {t('landing:booking.buttonText')}
     </Button>
@@ -68,18 +68,18 @@ export default function BookingSection() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const processedSuccessKeyRef = useRef<string | null>(null);
-  
+
   let dateLocale;
   if (language === 'es') dateLocale = es;
   else if (language === 'ca') dateLocale = ca;
   else dateLocale = en;
 
 
-  const initialState: BookingFormState = { 
-    messageKey: null, 
-    success: false, 
-    errors: null, 
-    messageParams: null 
+  const initialState: BookingFormState = {
+    messageKey: null,
+    success: false,
+    errors: null,
+    messageParams: null
   };
   const [state, formAction] = useActionState(submitBooking, initialState);
 
@@ -92,77 +92,71 @@ export default function BookingSection() {
         variant: state.success ? "default" : "destructive",
       });
     }
-  }, [state?.messageKey, state?.success, state?.messageParams, toast, t]); // Toast can depend on `t` for re-translation
+  }, [state?.messageKey, state?.success, state?.messageParams, toast, t]);
 
-  // Effect for handling successful submissions (WhatsApp redirect, form reset)
-  // This effect should ONLY depend on `state` to avoid re-triggering on language change.
   useEffect(() => {
     if (state?.success && state.messageKey) {
-      // Only proceed if this specific success state hasn't been processed for side effects yet
       if (processedSuccessKeyRef.current !== state.messageKey) {
         if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
           const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
           console.log("CLIENT_BOOKING: Opening WhatsApp URL for new submission:", whatsappUrl);
           window.open(whatsappUrl, '_blank');
         }
-        
+
         formRef.current?.reset();
         setDate(new Date());
         setSelectedTime(undefined);
         setSelectedGuests(undefined);
-        
-        processedSuccessKeyRef.current = state.messageKey; // Mark this success as processed
+
+        processedSuccessKeyRef.current = state.messageKey;
       }
     } else if (!state?.success && state?.messageKey) {
-      // If the last action resulted in an error, reset the processed key
-      // so that a subsequent successful submission can be processed.
       processedSuccessKeyRef.current = null;
     } else if (!state?.messageKey) {
-      // If the state is initial (no messageKey), also ensure processed key is reset.
       processedSuccessKeyRef.current = null;
     }
-  }, [state]); // Crucially, only depend on `state`
+  }, [state]);
 
 
   return (
-    <section id="booking" className="py-16 sm:py-24 bg-secondary">
+    <section id="booking" className="py-12 sm:py-20 bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
+        <div className="text-center mb-10 sm:mb-14">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4">
             {t('landing:booking.sectionTitle')}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-md sm:text-lg text-muted-foreground max-w-xl sm:max-w-2xl mx-auto">
             {t('landing:booking.sectionDescription')}
           </p>
         </div>
 
-        <Card className="max-w-2xl mx-auto shadow-xl">
-          <form action={formAction} ref={formRef} className="space-y-6">
-            <CardHeader>
-              <CardTitle className="font-serif text-2xl">{t('landing:booking.cardTitle')}</CardTitle>
-              <CardDescription>
+        <Card className="max-w-xl sm:max-w-2xl mx-auto shadow-xl">
+          <form action={formAction} ref={formRef} className="space-y-4">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="font-serif text-xl sm:text-2xl">{t('landing:booking.cardTitle')}</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 {t(restaurantConfig.bookingMethod === 'whatsapp' ? 'landing:booking.cardDescriptionWhatsapp' : 'landing:booking.cardDescription')}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <CardContent className="space-y-4 sm:space-y-5 px-4 sm:px-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                 <div>
                   <Label htmlFor="name">{t('landing:booking.label.name')}</Label>
-                  <Input id="name" name="name" placeholder={t('landing:booking.placeholder.name')} className="bg-input mt-1" />
-                  {state?.errors?.name && <p className="text-sm text-destructive mt-1">{state.errors.name.map(errKey => t(errKey)).join(", ")}</p>}
+                  <Input id="name" name="name" placeholder={t('landing:booking.placeholder.name')} className="bg-input mt-1.5" />
+                  {state?.errors?.name && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.name.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
                   <Label htmlFor="email">{t('landing:booking.label.email')}</Label>
-                  <Input id="email" name="email" type="email" placeholder={t('landing:booking.placeholder.email')} className="bg-input mt-1" />
-                  {state?.errors?.email && <p className="text-sm text-destructive mt-1">{state.errors.email.map(errKey => t(errKey)).join(", ")}</p>}
+                  <Input id="email" name="email" type="email" placeholder={t('landing:booking.placeholder.email')} className="bg-input mt-1.5" />
+                  {state?.errors?.email && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.email.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
               </div>
               <div>
                 <Label htmlFor="phone">{t('landing:booking.label.phone')}</Label>
-                <Input id="phone" name="phone" type="tel" placeholder={t('landing:booking.placeholder.phone')} className="bg-input mt-1" />
-                {state?.errors?.phone && <p className="text-sm text-destructive mt-1">{state.errors.phone.map(errKey => t(errKey)).join(", ")}</p>}
+                <Input id="phone" name="phone" type="tel" placeholder={t('landing:booking.placeholder.phone')} className="bg-input mt-1.5" />
+                {state?.errors?.phone && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.phone.map(errKey => t(errKey)).join(", ")}</p>}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
                 <div>
                   <Label htmlFor="date-popover">{t('landing:booking.label.date')}</Label>
                   <Popover>
@@ -171,7 +165,7 @@ export default function BookingSection() {
                         id="date-popover"
                         variant={"outline"}
                         className={cn(
-                          "w-full justify-start text-left font-normal mt-1 bg-input",
+                          "w-full justify-start text-left font-normal mt-1.5 bg-input text-sm",
                           !date && "text-muted-foreground"
                         )}
                       >
@@ -191,12 +185,12 @@ export default function BookingSection() {
                     </PopoverContent>
                   </Popover>
                   <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
-                  {state?.errors?.date && <p className="text-sm text-destructive mt-1">{state.errors.date.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.date && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.date.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
                   <Label htmlFor="time">{t('landing:booking.label.time')}</Label>
                   <Select name="time" value={selectedTime} onValueChange={setSelectedTime}>
-                    <SelectTrigger id="time" className="w-full mt-1 bg-input">
+                    <SelectTrigger id="time" className="w-full mt-1.5 bg-input text-sm">
                       <Clock className="mr-2 h-4 w-4 inline-block" />
                       <SelectValue placeholder={t('landing:booking.placeholder.time')} />
                     </SelectTrigger>
@@ -206,12 +200,12 @@ export default function BookingSection() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {state?.errors?.time && <p className="text-sm text-destructive mt-1">{state.errors.time.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.time && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.time.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
                   <Label htmlFor="guests">{t('landing:booking.label.guests')}</Label>
                   <Select name="guests" value={selectedGuests} onValueChange={setSelectedGuests}>
-                    <SelectTrigger id="guests" className="w-full mt-1 bg-input">
+                    <SelectTrigger id="guests" className="w-full mt-1.5 bg-input text-sm">
                       <Users className="mr-2 h-4 w-4 inline-block" />
                       <SelectValue placeholder={t('landing:booking.placeholder.guests')} />
                     </SelectTrigger>
@@ -221,21 +215,21 @@ export default function BookingSection() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {state?.errors?.guests && <p className="text-sm text-destructive mt-1">{state.errors.guests.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.guests && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.guests.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
               </div>
               <div>
                 <Label htmlFor="notes">{t('landing:booking.label.notes', { restaurantName })}</Label>
-                <Input id="notes" name="notes" placeholder={t('landing:booking.placeholder.notes')} className="bg-input mt-1" />
-                {state?.errors?.notes && <p className="text-sm text-destructive mt-1">{state.errors.notes.map(errKey => t(errKey)).join(", ")}</p>}
+                <Input id="notes" name="notes" placeholder={t('landing:booking.placeholder.notes')} className="bg-input mt-1.5" />
+                {state?.errors?.notes && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.notes.map(errKey => t(errKey)).join(", ")}</p>}
               </div>
               {state?.errors?.general && (
-                <p className="text-sm text-destructive mt-1 text-center">
+                <p className="text-xs sm:text-sm text-destructive mt-1 text-center">
                   {state.errors.general.map(errKey => t(errKey, state.messageParams || undefined )).join(' ')}
                 </p>
               )}
             </CardContent>
-            <CardFooter>
+            <CardFooter className="p-4 sm:p-6 pt-2 sm:pt-4">
               <SubmitButton />
             </CardFooter>
           </form>
@@ -244,5 +238,4 @@ export default function BookingSection() {
     </section>
   );
 }
-
     
