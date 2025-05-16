@@ -3,8 +3,7 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
-// IMPORTANT: Replace this with your actual "Publish to web" CSV URL for the menu sheet
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv'; // YOUR_NEW_GOOGLE_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
 
 // Column names from the Google Sheet structure (ensure these EXACTLY match your sheet headers)
 const VISIBLE_COL = "Visible";
@@ -45,40 +44,40 @@ function mapCategoryToKey(categoryEN: string): string {
     case 'drinks':
       return 'drinks';
     default:
-      console.warn(`API_ROUTE_MAP_CATEGORY: Unknown category encountered: '${categoryEN}'. Defaulting to '${lowerCategory.replace(/\s+/g, '') || 'other'}'.`);
+      console.warn(`API_ROUTE_LOGIC_MAP_CATEGORY: Unknown category encountered: '${categoryEN}'. Defaulting to '${lowerCategory.replace(/\s+/g, '') || 'other'}'.`);
       return lowerCategory.replace(/\s+/g, '') || 'other'; // Fallback for unknown categories
   }
 }
 
 function parseCSV(csvText: string): Record<string, string>[] {
-  console.log(`API_ROUTE_PARSE_CSV: Received CSV text length: ${csvText.length}`);
+  console.log(`API_ROUTE_LOGIC_PARSE_CSV: Received CSV text length: ${csvText.length}`);
   const lines = csvText.trim().split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
 
   if (lines.length < 2) {
-    console.warn(`API_ROUTE_PARSE_CSV: CSV content is too short (less than 2 lines) or headers are missing. Lines found: ${lines.length}`);
-    if (lines.length === 1) console.warn(`API_ROUTE_PARSE_CSV: Headers received: ${lines[0]}`);
+    console.warn(`API_ROUTE_LOGIC_PARSE_CSV: CSV content is too short (less than 2 lines) or headers are missing. Lines found: ${lines.length}`);
+    if (lines.length === 1) console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Headers received: ${lines[0]}`);
     return [];
   }
 
   const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''));
-  console.log(`API_ROUTE_PARSE_CSV: Headers found in sheet: [${headersFromSheet.join(", ")}]`);
-  console.log(`API_ROUTE_PARSE_CSV: Expected headers: [${EXPECTED_HEADERS.join(", ")}]`);
+  console.log(`API_ROUTE_LOGIC_PARSE_CSV: Headers found in sheet: [${headersFromSheet.join(", ")}]`);
+  console.log(`API_ROUTE_LOGIC_PARSE_CSV: Expected headers: [${EXPECTED_HEADERS.join(", ")}]`);
 
   const missingHeaders = EXPECTED_HEADERS.filter(eh => !headersFromSheet.includes(eh));
   if (missingHeaders.length > 0) {
-    console.error(`API_ROUTE_PARSE_CSV: Critical header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
+    console.error(`API_ROUTE_LOGIC_PARSE_CSV: Critical header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
     return [];
   }
 
   const extraHeaders = headersFromSheet.filter(sh => !EXPECTED_HEADERS.includes(sh));
   if (extraHeaders.length > 0) {
-    console.warn(`API_ROUTE_PARSE_CSV: Warning: Sheet contains extra headers not in EXPECTED_HEADERS: [${extraHeaders.join(", ")}]. These will be ignored.`);
+    console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Warning: Sheet contains extra headers not in EXPECTED_HEADERS: [${extraHeaders.join(", ")}]. These will be ignored.`);
   }
 
   const jsonData = [];
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) {
-      console.log(`API_ROUTE_PARSE_CSV: Skipping empty line at index ${i}`);
+      console.log(`API_ROUTE_LOGIC_PARSE_CSV: Skipping empty line at index ${i}`);
       continue;
     }
     const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(value => value.trim().replace(/^"|"$/g, ''));
@@ -90,10 +89,10 @@ function parseCSV(csvText: string): Record<string, string>[] {
       });
       jsonData.push(entry);
     } else {
-      console.warn(`API_ROUTE_PARSE_CSV: Skipping malformed CSV line ${i + 1}. Expected ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
+      console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Skipping malformed CSV line ${i + 1}. Expected ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
     }
   }
-  console.log(`API_ROUTE_PARSE_CSV: Parsed ${jsonData.length} data rows.`);
+  console.log(`API_ROUTE_LOGIC_PARSE_CSV: Parsed ${jsonData.length} data rows.`);
   return jsonData;
 }
 
@@ -133,9 +132,10 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
 
     const csvText = await response.text();
     console.log(`API_ROUTE_LOGIC: Successfully fetched CSV. Length: ${csvText.length}. Preview (first 500 chars): ${csvText.substring(0,500)}`);
-    if (csvText.length < 2000) {
-      console.log(`API_ROUTE_LOGIC: Full fetched CSV content:\\n${csvText}`);
+    if (csvText.length < 2000 && csvText.length > 0) { // Log full content only if it's reasonably short but not empty
+      console.log(`API_ROUTE_LOGIC: Full fetched CSV content (short):\n${csvText}`);
     }
+
 
     if (!csvText.trim()) {
       console.warn(`API_ROUTE_LOGIC: Fetched CSV is empty. URL: ${fetchUrl}. Ensure sheet is published and has content.`);
@@ -152,7 +152,7 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty
       if (!(visibleString.toUpperCase() === "TRUE" || visibleString === "1" || visibleString.toUpperCase() === "SÍ" || visibleString.toUpperCase() === "VERDADERO")) {
         console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE (Value: '${visibleString}'). Skipping.`);
         return null;
@@ -232,12 +232,13 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
   } else if (allMenuItems.length === 0) {
     console.warn("API_ROUTE_LOGIC: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
   }
+  console.log(`API_ROUTE_LOGIC: Final allMenuItems before NextResponse.json:`, JSON.stringify(allMenuItems.slice(0, 2), null, 2)); // Log first 2 items
   return allMenuItems;
 }
 
 
 export async function GET() {
-  console.log("API_ROUTE_GET_HANDLER: GET /api/menu handler invoked.");
+  console.log("API_ROUTE_GET_HANDLER: /api/menu GET handler INVOKED.");
   const menuItems = await fetchAndProcessMenuData();
   console.log(`API_ROUTE_GET_HANDLER: Responding with ${menuItems.length} menu items.`);
   // Add cache control headers to prevent Vercel from caching an empty/error response for too long
