@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
+// !! IMPORTANT: This URL should be the "Publish to web" CSV export URL of your Google Sheet !!
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
 
 // Column names from the Google Sheet structure (ensure these EXACTLY match your sheet headers)
 const VISIBLE_COL = "Visible";
