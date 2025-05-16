@@ -76,15 +76,15 @@ export default function Header() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20"> {/* Increased header height slightly to accommodate larger logo */}
+        <div className="flex items-center justify-between h-28"> {/* Increased header height */}
           <Link href="/" className="flex items-center space-x-2">
             {restaurantConfig.logoUrl ? (
               <Image
                 src={restaurantConfig.logoUrl}
                 alt={`${restaurantName} Logo`}
-                width={192} // Increased width
-                height={64}  // Increased height
-                className="h-16 w-auto dark:filter dark:invert" // Increased height class
+                width={288} // Increased width (192 * 1.5)
+                height={96}  // Increased height (64 * 1.5)
+                className="h-24 w-auto dark:filter dark:invert" // Increased height class (h-16 * 1.5 = h-24)
                 priority
               />
             ) : (
@@ -109,9 +109,9 @@ export default function Header() {
                           <Image
                             src={restaurantConfig.logoUrl}
                             alt={`${restaurantName} Logo`}
-                            width={150} 
-                            height={50}
-                            className="h-12 w-auto dark:filter dark:invert" // Mobile sheet logo size can be different
+                            width={225} // Increased width (150 * 1.5)
+                            height={75}  // Increased height (50 * 1.5)
+                            className="h-20 w-auto dark:filter dark:invert" // Increased height class (h-12 * 1.5 approx h-20)
                           />
                         ) : (
                            <span className="text-xl font-serif font-bold text-foreground">{restaurantName}</span>
