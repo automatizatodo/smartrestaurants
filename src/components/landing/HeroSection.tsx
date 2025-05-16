@@ -10,7 +10,7 @@ import { useLanguage } from '@/context/LanguageContext';
 export default function HeroSection() {
   const [offsetY, setOffsetY] = useState(0);
   const { t, translations } = useLanguage();
-  const restaurantName = translations.common.restaurantName; // Get from common translations
+  const restaurantName = translations.common.restaurantName; 
 
   const handleScroll = () => setOffsetY(window.pageYOffset);
 
@@ -23,17 +23,17 @@ export default function HeroSection() {
     <section id="hero" className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
       <div
         className="absolute inset-0 z-0"
-        // style={{ transform: `translateY(${offsetY * 0.3}px)` }} // Temporarily remove parallax for debugging
+        style={{ transform: `translateY(${offsetY * 0.3}px)` }}
       >
         <Image
           src={restaurantConfig.heroImageUrl}
-          alt={t('landing:hero.title')} // Alt text can be localized hero title
+          alt={t('landing:hero.title')} 
           data-ai-hint={restaurantConfig.heroImageHint}
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{ objectFit: 'cover' }}
           quality={80}
           priority
-          // className="brightness-50" // Temporarily remove brightness filter for debugging
+          className="brightness-75" 
         />
       </div>
 

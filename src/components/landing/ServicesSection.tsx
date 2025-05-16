@@ -29,21 +29,19 @@ export default function ServicesSection() {
 
   return (
     <section id="services" className="relative py-16 sm:py-24 overflow-hidden">
-      {/* Background Image and Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/carnebrasa.jpg" 
           alt={t('landing:services.sectionTitle')} 
           data-ai-hint="grilled meat barbecue"
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{ objectFit: 'cover' }}
           quality={70} 
           priority={false} 
         />
-        <div className="absolute inset-0 bg-background/60 dark:bg-background/75"></div> {/* Reduced opacity here */}
+        <div className="absolute inset-0 bg-background/60 dark:bg-background/75"></div>
       </div>
 
-      {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
@@ -68,4 +66,3 @@ export default function ServicesSection() {
     </section>
   );
 }
-

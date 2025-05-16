@@ -20,38 +20,37 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   return (
     <div className={cn(
         "h-full transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1",
-        item.isChefSuggestion && "relative" // For positioning badge
+        item.isChefSuggestion && "relative" 
     )}>
       <Card className={cn(
           "overflow-hidden h-full flex flex-col group shadow-lg hover:shadow-xl bg-card text-card-foreground transition-all duration-300 ease-out",
-          item.isChefSuggestion && "border-2 border-primary/70 pt-2" // Add padding top if suggestion to not overlap border
+          item.isChefSuggestion && "border-2 border-primary/70 pt-2" 
         )}>
 
         {item.isChefSuggestion && (
           <Badge
             variant="default"
             className="absolute top-0 right-0 -mt-3 -mr-2 z-10 bg-primary text-primary-foreground text-xs px-2 py-1 flex items-center gap-1"
-            // Adjust top/right and -mt/-mr to position badge correctly over the border
           >
              <Sparkles className="h-3 w-3" /> {t('menu:chefsSuggestion')}
           </Badge>
         )}
         
-        {(restaurantConfig.showMenuItemImages || item.imageUrl !== `https://placehold.co/400x300.png`) && item.imageUrl && (
+        {(restaurantConfig.showMenuItemImages || (item.imageUrl && !item.imageUrl.includes('placehold.co'))) && item.imageUrl && (
           <div className="relative w-full h-56 sm:h-64 overflow-hidden">
             <Image
               src={imageUrl}
               alt={displayName} 
               data-ai-hint={item.imageHint}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: 'cover' }}
               className="transition-transform duration-500 ease-in-out group-hover:scale-110"
             />
           </div>
         )}
         <CardHeader className={cn(
             "pb-2", 
-            !((restaurantConfig.showMenuItemImages || item.imageUrl !== `https://placehold.co/400x300.png`) && item.imageUrl) ? 'pt-6' : 'pt-4' // Adjust top padding if no image
+            !((restaurantConfig.showMenuItemImages || (item.imageUrl && !item.imageUrl.includes('placehold.co'))) && item.imageUrl) ? 'pt-6' : 'pt-4' 
           )}>
           <CardTitle className="text-xl lg:text-2xl font-serif group-hover:text-primary transition-colors duration-300">
             {displayName}
@@ -83,5 +82,3 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
     </div>
   );
 }
-
-    

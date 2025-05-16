@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
-import type { TestimonialData } from '@/data/testimonials'; // Import the updated interface
+import type { TestimonialData } from '@/data/testimonials'; 
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function TestimonialCard({ testimonialItem }: { testimonialItem: TestimonialData }) {
@@ -35,8 +35,8 @@ export default function TestimonialCard({ testimonialItem }: { testimonialItem: 
               src={testimonialItem.avatarUrl}
               alt={t(testimonialItem.nameKey)}
               data-ai-hint={testimonialItem.avatarHint || "person portrait"}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: 'cover' }}
             />
           </div>
         )}

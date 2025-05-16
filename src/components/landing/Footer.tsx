@@ -1,7 +1,7 @@
 
 "use client";
 import Link from 'next/link';
-import Image from 'next/image'; // Import next/image
+import Image from 'next/image'; 
 import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from '@/context/LanguageContext';
@@ -22,9 +22,9 @@ export default function Footer() {
                   <Image
                     src={restaurantConfig.logoUrl}
                     alt={`${restaurantName} Logo`}
-                    width={432} // Increased width (144 * 3)
-                    height={144}  // Increased height (48 * 3)
-                    className="h-36 w-auto dark:filter dark:invert" // Increased height class (12 * 3 = 36)
+                    width={432} 
+                    height={144}  
+                    className="h-36 w-auto dark:filter dark:invert" 
                   />
                 ) : (
                   <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
