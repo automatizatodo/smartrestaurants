@@ -14,7 +14,7 @@ const geistSans = Geist({
 
 // Changed Lora to Playfair_Display for headings
 const playfairDisplay = Playfair_Display({
-  variable: '--font-playfair-display',
+  variable: '--font-playfair-display', 
   subsets: ['latin'],
   weight: ['400', '700', '900'], // Added more weights for headings
 });
