@@ -3,8 +3,6 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
-// IMPORTANT: Replace with your actual "Publish to web" CSV URL for the menu sheet.
-// Example: https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID/pub?gid=YOUR_GID&single=true&output=csv
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6P9RLviBEd9-MJetEer_exzZDGv1hBRLmq83sRN3WP07tVkF4zvxBEcF9ELmckqYza-le1O_rv3C7/pub?output=csv';
 
 // Column names from the Google Sheet structure
@@ -51,7 +49,7 @@ function mapCategoryToKey(categoryEN: string): string {
 
 function parseCSV(csvText: string): Record<string, string>[] {
   console.log(`API_ROUTE_PARSE_CSV: Received CSV text length: ${csvText.length}`);
-  const lines = csvText.trim().split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
+  const lines = csvText.trim().split(/\r\n|\n|\r/).filter(line => line.trim() !== ''); // Handles different line endings and filters empty lines
 
   if (lines.length < 2) {
     console.warn(`API_ROUTE_PARSE_CSV: CSV content is too short (less than 2 lines) or headers are missing. Lines found: ${lines.length}`);
@@ -59,7 +57,7 @@ function parseCSV(csvText: string): Record<string, string>[] {
     return [];
   }
 
-  const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''));
+  const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, '')); // Trim and remove quotes from headers
   console.log(`API_ROUTE_PARSE_CSV: Headers found in sheet: [${headersFromSheet.join(", ")}]`);
   console.log(`API_ROUTE_PARSE_CSV: Expected headers: [${EXPECTED_HEADERS.join(", ")}]`);
 
@@ -67,7 +65,7 @@ function parseCSV(csvText: string): Record<string, string>[] {
   const missingHeaders = EXPECTED_HEADERS.filter(eh => !headersFromSheet.includes(eh));
   if (missingHeaders.length > 0) {
     console.error(`API_ROUTE_PARSE_CSV: Critical header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
-    return [];
+    return []; // Stop processing if critical headers are missing
   }
 
   const extraHeaders = headersFromSheet.filter(sh => !EXPECTED_HEADERS.includes(sh));
@@ -113,8 +111,8 @@ export async function GET() {
   const googleSheetCsvUrl = GOOGLE_SHEET_CSV_URL;
 
   if (googleSheetCsvUrl === 'YOUR_NEW_GOOGLE_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE' || !googleSheetCsvUrl) {
-    console.error("API_ROUTE_GET_MENU: CRITICAL - GOOGLE_SHEET_CSV_URL is not configured or is still the placeholder. Please update it in src/app/api/menu/route.ts with your actual 'Publish to web' CSV URL.");
-    return NextResponse.json({ error: "Menu data source not configured" }, { status: 500 });
+    console.error("API_ROUTE_GET_MENU: CRITICAL - GOOGLE_SHEET_CSV_URL is not configured. Please update it in src/app/api/menu/route.ts.");
+    return NextResponse.json({ error: "Menu service not configured" }, { status: 500 });
   }
   console.log(`API_ROUTE_GET_MENU: Fetching menu from URL: ${googleSheetCsvUrl}`);
 
@@ -122,7 +120,7 @@ export async function GET() {
   let parsedData: Record<string, string>[] = []; 
 
   try {
-    const response = await fetch(googleSheetCsvUrl, { cache: 'no-store' });
+    const response = await fetch(googleSheetCsvUrl, { cache: 'no-store' }); // Use no-store for testing to ensure fresh data
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -141,14 +139,21 @@ export async function GET() {
     parsedData = parseCSV(csvText);
     console.log(`API_ROUTE_GET_MENU: Parsed ${parsedData.length} items from CSV.`);
 
+    if (parsedData.length === 0) {
+        console.warn("API_ROUTE_GET_MENU: No data rows parsed from CSV. Check CSV structure, headers, and content in Google Sheet.");
+    }
+
     let visibleItemsCount = 0;
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
+      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
+
       const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty, and trim
       if (visibleString.toUpperCase() === "FALSE" || visibleString === "0") {
-        console.log(`API_ROUTE_GET_MENU: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as not visible. Skipping.`);
+        console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE. Skipping.`);
         return null;
       }
       visibleItemsCount++;
+      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' IS VISIBLE.`);
 
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
@@ -159,7 +164,7 @@ export async function GET() {
       const alergenosString = item[ALERGENOS_COL] || "";
 
       if (!nameES || !nameEN || !categoryEN) {
-        console.warn(`API_ROUTE_GET_MENU: Item at row ${index + 2} is missing essential data (Name ES/EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
+        console.warn(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item at row ${index + 2} (Visible) is MISSING ESSENTIAL DATA (Name ES/EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
         return null;
       }
 
@@ -169,11 +174,11 @@ export async function GET() {
       }
       
       let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
-      if (!imageHint || imageHint === "food item") {
-        imageHint = (categoryEN || "food plate").toLowerCase();
+      if (!imageHint || imageHint === "food item") { // if nameEN was empty or just generic
+        imageHint = (categoryEN || "food plate").toLowerCase(); // fallback to category if name is not descriptive
       }
       if (finalImageUrl.includes('placehold.co')) {
-        console.log(`API_ROUTE_GET_MENU: Item '${nameEN}' using placeholder. Hint: '${imageHint}'`);
+        console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' using placeholder. Hint: '${imageHint}'`);
       }
 
 
@@ -184,7 +189,7 @@ export async function GET() {
         if (!isNaN(numericPrice)) {
             formattedPrice = `€${numericPrice.toFixed(2)}`;
         } else {
-            console.warn(`API_ROUTE_GET_MENU: Item '${nameEN}' (row ${index + 2}) has unparseable price: '${item[PRECIO_COL]}'. Setting to undefined.`);
+            console.warn(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Item '${nameEN}' (row ${index + 2}) has unparseable price: '${item[PRECIO_COL]}'. Setting to undefined.`);
         }
       }
       
@@ -196,6 +201,7 @@ export async function GET() {
 
       const categoryKey = mapCategoryToKey(categoryEN);
       
+      console.log(`API_ROUTE_GET_MENU_ITEM_PROCESSING: Successfully processed item '${nameEN}'.`);
       return {
         id: `${categoryKey}-${index}-${Date.now()}`, // More unique ID
         name: { en: nameEN.trim(), es: nameES.trim() },
@@ -227,4 +233,3 @@ export async function GET() {
   }
   return NextResponse.json(allMenuItems, { status: 200 });
 }
-    
