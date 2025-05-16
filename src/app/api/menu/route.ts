@@ -143,7 +143,7 @@ export async function GET() {
 
     let visibleItemsCount = 0;
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
-      const visibleString = item[VISIBLE_COL] || "TRUE"; // Default to TRUE if column is missing or empty
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty, and trim
       if (visibleString.toUpperCase() === "FALSE" || visibleString === "0") {
         console.log(`API_ROUTE_GET_MENU: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as not visible. Skipping.`);
         return null;
