@@ -90,7 +90,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ca" className="dark"> {/* Default lang set to Catalan */}
+    <html lang="ca" className="dark">
       <body
         className={`${geistSans.variable} ${playfairDisplay.variable} antialiased`}
         suppressHydrationWarning={true}
