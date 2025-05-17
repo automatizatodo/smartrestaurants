@@ -40,7 +40,6 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
         {shouldShowImage && (
           <div 
             className="relative w-full aspect-video sm:aspect-[16/9] md:aspect-video overflow-hidden h-28 sm:h-32 md:h-28"
-            suppressHydrationWarning // Added to help with alt text mismatch
           > 
             <Image
               src={imageUrl}
@@ -50,6 +49,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
               style={{ objectFit: 'cover' }}
               className="transition-transform duration-500 ease-in-out group-hover:scale-105" 
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              suppressHydrationWarning // Added here
             />
           </div>
         )}
