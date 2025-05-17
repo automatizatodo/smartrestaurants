@@ -10,15 +10,25 @@ import type { MenuItemData } from '@/data/menu';
 
 interface MenuPageClientContentProps {
   menuItems: MenuItemData[];
+  menuDelDiaPrice?: string;
+  menuDelDiaPriceDescriptionKey?: string;
 }
 
-export default function MenuPageClientContent({ menuItems }: MenuPageClientContentProps) {
+export default function MenuPageClientContent({
+  menuItems,
+  menuDelDiaPrice,
+  menuDelDiaPriceDescriptionKey,
+}: MenuPageClientContentProps) {
   const { t, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
 
   useEffect(() => {
     document.title = `${t('common:page.menu.title')} | ${restaurantName}`;
   }, [t, restaurantName]);
+
+  const menuDelDiaPriceDescription = menuDelDiaPriceDescriptionKey
+    ? t(menuDelDiaPriceDescriptionKey)
+    : "";
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -29,6 +39,16 @@ export default function MenuPageClientContent({ menuItems }: MenuPageClientConte
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4">
                {t('common:page.menu.title')}
             </h1>
+            {menuDelDiaPrice && (
+              <div className="mb-6">
+                <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
+                {menuDelDiaPriceDescription && (
+                  <p className="text-sm text-muted-foreground mt-1" suppressHydrationWarning>
+                    {menuDelDiaPriceDescription}
+                  </p>
+                )}
+              </div>
+            )}
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
                {t('common:page.menu.description', { restaurantName })}
             </p>

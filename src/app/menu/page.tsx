@@ -3,6 +3,7 @@ import MenuPageClientContent from './MenuPageClientContent';
 import { fetchMenuFromGoogleSheet } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import type { Metadata } from 'next';
+import restaurantConfig from '@/config/restaurant.config'; // Import restaurantConfig
 
 // Metadata for the menu page
 // Note: For dynamic metadata based on language, you'd typically use generateMetadata
@@ -29,7 +30,18 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function MenuPage() {
   const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
-  return <MenuPageClientContent menuItems={menuItems} />;
+  const menuDelDiaPrice = restaurantConfig.menuDelDia?.price;
+  const menuDelDiaPriceDescriptionKey = restaurantConfig.menuDelDia?.priceDescriptionKey;
+
+  return (
+    <MenuPageClientContent
+      menuItems={menuItems}
+      menuDelDiaPrice={menuDelDiaPrice}
+      menuDelDiaPriceDescriptionKey={menuDelDiaPriceDescriptionKey}
+    />
+  );
 }
