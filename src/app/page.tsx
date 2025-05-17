@@ -11,19 +11,24 @@ import TestimonialCarousel from '@/components/landing/TestimonialCarousel';
 import Footer from '@/components/landing/Footer';
 import { fetchMenuFromGoogleSheet } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
+import { Suspense } from 'react';
+
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
-  console.log("HOMEPAGE_LOG: Received menuItems in HomePage:", JSON.stringify(menuItems, null, 2));
+  console.log("HOMEPAGE_LOG: Received menuItems in HomePage:", JSON.stringify(menuItems.slice(0,2), null, 2)); // Log first 2 items for brevity
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow">
         <HeroSection />
-        <AboutUsSection />
-        <InteractiveMenu menuItems={menuItems} />
-        <ServicesSection /> {/* Add the new section here */}
+        <ServicesSection /> {/* Moved ServicesSection here */}
+        <Suspense fallback={<div className="text-center py-10">Loading menu...</div>}>
+          <InteractiveMenu menuItems={menuItems} />
+        </Suspense>
+        <AboutUsSection /> {/* Moved AboutUsSection here */}
         <AISommelierSection />
         <BookingSection />
         <ContactMapSection />
@@ -33,3 +38,4 @@ export default async function HomePage() {
     </div>
   );
 }
+
