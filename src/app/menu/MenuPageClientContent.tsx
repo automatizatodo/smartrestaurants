@@ -10,7 +10,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import type { MenuItemData } from '@/data/menu';
 import { Button } from '@/components/ui/button';
 import restaurantConfig from '@/config/restaurant.config';
-import { StarIcon as GoogleIcon } from 'lucide-react';
+import { StarIcon as GoogleIcon } from 'lucide-react'; // Assuming StarIcon is appropriate for Google.
+import { cn } from '@/lib/utils';
 
 const TripAdvisorIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5">
@@ -25,16 +26,16 @@ const TripAdvisorIcon = () => (
 
 interface MenuPageClientContentProps {
   menuItems: MenuItemData[];
-  currentMenuPrice?: string | null; // Updated prop name
+  currentMenuPrice?: string | null;
   menuDelDiaPriceDescriptionKey?: string;
 }
 
 export default function MenuPageClientContent({
   menuItems,
-  currentMenuPrice, // Use new prop
+  currentMenuPrice,
   menuDelDiaPriceDescriptionKey,
 }: MenuPageClientContentProps) {
-  const { t, translations } = useLanguage();
+  const { t, language, setLanguage, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
 
   useEffect(() => {
@@ -45,17 +46,23 @@ export default function MenuPageClientContent({
     ? t(menuDelDiaPriceDescriptionKey)
     : "";
 
+  const languageButtons = [
+    { code: 'ca', name: 'Català' },
+    { code: 'es', name: 'Español' },
+    { code: 'en', name: 'English' },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow pt-24 pb-16 sm:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16 pt-0 lg:pt-8">
+          <div className="text-center mb-8 sm:mb-10 pt-0 lg:pt-8"> {/* Reduced bottom margin from 12/16 to 8/10 */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4">
                {t('common:page.menu.title')}
             </h1>
-            {currentMenuPrice && ( // Use currentMenuPrice
-              <div className="mb-6">
+            {currentMenuPrice && (
+              <div className="mb-6"> {/* Reduced bottom margin from 8 to 6 */}
                 <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
                 {menuDelDiaPriceDescription && (
                   <p className="text-sm text-muted-foreground mt-1" suppressHydrationWarning>
@@ -68,6 +75,24 @@ export default function MenuPageClientContent({
                {t('common:page.menu.description', { restaurantName })}
             </p>
           </div>
+
+          {/* Language Selector Buttons */}
+          <div className="flex justify-center space-x-2 mb-6 sm:mb-8">
+            {languageButtons.map((langButton) => (
+              <Button
+                key={langButton.code}
+                variant={language === langButton.code ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setLanguage(langButton.code as 'ca' | 'es' | 'en')}
+                className={cn(
+                  language === langButton.code ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10'
+                )}
+              >
+                {langButton.name}
+              </Button>
+            ))}
+          </div>
+
           <FullMenuDisplay menuItems={menuItems} />
 
           {(restaurantConfig.googleReviewUrl || restaurantConfig.tripAdvisorReviewUrl) && (
