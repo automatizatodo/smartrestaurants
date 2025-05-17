@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu as MenuIcon, X as XIcon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/context/LanguageContext';
@@ -13,7 +13,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import restaurantConfig from '@/config/restaurant.config';
 
 const navItemKeysBase = [
-  { labelKey: 'common:nav.ourMenu', href: '/#menu' },
+  // { labelKey: 'common:nav.ourMenu', href: '/#menu' }, // Removed
   { labelKey: 'common:nav.fullMenu', href: '/menu' },
   { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
@@ -22,7 +22,7 @@ const navItemKeysBase = [
 const aiSommelierNavItem = { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' };
 
 const navItemKeysEnd = [
-  { labelKey: 'common:nav.bookTable', href: '/#booking' },
+  // { labelKey: 'common:nav.bookTable', href: '/#booking' }, // Removed
   { labelKey: 'common:nav.contact', href: '/#contact-map' },
   { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
 ];
@@ -99,9 +99,9 @@ export default function Header() {
               <Image
                 src={restaurantConfig.logoUrl}
                 alt={`${restaurantName} Logo`}
-                width={288} // Increased from 192
-                height={96} // Increased from 64
-                className="h-24 w-auto dark:filter dark:invert" // Increased from h-16 to h-24
+                width={288} 
+                height={96} 
+                className="h-24 w-auto dark:filter dark:invert" 
                 priority
                 style={{ objectFit: 'contain' }}
               />
@@ -128,9 +128,9 @@ export default function Header() {
                           <Image
                             src={restaurantConfig.logoUrl}
                             alt={`${restaurantName} Logo`}
-                            width={225} // Increased from 150
-                            height={75}  // Increased from 50
-                            className="h-20 w-auto dark:filter dark:invert" // Increased from h-12 to h-20
+                            width={225} 
+                            height={75}  
+                            className="h-20 w-auto dark:filter dark:invert" 
                             style={{ objectFit: 'contain' }}
                           />
                         ) : (
