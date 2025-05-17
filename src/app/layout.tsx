@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico', // Standard path for favicon in public folder
+    icon: '/faviconCanFanals.svg', // Standard path for favicon in public folder
     // You can also add other icons here, e.g., apple-touch-icon
     // apple: '/apple-touch-icon.png',
   },

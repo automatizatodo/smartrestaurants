@@ -10,9 +10,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import type { MenuItemData } from '@/data/menu';
 import { Button } from '@/components/ui/button';
 import restaurantConfig from '@/config/restaurant.config';
-import { StarIcon as GoogleIcon } from 'lucide-react'; // Using StarIcon for Google as a placeholder
+import { StarIcon as GoogleIcon } from 'lucide-react';
 
-// Placeholder for TripAdvisor Icon - Re-using the one from TestimonialCarousel
 const TripAdvisorIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5">
     <circle cx="12" cy="12" r="10"></circle>
@@ -26,13 +25,13 @@ const TripAdvisorIcon = () => (
 
 interface MenuPageClientContentProps {
   menuItems: MenuItemData[];
-  menuDelDiaPrice?: string;
+  currentMenuPrice?: string | null; // Updated prop name
   menuDelDiaPriceDescriptionKey?: string;
 }
 
 export default function MenuPageClientContent({
   menuItems,
-  menuDelDiaPrice,
+  currentMenuPrice, // Use new prop
   menuDelDiaPriceDescriptionKey,
 }: MenuPageClientContentProps) {
   const { t, translations } = useLanguage();
@@ -49,15 +48,15 @@ export default function MenuPageClientContent({
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow pt-24 pb-16 sm:pb-24"> {/* Add padding top to account for fixed header */}
+      <main className="flex-grow pt-24 pb-16 sm:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16 pt-0 lg:pt-8"> {/* Added pt-0 lg:pt-8 for more top space on desktop */}
+          <div className="text-center mb-12 sm:mb-16 pt-0 lg:pt-8">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4">
                {t('common:page.menu.title')}
             </h1>
-            {menuDelDiaPrice && (
+            {currentMenuPrice && ( // Use currentMenuPrice
               <div className="mb-6">
-                <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
+                <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
                 {menuDelDiaPriceDescription && (
                   <p className="text-sm text-muted-foreground mt-1" suppressHydrationWarning>
                     {menuDelDiaPriceDescription}
@@ -71,7 +70,6 @@ export default function MenuPageClientContent({
           </div>
           <FullMenuDisplay menuItems={menuItems} />
 
-          {/* Review Buttons Section */}
           {(restaurantConfig.googleReviewUrl || restaurantConfig.tripAdvisorReviewUrl) && (
             <div className="mt-12 sm:mt-16 text-center flex flex-col items-center space-y-3 sm:flex-row sm:space-y-0 sm:justify-center sm:space-x-6">
               {restaurantConfig.googleReviewUrl && (

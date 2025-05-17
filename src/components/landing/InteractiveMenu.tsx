@@ -14,9 +14,10 @@ import restaurantConfig from '@/config/restaurant.config';
 
 interface InteractiveMenuProps {
   menuItems: MenuItemData[];
+  currentMenuPrice?: string | null; // Updated to accept dynamic price
 }
 
-export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
+export default function InteractiveMenu({ menuItems, currentMenuPrice }: InteractiveMenuProps) {
   const { t } = useLanguage();
 
   const availableCategoryKeys = Array.from(new Set(menuItems.map(item => item.categoryKey).filter(Boolean)));
@@ -28,7 +29,6 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all';
   const [activeTab, setActiveTab] = useState<string>(defaultCategory);
 
-  const menuDelDiaPrice = restaurantConfig.menuDelDia?.price;
   const menuDelDiaPriceDescription = restaurantConfig.menuDelDia?.priceDescriptionKey
     ? t(restaurantConfig.menuDelDia.priceDescriptionKey)
     : "";
@@ -43,9 +43,9 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
           >
             {t('landing:menu.sectionTitle')}
           </h2>
-           {menuDelDiaPrice && (
+           {currentMenuPrice && ( // Use currentMenuPrice
             <div className="mb-8">
-              <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
+              <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
               {menuDelDiaPriceDescription && (
                 <p
                   className="text-sm text-muted-foreground mt-1"
@@ -88,9 +88,9 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
           >
             {t('landing:menu.sectionTitle')}
           </h2>
-          {menuDelDiaPrice && (
+          {currentMenuPrice && ( // Use currentMenuPrice
             <div className="mb-8">
-              <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
+              <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
               {menuDelDiaPriceDescription && (
                 <p
                   className="text-sm text-muted-foreground mt-1"
@@ -134,9 +134,9 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
           >
             {t('landing:menu.sectionTitle')}
           </h2>
-          {menuDelDiaPrice && (
+          {currentMenuPrice && ( // Use currentMenuPrice
             <div className="mb-6"> {/* Reduced mb from 8 to 6 */}
-              <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
+              <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
                {menuDelDiaPriceDescription && (
                 <p
                   className="text-sm text-muted-foreground mt-1"
@@ -171,10 +171,10 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
 
           {sortedCategories.map((category) => (
             <TabsContent key={category.key} value={category.key}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10">
                 {menuItems
                   .filter(item => item.categoryKey === category.key)
-                  .slice(0, 3)
+                  .slice(0, 3) // Still showing only first 3 for homepage snippet
                   .map((item, index) => (
                     <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                       <MenuItemCard item={item} />
@@ -201,4 +201,3 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     </section>
   );
 }
-

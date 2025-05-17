@@ -1,14 +1,10 @@
 
 import MenuPageClientContent from './MenuPageClientContent';
-import { fetchMenuFromGoogleSheet } from '@/services/menuService';
+import { fetchMenuDataWithPrice } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import type { Metadata } from 'next';
-import restaurantConfig from '@/config/restaurant.config'; // Import restaurantConfig
+import restaurantConfig from '@/config/restaurant.config';
 
-// Metadata for the menu page
-// Note: For dynamic metadata based on language, you'd typically use generateMetadata
-// For now, we'll use static metadata, assuming Catalan as primary for this example.
-// The LanguageContext will handle on-page text translation.
 import caCommon from '@/locales/ca/common.json';
 import caMenuPage from '@/locales/ca/page-specific/menu.json';
 
@@ -33,14 +29,13 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function MenuPage() {
-  const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
-  const menuDelDiaPrice = restaurantConfig.menuDelDia?.price;
+  const { menuItems, currentMenuPrice } = await fetchMenuDataWithPrice();
   const menuDelDiaPriceDescriptionKey = restaurantConfig.menuDelDia?.priceDescriptionKey;
 
   return (
     <MenuPageClientContent
       menuItems={menuItems}
-      menuDelDiaPrice={menuDelDiaPrice}
+      currentMenuPrice={currentMenuPrice}
       menuDelDiaPriceDescriptionKey={menuDelDiaPriceDescriptionKey}
     />
   );
