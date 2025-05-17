@@ -96,7 +96,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
                     key={item.id}
                     className={cn(
                         "mb-2 sm:mb-3 break-inside-avoid",
-                        item.isChefSuggestion && "pt-2"
+                        item.isChefSuggestion && "pt-2" 
                     )}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
@@ -107,27 +107,38 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
 
               {/* Handle subcategories for "Segon Plat" */}
               {category.key === SECOND_COURSES_KEY && (
-                <div className="mt-3 pt-3 border-t border-border/50">
-                  {groupedMenu[GRILLED_GARNISH_KEY] && groupedMenu[GRILLED_GARNISH_KEY].length > 0 && (
-                    <div className="mb-3">
-                      <h4 className="text-md font-serif text-foreground/90 mb-1.5 px-1">{t('menu:grilledGarnish')}</h4>
-                      <div className="divide-y divide-border/50 border border-border/50 rounded-md">
-                        {groupedMenu[GRILLED_GARNISH_KEY].map(subItem => (
-                          <SubMenuItemDisplay key={subItem.id} item={subItem} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {groupedMenu[SAUCES_KEY] && groupedMenu[SAUCES_KEY].length > 0 && (
+                (groupedMenu[GRILLED_GARNISH_KEY] && groupedMenu[GRILLED_GARNISH_KEY].length > 0) ||
+                (groupedMenu[SAUCES_KEY] && groupedMenu[SAUCES_KEY].length > 0)
+              ) && (
+                <div className="mt-4 pt-4 border-t border-border/50">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    {/* Columna Guarnició Brasa */}
                     <div>
-                      <h4 className="text-md font-serif text-foreground/90 mb-1.5 px-1">{t('menu:sauces')}</h4>
-                       <div className="divide-y divide-border/50 border border-border/50 rounded-md">
-                        {groupedMenu[SAUCES_KEY].map(subItem => (
-                          <SubMenuItemDisplay key={subItem.id} item={subItem} />
-                        ))}
-                      </div>
+                      {groupedMenu[GRILLED_GARNISH_KEY] && groupedMenu[GRILLED_GARNISH_KEY].length > 0 && (
+                        <>
+                          <h4 className="text-lg font-serif text-foreground/90 mb-2 px-1">{t('menu:grilledGarnish')}</h4>
+                          <div className="divide-y divide-border/50 border border-border/50 rounded-md bg-secondary/30 p-1">
+                            {groupedMenu[GRILLED_GARNISH_KEY].map(subItem => (
+                              <SubMenuItemDisplay key={subItem.id} item={subItem} />
+                            ))}
+                          </div>
+                        </>
+                      )}
                     </div>
-                  )}
+                    {/* Columna Salses */}
+                    <div>
+                      {groupedMenu[SAUCES_KEY] && groupedMenu[SAUCES_KEY].length > 0 && (
+                        <>
+                          <h4 className="text-lg font-serif text-foreground/90 mb-2 px-1">{t('menu:sauces')}</h4>
+                           <div className="divide-y divide-border/50 border border-border/50 rounded-md bg-secondary/30 p-1">
+                            {groupedMenu[SAUCES_KEY].map(subItem => (
+                              <SubMenuItemDisplay key={subItem.id} item={subItem} />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </AccordionContent>
@@ -137,3 +148,4 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
     </Accordion>
   );
 }
+
