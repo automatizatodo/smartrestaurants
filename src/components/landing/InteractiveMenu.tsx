@@ -4,12 +4,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import MenuItemCard from './MenuItemCard';
-import { menuCategories } from '@/data/menu'; 
-import type { MenuItemData } from '@/data/menu'; 
+import { menuCategories } from '@/data/menu';
+import type { MenuItemData } from '@/data/menu';
 import { useLanguage } from '@/context/LanguageContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { UtensilsCrossed, AlertTriangle } from 'lucide-react'; 
+import { UtensilsCrossed, AlertTriangle } from 'lucide-react';
 import restaurantConfig from '@/config/restaurant.config';
 
 interface InteractiveMenuProps {
@@ -20,7 +20,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   const { t } = useLanguage();
 
   const availableCategoryKeys = Array.from(new Set(menuItems.map(item => item.categoryKey).filter(Boolean)));
-  
+
   const sortedCategories = menuCategories
     .filter(cat => availableCategoryKeys.includes(cat.key))
     .sort((a, b) => a.order - b.order);
@@ -29,15 +29,15 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   const [activeTab, setActiveTab] = useState<string>(defaultCategory);
 
   const menuDelDiaPrice = restaurantConfig.menuDelDia?.price;
-  const menuDelDiaPriceDescription = restaurantConfig.menuDelDia?.priceDescriptionKey 
-    ? t(restaurantConfig.menuDelDia.priceDescriptionKey) 
+  const menuDelDiaPriceDescription = restaurantConfig.menuDelDia?.priceDescriptionKey
+    ? t(restaurantConfig.menuDelDia.priceDescriptionKey)
     : "";
-  
+
   if (!menuItems || menuItems.length === 0) {
     return (
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 
+          <h2
             className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4"
             suppressHydrationWarning
           >
@@ -47,7 +47,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
             <div className="mb-8">
               <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
               {menuDelDiaPriceDescription && (
-                <p 
+                <p
                   className="text-sm text-muted-foreground mt-1"
                   suppressHydrationWarning
                 >
@@ -78,7 +78,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     return (
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 
+          <h2
             className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4"
             suppressHydrationWarning
           >
@@ -88,7 +88,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
             <div className="mb-8">
               <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
               {menuDelDiaPriceDescription && (
-                <p 
+                <p
                   className="text-sm text-muted-foreground mt-1"
                   suppressHydrationWarning
                 >
@@ -120,9 +120,9 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     <section id="menu" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8"> {/* Reduced mb from 12/16 to 8 */}
-          <h2 
+          <h2
             className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4"
-            suppressHydrationWarning 
+            suppressHydrationWarning
           >
             {t('landing:menu.sectionTitle')}
           </h2>
@@ -130,7 +130,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
             <div className="mb-6"> {/* Reduced mb from 8 to 6 */}
               <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
                {menuDelDiaPriceDescription && (
-                <p 
+                <p
                   className="text-sm text-muted-foreground mt-1"
                   suppressHydrationWarning
                 >
@@ -139,10 +139,10 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
               )}
             </div>
           )}
-          <p 
+          <p
             className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12" /* Reduced bottom margin for description */
             suppressHydrationWarning
-          > 
+          >
             {t('landing:menu.sectionDescription')}
           </p>
         </div>
@@ -150,12 +150,13 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full flex items-center justify-start overflow-x-auto scrollbar-hide mb-10 sm:mb-12 sm:flex-wrap sm:justify-center sm:overflow-x-visible"> {/* Adjusted mb */}
             {sortedCategories.map((category) => (
-              <TabsTrigger 
-                key={category.key} 
-                value={category.key} 
+              <TabsTrigger
+                key={category.key}
+                value={category.key}
                 className="flex-shrink-0 text-sm md:text-base sm:flex-shrink mx-1"
+                suppressHydrationWarning
               >
-                {t(`menu:${category.key}`)} 
+                {t(`menu:${category.key}`)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -165,7 +166,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
                 {menuItems
                   .filter(item => item.categoryKey === category.key)
-                  .slice(0, 3) 
+                  .slice(0, 3)
                   .map((item, index) => (
                     <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                       <MenuItemCard item={item} />
@@ -188,4 +189,3 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     </section>
   );
 }
-
