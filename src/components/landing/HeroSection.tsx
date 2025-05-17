@@ -49,7 +49,7 @@ export default function HeroSection() {
           {t('landing:hero.tagline')}
         </p>
         <div className="flex flex-col space-y-4 items-center sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
-          <Link href="/#menu" passHref>
+          <Link href="/menu" passHref>
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105 w-full sm:w-auto">
               {t('landing:hero.viewMenuButton')}
             </Button>
@@ -69,3 +69,4 @@ export default function HeroSection() {
     </section>
   );
 }
+
