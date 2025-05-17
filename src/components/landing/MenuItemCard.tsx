@@ -12,6 +12,7 @@ import { Sparkles } from 'lucide-react';
 export default function MenuItemCard({ item }: { item: MenuItemData }) {
   const { language, t } = useLanguage(); 
   
+  // Ensure imageUrl is a full URL if it's not already
   const imageUrl = item.imageUrl.startsWith('http') ? item.imageUrl : `https://${item.imageUrl}`;
 
   const displayName = item.name[language] || item.name.en;
@@ -36,7 +37,8 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
           </Badge>
         )}
         
-        {(restaurantConfig.showMenuItemImages || (item.imageUrl && !item.imageUrl.includes('placehold.co'))) && item.imageUrl && (
+        {/* Updated condition: Show image only if showMenuItemImages is true AND the URL is not a placeholder */}
+        {restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co') && (
           <div className="relative w-full h-56 sm:h-64 overflow-hidden">
             <Image
               src={imageUrl}
@@ -50,7 +52,8 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
         )}
         <CardHeader className={cn(
             "pb-2", 
-            !((restaurantConfig.showMenuItemImages || (item.imageUrl && !item.imageUrl.includes('placehold.co'))) && item.imageUrl) ? 'pt-6' : 'pt-4' 
+            // Adjust top padding if no image is shown
+            !(restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co')) ? 'pt-6' : 'pt-4' 
           )}>
           <CardTitle className="text-xl lg:text-2xl font-serif group-hover:text-primary transition-colors duration-300">
             {displayName}
