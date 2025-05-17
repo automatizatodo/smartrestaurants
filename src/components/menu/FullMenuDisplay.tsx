@@ -52,7 +52,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
 
   const defaultOpenValue: string[] = [];
 
-  if (sortedTopLevelCategories.length === 0 && !groupedMenu[SECOND_COURSES_KEY]?.length) { // Check if even second courses (which might contain subcats) are missing
+  if (sortedTopLevelCategories.length === 0 && !groupedMenu[SECOND_COURSES_KEY]?.length) { 
      return (
       <div className="text-center py-10 flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
         <AlertTriangle className="w-16 h-16 mb-6 text-primary" />
@@ -66,22 +66,19 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
     <Accordion type="multiple" defaultValue={defaultOpenValue} className="w-full space-y-1 sm:space-y-2">
       {sortedTopLevelCategories.map((category) => {
         const itemsInCategory = groupedMenu[category.key];
-        if (!itemsInCategory || itemsInCategory.length === 0) {
-          // If it's not second courses and it's empty, skip it.
-          // Second courses might be "empty" of main items but have subcategories.
-          if (category.key !== SECOND_COURSES_KEY) {
-            return null;
-          }
-        }
         
-        // For second courses, check if it has main items OR subcategory items
         if (category.key === SECOND_COURSES_KEY && 
             (!itemsInCategory || itemsInCategory.length === 0) &&
             (!groupedMenu[GRILLED_GARNISH_KEY] || groupedMenu[GRILLED_GARNISH_KEY].length === 0) &&
             (!groupedMenu[SAUCES_KEY] || groupedMenu[SAUCES_KEY].length === 0)
            ) {
-          return null; // Skip second courses if it has no main items AND no subcategory items
+          return null; 
         }
+        
+        if (category.key !== SECOND_COURSES_KEY && (!itemsInCategory || itemsInCategory.length === 0)) {
+            return null;
+        }
+
 
         const categoryTitleKey = `menu:${category.key}`;
         return (
@@ -96,7 +93,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
                     key={item.id}
                     className={cn(
                         "mb-2 sm:mb-3 break-inside-avoid",
-                        item.isChefSuggestion && "pt-2" 
+                        item.isChefSuggestion && "pt-3" // Increased padding for chef suggestion items
                     )}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
@@ -105,14 +102,12 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
                 ))}
               </div>
 
-              {/* Handle subcategories for "Segon Plat" */}
               {category.key === SECOND_COURSES_KEY && (
                 (groupedMenu[GRILLED_GARNISH_KEY] && groupedMenu[GRILLED_GARNISH_KEY].length > 0) ||
                 (groupedMenu[SAUCES_KEY] && groupedMenu[SAUCES_KEY].length > 0)
               ) && (
                 <div className="mt-4 pt-4 border-t border-border/50">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                    {/* Columna Guarnició Brasa */}
                     <div>
                       {groupedMenu[GRILLED_GARNISH_KEY] && groupedMenu[GRILLED_GARNISH_KEY].length > 0 && (
                         <>
@@ -125,7 +120,6 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
                         </>
                       )}
                     </div>
-                    {/* Columna Salses */}
                     <div>
                       {groupedMenu[SAUCES_KEY] && groupedMenu[SAUCES_KEY].length > 0 && (
                         <>
@@ -148,4 +142,3 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
     </Accordion>
   );
 }
-
