@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import MenuItemCard from '@/components/landing/MenuItemCard'; 
 import { AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 
 interface FullMenuDisplayProps {
@@ -74,7 +75,10 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
                 {itemsInCategory.map((item, index) => (
                   <div 
                     key={item.id} 
-                    className="animate-fade-in-up mb-2 sm:mb-3 break-inside-avoid" // Added mb and break-inside-avoid
+                    className={cn(
+                        "animate-fade-in-up mb-2 sm:mb-3 break-inside-avoid",
+                        item.isChefSuggestion && "pt-2" // Add padding-top if it's a chef suggestion
+                    )}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
                     <MenuItemCard item={item} />
