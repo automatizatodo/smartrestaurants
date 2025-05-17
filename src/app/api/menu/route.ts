@@ -15,7 +15,7 @@ import { format, parse as parseTime } from 'date-fns';
 // 4. Selecting that specific menu sheet and "Comma-separated values (.csv)"
 // 5. Clicking "Publish" and copying the generated URL here.
 // It will likely include a "gid=YOUR_SHEET_GID" parameter.
-let GOOGLE_SHEET_CSV_URL = 'REPLACE_WITH_YOUR_MAIN_MENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
+let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
 
 // !!! IMPORTANT: URL for the "preciosmenu" sheet !!!
 // You MUST get this by:
