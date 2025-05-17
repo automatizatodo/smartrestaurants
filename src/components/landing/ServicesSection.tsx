@@ -4,7 +4,8 @@
 import { useLanguage } from '@/context/LanguageContext';
 import ServiceCard from './ServiceCard';
 import { Coffee, ClipboardList, ChefHat } from 'lucide-react';
-// Image import is no longer needed for background
+import Image from 'next/image';
+import restaurantConfig from '@/config/restaurant.config';
 
 const servicesList = [
   {
@@ -13,14 +14,14 @@ const servicesList = [
     descriptionKey: "landing:services.breakfasts.description"
   },
   {
-    icon: ClipboardList,
-    titleKey: "landing:services.setMenus.title",
-    descriptionKey: "landing:services.setMenus.description"
-  },
-  {
-    icon: ChefHat,
+    icon: ChefHat, // Moved Traditional & Grilled to be the second item
     titleKey: "landing:services.traditionalAndGrilled.title",
     descriptionKey: "landing:services.traditionalAndGrilled.description"
+  },
+  {
+    icon: ClipboardList, // Moved Set Menus to be the third item
+    titleKey: "landing:services.setMenus.title",
+    descriptionKey: "landing:services.setMenus.description"
   }
 ];
 
@@ -28,10 +29,20 @@ export default function ServicesSection() {
   const { t } = useLanguage();
 
   return (
-    <section id="services" className="py-16 sm:py-24 bg-background"> {/* Removed relative, overflow-hidden, added bg-background */}
-      {/* Background Image and Overlay Div have been removed */}
+    <section id="services" className="py-16 sm:py-24 bg-background relative overflow-hidden">
+      <Image
+        src="/carnebrasa.jpg"
+        alt={t('landing:services.backgroundImageAlt', {restaurantName: t('common:restaurantName')})}
+        data-ai-hint="grilled meat barbecue"
+        fill
+        style={{ objectFit: 'cover' }}
+        className="absolute inset-0 z-0"
+        quality={70}
+        priority={false}
+      />
+      <div className="absolute inset-0 bg-background/60 dark:bg-background/75 z-0"></div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8"> {/* Removed relative z-10 */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
             {t('landing:services.sectionTitle')}
