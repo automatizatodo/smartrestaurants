@@ -69,7 +69,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
               {t(categoryTitleKey)}
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6 pt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pt-4 items-start"> {/* Added items-start */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 pt-4 items-start"> {/* Reduced gap from 6 to 5 */}
                 {itemsInCategory.map((item, index) => (
                   <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.05}s` }}>
                     <MenuItemCard item={item} />
@@ -84,3 +84,4 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
   );
 }
 
+    
