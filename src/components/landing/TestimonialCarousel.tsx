@@ -107,9 +107,9 @@ export default function TestimonialCarousel() {
             ))}
           </div>
 
-        <div className="mt-12 sm:mt-16 text-center space-y-5 sm:space-y-0 sm:flex sm:justify-center sm:space-x-6"> {/* Changed space-y-4 to space-y-5 */}
+        <div className="mt-12 sm:mt-16 text-center flex flex-col items-center space-y-3 sm:flex-row sm:space-y-0 sm:justify-center sm:space-x-6">
           {restaurantConfig.googleReviewUrl && (
-            <Link href={restaurantConfig.googleReviewUrl} target="_blank" rel="noopener noreferrer" passHref>
+            <Link href={restaurantConfig.googleReviewUrl} target="_blank" rel="noopener noreferrer" passHref className="w-full sm:w-auto">
               <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto">
                 <GoogleIcon className="mr-2 h-5 w-5" /> {/* Using a placeholder Google icon */}
                 {t('landing:testimonials.leaveGoogleReview')}
@@ -117,7 +117,7 @@ export default function TestimonialCarousel() {
             </Link>
           )}
           {restaurantConfig.tripAdvisorReviewUrl && (
-            <Link href={restaurantConfig.tripAdvisorReviewUrl} target="_blank" rel="noopener noreferrer" passHref>
+            <Link href={restaurantConfig.tripAdvisorReviewUrl} target="_blank" rel="noopener noreferrer" passHref className="w-full sm:w-auto">
               <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto">
                 <TripAdvisorIcon /> {/* Using a placeholder TripAdvisor icon */}
                 {t('landing:testimonials.leaveTripAdvisorReview')}
@@ -129,4 +129,3 @@ export default function TestimonialCarousel() {
     </section>
   );
 }
-
