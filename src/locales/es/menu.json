@@ -1,16 +1,18 @@
 
 {
   "starters": "Entrantes",
-  "mainCourses": "Platos Principales",
+  "mainCourses": "Primeros Platos",
+  "secondCourses": "Segundo Plato",
+  "grilledGarnish": "Guarnición Brasa",
+  "sauces": "Salsas",
   "desserts": "Postres",
-  "drinks": "Bebidas",
+  "breads": "Panes",
+  "beverages": "Bebidas",
+  "wines": "Vinos",
   "other": "Otros",
   "menuDelDia.title": "Menú del Día",
   "menuDelDia.priceTitle": "Precio del Menú",
   "menuDelDia.priceIncludes": "IVA incluido. Pan, bebida y postre o café.",
   "menuDelDia.notes": "Disponible de martes a viernes a mediodía, excepto festivos.",
-  "chefsSuggestion": "Sugerencia del Chef",
-  "allergensTitle": "Alérgenos:"
+  "chefsSuggestion": "Sugerencia del Chef"
 }
-
-    

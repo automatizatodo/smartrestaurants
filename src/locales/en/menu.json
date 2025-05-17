@@ -2,15 +2,17 @@
 {
   "starters": "Starters",
   "mainCourses": "Main Courses",
+  "secondCourses": "Second Courses",
+  "grilledGarnish": "Grilled Garnish",
+  "sauces": "Sauces",
   "desserts": "Desserts",
-  "drinks": "Drinks",
+  "breads": "Breads",
+  "beverages": "Beverages",
+  "wines": "Wines",
   "other": "Other",
   "menuDelDia.title": "Menu of the Day",
   "menuDelDia.priceTitle": "Menu Price",
   "menuDelDia.priceIncludes": "VAT included. Bread, drink and dessert or coffee.",
   "menuDelDia.notes": "Available Tuesday to Friday midday, excluding holidays.",
-  "chefsSuggestion": "Chef's Suggestion",
-  "allergensTitle": "Allergens:"
+  "chefsSuggestion": "Chef's Suggestion"
 }
-
-    

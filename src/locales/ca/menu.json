@@ -1,16 +1,18 @@
 
 {
   "starters": "Entrants",
-  "mainCourses": "Plats Principals",
+  "mainCourses": "Primers Plats",
+  "secondCourses": "Segon Plat",
+  "grilledGarnish": "Guarnició Brasa",
+  "sauces": "Salses",
   "desserts": "Postres",
-  "drinks": "Begudes",
+  "breads": "Pans",
+  "beverages": "Begudes",
+  "wines": "Vins",
   "other": "Altres",
   "menuDelDia.title": "Menú del Dia",
   "menuDelDia.priceTitle": "Preu del Menú",
   "menuDelDia.priceIncludes": "IVA inclòs. Pa, beguda i postre o cafè.",
   "menuDelDia.notes": "Disponible de dimarts a divendres al migdia, excepte festius.",
-  "chefsSuggestion": "Suggeriment del Xef",
-  "allergensTitle": "Al·lèrgens:"
+  "chefsSuggestion": "Suggeriment del Xef"
 }
-
-    

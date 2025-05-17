@@ -3,111 +3,110 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
-// !! IMPORTANT: This URL should be the "Publish to web" CSV export URL of your Google Sheet !!
 let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
 
-
-// Column names from the Google Sheet structure (ensure these EXACTLY match your sheet headers)
+// Column names from the Google Sheet structure
 const VISIBLE_COL = "Visible";
-const CATEGORIA_CA_COL = "Categoría (CA)"; // New Catalan column
+const CATEGORIA_CA_COL = "Categoría (CA)";
 const CATEGORIA_ES_COL = "Categoría (ES)";
 const CATEGORY_EN_COL = "Category (EN)";
-const NOM_CA_COL = "Nom (CA)"; // New Catalan column
+const NOM_CA_COL = "Nom (CA)";
 const NOMBRE_ES_COL = "Nombre (ES)";
 const NAME_EN_COL = "Name (EN)";
-const DESCRIPCIO_CA_COL = "Descripció (CA)"; // New Catalan column
+const DESCRIPCIO_CA_COL = "Descripció (CA)";
 const DESCRIPCION_ES_COL = "Descripción (ES)";
 const DESCRIPTION_EN_COL = "Description (EN)";
 const PRECIO_COL = "Precio (€)";
 const LINK_IMAGEN_COL = "Link Imagen";
 const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
 const ALERGENOS_COL = "Alergenos";
-// const ELIMINAR_COL = "Eliminar"; // Not strictly needed in expected headers if we don't use it
+// const ELIMINAR_COL = "Eliminar"; // Not strictly needed if not used by logic
 
-// Expected headers for validation - Updated to reflect the new Excel structure
+// Expected headers for validation - Reflects the new Excel structure including Catalan
 const EXPECTED_HEADERS = [
   VISIBLE_COL,
-  CATEGORIA_CA_COL,
-  CATEGORIA_ES_COL,
-  CATEGORY_EN_COL,
-  NOM_CA_COL,
-  NOMBRE_ES_COL,
-  NAME_EN_COL,
-  DESCRIPCIO_CA_COL,
-  DESCRIPCION_ES_COL,
-  DESCRIPTION_EN_COL,
+  CATEGORIA_CA_COL, CATEGORIA_ES_COL, CATEGORY_EN_COL,
+  NOM_CA_COL, NOMBRE_ES_COL, NAME_EN_COL,
+  DESCRIPCIO_CA_COL, DESCRIPCION_ES_COL, DESCRIPTION_EN_COL,
   PRECIO_COL,
-  LINK_IMAGEN_COL,
-  SUGERENCIA_CHEF_COL,
-  ALERGENOS_COL
+  LINK_IMAGEN_COL, SUGERENCIA_CHEF_COL, ALERGENOS_COL
 ];
 
 // Helper to map English category names from sheet to consistent categoryKeys
 function mapCategoryToKey(categoryEN: string): string {
-  if (!categoryEN) return 'other'; // Handle cases where categoryEN might be empty
+  if (!categoryEN) return 'other';
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters':
       return 'starters';
-    case 'main courses':
+    case 'main courses': // This will map to "Primers Plats"
       return 'mainCourses';
+    case 'second courses': // This will map to "Segon Plat"
+      return 'secondCourses';
+    case 'grilled garnish': // New
+      return 'grilledGarnish';
+    case 'sauces': // New
+      return 'sauces';
     case 'desserts':
       return 'desserts';
-    case 'beverages': // Accept "Beverages" as an alternative for drinks
-    case 'drinks':
-      return 'drinks';
+    case 'breads': // New
+      return 'breads';
+    case 'beverages': // Updated from 'drinks' if it was different
+      return 'beverages';
+    case 'wines': // New
+      return 'wines';
     default:
       console.warn(`API_ROUTE_LOGIC_MAP_CATEGORY: Unknown category encountered: '${categoryEN}'. Defaulting to '${lowerCategory.replace(/\s+/g, '') || 'other'}'.`);
-      return lowerCategory.replace(/\s+/g, '') || 'other'; // Fallback for unknown categories
+      return lowerCategory.replace(/\s+/g, '') || 'other';
   }
 }
 
 function parseCSV(csvText: string): Record<string, string>[] {
-  console.log(`API_ROUTE_LOGIC_PARSE_CSV: Received CSV text length: ${csvText.length}`);
+  console.log(`API_ROUTE_PARSE_CSV: Received CSV text length: ${csvText.length}`);
   const lines = csvText.trim().split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
 
   if (lines.length < 2) {
-    console.warn(`API_ROUTE_LOGIC_PARSE_CSV: CSV content is too short (less than 2 lines) or headers are missing. Lines found: ${lines.length}`);
-    if (lines.length === 1) console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Headers received: ${lines[0]}`);
+    console.warn(`API_ROUTE_PARSE_CSV: CSV content is too short (less than 2 lines) or headers are missing. Lines found: ${lines.length}`);
+    if (lines.length === 1) console.warn(`API_ROUTE_PARSE_CSV: Headers received: ${lines[0]}`);
     return [];
   }
 
   const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''));
-  console.log(`API_ROUTE_LOGIC_PARSE_CSV: Headers found in sheet: [${headersFromSheet.join(", ")}]`);
-  console.log(`API_ROUTE_LOGIC_PARSE_CSV: Expected headers: [${EXPECTED_HEADERS.join(", ")}]`);
+  console.log(`API_ROUTE_PARSE_CSV: Headers found in sheet: [${headersFromSheet.join(", ")}]`);
+  console.log(`API_ROUTE_PARSE_CSV: Expected headers: [${EXPECTED_HEADERS.join(", ")}]`);
 
   const missingHeaders = EXPECTED_HEADERS.filter(eh => !headersFromSheet.includes(eh));
   if (missingHeaders.length > 0) {
-    console.error(`API_ROUTE_LOGIC_PARSE_CSV: Critical header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
+    console.error(`API_ROUTE_PARSE_CSV: Critical header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
     return [];
   }
 
-  const extraHeaders = headersFromSheet.filter(sh => !EXPECTED_HEADERS.includes(sh) && sh.toLowerCase() !== "eliminar"); // Allow "Eliminar" without making it mandatory
+  const extraHeaders = headersFromSheet.filter(sh => !EXPECTED_HEADERS.includes(sh));
   if (extraHeaders.length > 0) {
-    console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Warning: Sheet contains extra headers not in EXPECTED_HEADERS: [${extraHeaders.join(", ")}]. These will be ignored if not 'Eliminar'.`);
+    console.warn(`API_ROUTE_PARSE_CSV: Warning: Sheet contains extra headers not in EXPECTED_HEADERS: [${extraHeaders.join(", ")}]. These will be ignored.`);
   }
 
   const jsonData = [];
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) {
-      console.log(`API_ROUTE_LOGIC_PARSE_CSV: Skipping empty line at index ${i}`);
+      console.log(`API_ROUTE_PARSE_CSV: Skipping empty line at index ${i}`);
       continue;
     }
     const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(value => value.trim().replace(/^"|"$/g, ''));
 
-    if (values.length >= headersFromSheet.length) { // Allow more values than headers, but map only known headers
+    if (values.length >= headersFromSheet.length) {
       const entry: Record<string, string> = {};
       headersFromSheet.forEach((header, index) => {
-        if (values[index] !== undefined) { // Ensure value exists
+        if (values[index] !== undefined) {
           entry[header] = values[index];
         }
       });
       jsonData.push(entry);
     } else {
-      console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Skipping malformed CSV line ${i + 1}. Expected at least ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
+      console.warn(`API_ROUTE_PARSE_CSV: Skipping malformed CSV line ${i + 1}. Expected at least ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
     }
   }
-  console.log(`API_ROUTE_LOGIC_PARSE_CSV: Parsed ${jsonData.length} data rows.`);
+  console.log(`API_ROUTE_PARSE_CSV: Parsed ${jsonData.length} data rows.`);
   return jsonData;
 }
 
@@ -115,7 +114,6 @@ function isValidHttpUrl(string: string): boolean {
   if (!string || typeof string !== 'string') return false;
   let url;
   try {
-    // If it doesn't start with http/https but looks like a domain, prepend https
     if (!string.startsWith('http://') && !string.startsWith('https://') && string.includes('.') && !string.includes(' ')) {
       string = `https://${string}`;
       console.log(`API_ROUTE_LOGIC_IS_VALID_URL: Prepended https:// to: ${string}`);
@@ -141,7 +139,6 @@ function transformGoogleDriveLink(url: string): string {
   return url;
 }
 
-// Extracted core logic
 export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
   console.log(`API_ROUTE_LOGIC: fetchAndProcessMenuData called.`);
   if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes('YOUR_GOOGLE_SHEET') || GOOGLE_SHEET_CSV_URL.includes('YOUR_NEW_GOOGLE_SHEET')) {
@@ -205,7 +202,7 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
       const alergenosString = item[ALERGENOS_COL] || "";
 
-      if (!nameEN || !categoryEN) { // Still rely on English name for hint and EN category for key
+      if (!nameEN || !categoryEN) {
         console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row ${index + 2} (Visible) is MISSING ESSENTIAL DATA (Name EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
         return null;
       }
@@ -249,9 +246,9 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE'].includes(sugerenciaChefString.toLowerCase());
       const categoryKey = mapCategoryToKey(categoryEN);
 
-      console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item '${nameEN}'.`);
+      console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item '${nameEN}'. Category Key: '${categoryKey}'`);
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`, // Unique ID
+        id: `${categoryKey}-${index}-${Date.now()}`,
         name: {
           ca: (nameCA || nameES || nameEN || "Plat sense nom").trim(),
           es: (nameES || nameEN || nameCA || "Plato sin nombre").trim(),
@@ -294,7 +291,7 @@ export async function GET() {
   const menuItems = await fetchAndProcessMenuData();
   console.log(`API_ROUTE_GET_HANDLER: Responding with ${menuItems.length} menu items.`);
   const headers = new Headers();
-  headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
+  headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59'); // Cache on CDN for 1s, stale for 59s
 
   return NextResponse.json(menuItems, { status: 200, headers });
 }

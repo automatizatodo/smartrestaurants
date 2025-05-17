@@ -1,6 +1,6 @@
 
 export interface MenuItemText {
-  ca: string; // Afegit per al català
+  ca: string;
   en: string;
   es: string;
 }
@@ -9,27 +9,30 @@ export interface MenuItemData {
   id: string;
   name: MenuItemText;
   description: MenuItemText;
-  price?: string; // Price is now optional, as it might not be displayed for individual items
-  categoryKey: string; // e.g., "starters", "mainCourses", "desserts", "drinks"
+  price?: string;
+  categoryKey: string; // e.g., "starters", "mainCourses", "secondCourses", "desserts"
   imageUrl: string;
   imageHint: string;
-  allergens?: string[]; // New: list of allergen keys/names
-  isChefSuggestion?: boolean; // New: to mark chef's suggestions
+  allergens?: string[];
+  isChefSuggestion?: boolean;
 }
 
 export interface MenuCategory {
-  key: string; // "starters", "mainCourses", etc.
+  key: string;
   order: number;
 }
 
-// Define category keys and their display order
-// These keys will be derived from the 'Category (EN)' column in the Google Sheet
-// and used to look up translations in menu.json (e.g., t('menu:starters'))
+// Define category keys and their display order for top-level accordions
+// "Guarnició Brasa" (grilledGarnish) and "Salses" (sauces) will be nested
+// within "Segon Plat" (secondCourses) and won't appear as top-level items here.
 export const menuCategories: MenuCategory[] = [
-  { key: 'starters', order: 1 },
-  { key: 'mainCourses', order: 2 },
-  { key: 'desserts', order: 3 },
-  { key: 'drinks', order: 4 },
-  // Add other categories if your "Menú del Día" has more sections
-  // e.g., { key: 'primeros', order: 1 }, { key: 'segundos', order: 2 },
+  { key: 'starters', order: 1 },        // Entrants
+  { key: 'mainCourses', order: 2 },     // Primers Plats (Mapped from "Main Courses" in sheet)
+  { key: 'secondCourses', order: 3 },   // Segon Plat (Mapped from "Second Courses" in sheet)
+  { key: 'desserts', order: 4 },       // Postres
+  { key: 'breads', order: 5 },         // Pans
+  { key: 'beverages', order: 6 },     // Begudes
+  { key: 'wines', order: 7 },           // Vins
+  // Note: 'grilledGarnish' and 'sauces' are intentionally omitted here for top-level accordion
+  // They will be handled as sub-categories within 'secondCourses'.
 ];
