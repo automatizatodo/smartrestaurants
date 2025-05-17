@@ -34,7 +34,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
         </Badge>
       )}
       <Card className={cn(
-          "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out"
+          "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
         )}>
         
         {shouldShowImage && (
@@ -43,6 +43,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
             suppressHydrationWarning
           > 
             <Image
+              suppressHydrationWarning
               src={imageUrl}
               alt={displayName}
               data-ai-hint={item.imageHint}
@@ -50,7 +51,6 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
               style={{ objectFit: 'cover' }}
               className="transition-transform duration-500 ease-in-out group-hover:scale-105" 
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              suppressHydrationWarning
             />
           </div>
         )}
@@ -61,20 +61,20 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
             shouldShowImage && !item.isChefSuggestion ? 'pt-2 sm:pt-3' : ''
           )}>
           <CardTitle 
-            className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight"
             suppressHydrationWarning
+            className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight"
           > 
             {displayName}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col justify-between flex-1 px-3 sm:px-4 pb-3 pt-0"> 
-          <CardDescription className="text-xs text-muted-foreground mb-2 line-clamp-3" suppressHydrationWarning> 
+          <CardDescription suppressHydrationWarning className="text-xs text-muted-foreground mb-2 line-clamp-3"> 
             {displayDescription}
           </CardDescription>
           
           {item.allergens && item.allergens.length > 0 && (
             <div className="mt-1.5 mb-2"> 
-              <p className="text-[10px] font-medium text-muted-foreground mb-0.5" suppressHydrationWarning>{t('menu:allergensTitle')}</p> 
+              <p suppressHydrationWarning className="text-[10px] font-medium text-muted-foreground mb-0.5">{t('menu:allergensTitle')}</p> 
               <div className="flex flex-wrap gap-1.5 items-center">
                 {item.allergens.map(allergen => {
                   const iconName = allergen
@@ -86,7 +86,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
                   const capitalizedAllergen = allergen.charAt(0).toUpperCase() + allergen.slice(1);
 
                   return (
-                    <div key={allergen} className="relative h-5 w-5" title={capitalizedAllergen}> {/* Changed h-4 w-4 to h-5 w-5 */}
+                    <div key={allergen} className="relative h-6 w-6" title={capitalizedAllergen}> {/* Increased size */}
                       <Image
                         src={`/alergenos/${iconName}.svg`}
                         alt={capitalizedAllergen}
