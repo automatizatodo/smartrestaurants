@@ -83,8 +83,8 @@ const restaurantConfig: RestaurantConfig = {
   theme: {
     primary: 'hsl(51, 100%, 50%)',
   },
-  showMenuItemImages: true, // Changed to true to allow images from sheet link
-  showAISommelierSection: true, // Default to show AI Sommelier
+  showMenuItemImages: true, 
+  showAISommelierSection: false, // Set to false as requested
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp',
   whatsappBookingNumber: '+34600000000',
