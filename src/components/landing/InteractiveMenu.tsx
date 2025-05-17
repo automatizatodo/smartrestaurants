@@ -139,7 +139,10 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
               )}
             </div>
           )}
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12"> {/* Reduced bottom margin for description */}
+          <p 
+            className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12" /* Reduced bottom margin for description */
+            suppressHydrationWarning
+          > 
             {t('landing:menu.sectionDescription')}
           </p>
         </div>
