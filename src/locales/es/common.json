@@ -44,8 +44,9 @@
   },
   "cookieConsent": {
     "ariaLabel": "Aviso de cookies",
-    "text": "Este sitio web utiliza cookies para mejorar su experiencia de navegación. Al continuar utilizando este sitio, acepta nuestro uso de cookies.",
+    "text": "Este sitio web utiliza cookies para proporcionar la funcionalidad necesaria del sitio y para mejorar tu experiencia. Al utilizar este sitio web, aceptas nuestro uso de cookies.",
     "acceptButton": "Aceptar",
+    "rejectButton": "Rechazar",
     "privacyPolicyLink": "Política de Privacidad"
   }
 }

@@ -44,8 +44,9 @@
   },
   "cookieConsent": {
     "ariaLabel": "Avís de galetes",
-    "text": "Aquest lloc web utilitza galetes per millorar la vostra experiència de navegació. En continuar utilitzant aquest lloc, accepteu el nostre ús de galetes.",
+    "text": "Aquest lloc web utilitza galetes per proporcionar la funcionalitat necessària del lloc i per millorar la teva experiència. En utilitzar aquest lloc web, acceptes el nostre ús de galetes.",
     "acceptButton": "Acceptar",
+    "rejectButton": "Rebutjar",
     "privacyPolicyLink": "Política de Privacitat"
   }
 }
