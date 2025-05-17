@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -19,6 +20,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'placehold.co', // Added placehold.co
+        port: '',
+        pathname: '/**',
+      },
+      { // Added for Google Drive, though view links are problematic
+        protocol: 'https',
+        hostname: 'drive.google.com',
         port: '',
         pathname: '/**',
       }
