@@ -2,14 +2,13 @@
 "use client";
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
-import Image from 'next/image';
+// import Image from 'next/image'; // No longer needed
 import type { TestimonialData } from '@/data/testimonials'; 
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function TestimonialCard({ testimonialItem }: { testimonialItem: TestimonialData }) {
   const { t, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
-
 
   const renderStars = () => {
     const stars = [];
@@ -25,22 +24,13 @@ export default function TestimonialCard({ testimonialItem }: { testimonialItem: 
   
   const testimonialText = t(testimonialItem.testimonialKey, { restaurantName });
 
-
   return (
     <Card className="h-full flex flex-col bg-card text-card-foreground shadow-lg p-6 rounded-lg">
       <CardContent className="flex flex-col items-center text-center flex-grow p-0">
-        {testimonialItem.avatarUrl && (
-          <div className="relative w-20 h-20 mb-4 rounded-full overflow-hidden shadow-md">
-            <Image
-              src={testimonialItem.avatarUrl}
-              alt={t(testimonialItem.nameKey)}
-              data-ai-hint={testimonialItem.avatarHint || "person portrait"}
-              fill
-              style={{ objectFit: 'cover' }}
-            />
-          </div>
-        )}
-        <div className="flex mb-3">{renderStars()}</div>
+        {/* Avatar Image Removed */}
+        <div className="flex mb-3 mt-2">{/* Added mt-2 to compensate for avatar removal if needed, adjust as necessary */}
+          {renderStars()}
+        </div>
         <p className="text-muted-foreground italic mb-4 text-md flex-grow">&ldquo;{testimonialText}&rdquo;</p>
         <h4 className="font-semibold font-serif text-lg text-primary">{t(testimonialItem.nameKey)}</h4>
         {testimonialItem.titleKey && <p className="text-xs text-muted-foreground">{t(testimonialItem.titleKey)}</p>}
