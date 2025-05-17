@@ -1,7 +1,7 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Geist } from 'next/font/google';
-import { Playfair_Display } from 'next/font/google';
+import { Playfair_Display, Cinzel } from 'next/font/google'; // Import Cinzel
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -17,6 +17,12 @@ const playfairDisplay = Playfair_Display({
   variable: '--font-playfair-display',
   subsets: ['latin'],
   weight: ['400', '700', '900'],
+});
+
+const cinzel = Cinzel({ // Define Cinzel
+  variable: '--font-cinzel',
+  subsets: ['latin'],
+  weight: ['400', '700'], // Choose appropriate weights
 });
 
 // Default metadata, primarily in Catalan as it's the default language
@@ -92,7 +98,7 @@ export default function RootLayout({
   return (
     <html lang="ca" className="dark">
       <body
-        className={`${geistSans.variable} ${playfairDisplay.variable} antialiased`}
+        className={`${geistSans.variable} ${playfairDisplay.variable} ${cinzel.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <LanguageProvider>

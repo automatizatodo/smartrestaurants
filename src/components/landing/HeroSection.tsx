@@ -42,10 +42,16 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-10 p-4 sm:p-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-bold text-white mb-6 shadow-text">
+        <h1 
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 shadow-text uppercase" // Added uppercase for all-caps effect
+          style={{ fontFamily: 'var(--font-cinzel), serif' }} // Apply Cinzel font
+        >
           {restaurantName}
         </h1>
-        <p className="text-xl sm:text-2xl md:text-3xl text-gray-200 mb-10 max-w-3xl mx-auto font-sans shadow-text">
+        <p 
+          className="text-xl sm:text-2xl md:text-3xl text-gray-200 mb-10 max-w-3xl mx-auto font-sans shadow-text"
+          style={{ fontFamily: 'var(--font-cinzel), serif' }} // Apply Cinzel font
+        >
           {t('landing:hero.tagline')}
         </p>
         <div className="flex flex-col space-y-4 items-center sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
@@ -69,4 +75,3 @@ export default function HeroSection() {
     </section>
   );
 }
-
