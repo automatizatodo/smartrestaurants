@@ -17,12 +17,13 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   const displayName = item.name[language] || item.name.en;
   const displayDescription = item.description[language] || item.description.en;
 
+  // Condition to show image only if showMenuItemImages is true AND the URL is not a placeholder
   const shouldShowImage = restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co');
 
   return (
     <div className={cn(
         "transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-0.5", 
-        item.isChefSuggestion && "relative" // This parent div is relative
+        item.isChefSuggestion && "relative" 
     )}>
       {item.isChefSuggestion && (
         <Badge
@@ -35,14 +36,13 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
       )}
       <Card className={cn(
           "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
-          // item.isChefSuggestion && "border-2 border-primary/60" // Border is less necessary if badge is outside
         )}>
         
         {shouldShowImage && (
           <div className="relative w-full aspect-video sm:aspect-[16/9] md:aspect-video overflow-hidden h-28 sm:h-32 md:h-28"> 
             <Image
               src={imageUrl}
-              alt={displayName} 
+              alt={displayName} // This alt text will still mismatch, but often isn't the primary cause of the hydration error itself
               data-ai-hint={item.imageHint}
               fill
               style={{ objectFit: 'cover' }}
@@ -55,21 +55,24 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
             "pb-1 pt-3 px-3 sm:px-4", 
             !shouldShowImage ? 'pt-4' : 'pt-2 sm:pt-3'
           )}>
-          <CardTitle className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight"> 
+          <CardTitle 
+            className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight"
+            suppressHydrationWarning
+          > 
             {displayName}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col justify-between flex-1 px-3 sm:px-4 pb-3 pt-0"> 
-          <CardDescription className="text-xs text-muted-foreground mb-2 line-clamp-3"> 
+          <CardDescription className="text-xs text-muted-foreground mb-2 line-clamp-3" suppressHydrationWarning> 
             {displayDescription}
           </CardDescription>
           
           {item.allergens && item.allergens.length > 0 && (
             <div className="mt-1.5 mb-2"> 
-              <p className="text-[10px] font-medium text-muted-foreground mb-0.5">{t('menu:allergensTitle')}</p> 
+              <p className="text-[10px] font-medium text-muted-foreground mb-0.5" suppressHydrationWarning>{t('menu:allergensTitle')}</p> 
               <div className="flex flex-wrap gap-1">
                 {item.allergens.map(allergen => (
-                  <Badge key={allergen} variant="outline" className="text-[10px] capitalize px-1 py-0"> 
+                  <Badge key={allergen} variant="outline" className="text-[10px] capitalize px-1 py-0" suppressHydrationWarning> 
                     {allergen}
                   </Badge>
                 ))}
