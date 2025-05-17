@@ -55,7 +55,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
   }
 
   return (
-    <Accordion type="multiple" defaultValue={defaultOpenValue} className="w-full space-y-3 sm:space-y-4"> {/* Reduced space-y */}
+    <Accordion type="multiple" defaultValue={defaultOpenValue} className="w-full space-y-2 sm:space-y-3"> {/* Reduced space-y */}
       {sortedCategoryKeys.map((categoryKey) => {
         const itemsInCategory = groupedMenu[categoryKey];
         if (!itemsInCategory || itemsInCategory.length === 0) {
@@ -65,11 +65,11 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
         const categoryTitleKey = `menu:${categoryKey}`;
         return (
           <AccordionItem key={categoryKey} value={categoryKey} className="border-b-0 rounded-lg overflow-hidden shadow-md bg-card">
-            <AccordionTrigger className="px-4 py-3 sm:px-6 sm:py-4 text-lg sm:text-xl font-serif text-primary hover:no-underline hover:bg-accent/50 transition-colors"> {/* Reduced padding and font size */}
+            <AccordionTrigger className="px-3 py-2 sm:px-4 sm:py-3 text-md sm:text-lg font-serif text-primary hover:no-underline hover:bg-accent/50 transition-colors"> {/* Reduced padding and font size */}
               {t(categoryTitleKey)}
             </AccordionTrigger>
-            <AccordionContent className="px-3 sm:px-4 pb-3 sm:pb-4 pt-0"> {/* Reduced padding */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 pt-3 sm:pt-4 items-start"> {/* Reduced gap */}
+            <AccordionContent className="px-2 pb-2 sm:px-3 sm:pb-3 pt-0"> {/* Reduced padding */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 pt-2 sm:pt-3 items-start"> {/* Adjusted grid columns and gap */}
                 {itemsInCategory.map((item, index) => (
                   <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.05}s` }}>
                     <MenuItemCard item={item} />
