@@ -43,7 +43,8 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
     return orderA - orderB;
   });
 
-  const defaultOpenValue = sortedCategoryKeys.length > 0 ? [sortedCategoryKeys[0]] : [];
+  // Set defaultOpenValue to an empty array to have all items collapsed by default
+  const defaultOpenValue: string[] = [];
 
   if (sortedCategoryKeys.length === 0) {
      return (
