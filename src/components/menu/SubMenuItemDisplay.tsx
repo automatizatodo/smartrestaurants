@@ -24,7 +24,7 @@ export default function SubMenuItemDisplay({ item, className }: SubMenuItemDispl
           <span className="text-xs text-muted-foreground ml-2">{item.price}</span>
         )}
       </div>
-      {displayDescription && displayDescription !== "No description available." && displayDescription !== "Sin descripción." && displayDescription !== "Sense descripció." && (
+      {displayDescription && (
         <p className="text-xs text-muted-foreground mt-0.5">{displayDescription}</p>
       )}
     </div>

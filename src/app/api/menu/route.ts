@@ -51,7 +51,7 @@ function mapCategoryToKey(categoryEN: string): string {
       return 'sauces';
     case 'desserts':
       return 'desserts';
-    case 'breads': // Added for "Pans"
+    case 'breads':
       return 'breads';
     case 'beverages':
       return 'beverages';
@@ -260,9 +260,9 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
           en: (nameEN || nameES || nameCA || "Unnamed Dish").trim(),
         },
         description: {
-          ca: (descCA || descES || descEN || "Sense descripció.").trim(),
-          es: (descES || descEN || descCA || "Sin descripción.").trim(),
-          en: (descEN || descES || descCA || "No description available.").trim(),
+          ca: (descCA || descES || descEN || "").trim(),
+          es: (descES || descEN || descCA || "").trim(),
+          en: (descEN || descES || descCA || "").trim(),
         },
         price: formattedPrice,
         categoryKey: categoryKey,
