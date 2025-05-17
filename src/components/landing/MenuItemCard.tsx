@@ -35,12 +35,13 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
       )}
       <Card className={cn(
           "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
+          item.isChefSuggestion && "pt-2"
         )}>
         
         {shouldShowImage && (
           <div 
             className="relative w-full aspect-video sm:aspect-[16/9] md:aspect-video overflow-hidden h-28 sm:h-32 md:h-28"
-            suppressHydrationWarning
+            suppressHydrationWarning={true}
           > 
             <Image
               suppressHydrationWarning
@@ -73,9 +74,9 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
           </CardDescription>
           
           {item.allergens && item.allergens.length > 0 && (
-            <div className="mt-1.5 mb-2"> 
-              <p suppressHydrationWarning className="text-[10px] font-medium text-muted-foreground mb-0.5">{t('menu:allergensTitle')}</p> 
-              <div className="flex flex-wrap gap-1.5 items-center">
+            <div className="mt-1.5 mb-2 flex items-center flex-wrap"> {/* Changed to flex container */}
+              <p suppressHydrationWarning className="text-[10px] font-medium text-muted-foreground mr-1.5">{t('menu:allergensTitle')}</p> {/* Added margin-right */}
+              <div className="flex flex-wrap gap-1 items-center"> {/* Reduced gap for icons */}
                 {item.allergens.map(allergen => {
                   const iconName = allergen
                     .toLowerCase()
@@ -86,7 +87,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
                   const capitalizedAllergen = allergen.charAt(0).toUpperCase() + allergen.slice(1);
 
                   return (
-                    <div key={allergen} className="relative h-6 w-6" title={capitalizedAllergen}> {/* Increased size */}
+                    <div key={allergen} className="relative h-6 w-6" title={capitalizedAllergen}>
                       <Image
                         src={`/alergenos/${iconName}.svg`}
                         alt={capitalizedAllergen}
