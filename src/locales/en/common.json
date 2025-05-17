@@ -41,5 +41,11 @@
   "seo": {
     "defaultTitleSuffix": "Restaurant in Sabadell - Grill & Traditional Cuisine",
     "defaultDescription": "Discover Can Fanals, your restaurant in Sabadell specializing in grilled meats, traditional Catalan cuisine, and gluten-free options. Book your table!"
+  },
+  "cookieConsent": {
+    "ariaLabel": "Cookie Notice",
+    "text": "This website uses cookies to enhance your browsing experience. By continuing to use this site, you agree to our use of cookies.",
+    "acceptButton": "Accept",
+    "privacyPolicyLink": "Privacy Policy"
   }
 }

@@ -1,28 +1,23 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Geist } from 'next/font/google';
-import { Playfair_Display, Cinzel } from 'next/font/google'; // Import Cinzel
+import { Cinzel } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
 import AppInitializer from '@/components/AppInitializer';
 import caCommon from '@/locales/ca/common.json'; // For default metadata
+import CookieConsentBanner from '@/components/common/CookieConsentBanner'; // Import the banner
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
 });
 
-const playfairDisplay = Playfair_Display({
-  variable: '--font-playfair-display',
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-});
-
-const cinzel = Cinzel({ // Define Cinzel
+const cinzel = Cinzel({ 
   variable: '--font-cinzel',
   subsets: ['latin'],
-  weight: ['400', '700'], // Choose appropriate weights
+  weight: ['400', '700'],
 });
 
 // Default metadata, primarily in Catalan as it's the default language
@@ -39,22 +34,22 @@ export const metadata: Metadata = {
     description: caCommon.seo.defaultDescription,
     url: process.env.NEXT_PUBLIC_APP_URL,
     siteName: caCommon.restaurantName,
-    // images: [ // Add a good default OG image later
+    // images: [ 
     //   {
-    //     url: `${process.env.NEXT_PUBLIC_APP_URL}/og-image.png`, // Example
+    //     url: `${process.env.NEXT_PUBLIC_APP_URL}/og-image.png`, 
     //     width: 1200,
     //     height: 630,
     //   },
     // ],
-    locale: 'ca_ES', // Default locale
+    locale: 'ca_ES', 
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: `${caCommon.restaurantName} | ${caCommon.seo.defaultTitleSuffix}`,
     description: caCommon.seo.defaultDescription,
-    // images: [`${process.env.NEXT_PUBLIC_APP_URL}/twitter-image.png`], // Example
-    // site: '@yourTwitterHandle', // Add if you have one
+    // images: [`${process.env.NEXT_PUBLIC_APP_URL}/twitter-image.png`], 
+    // site: '@yourTwitterHandle', 
   },
   robots: {
     index: true,
@@ -68,23 +63,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/faviconCanFanals.svg', // Standard path for favicon in public folder
-    // You can also add other icons here, e.g., apple-touch-icon
+    icon: '/faviconCanFanals.svg', 
     // apple: '/apple-touch-icon.png',
   },
-  // Verification (add your IDs if you use these services)
-  // verification: {
-  //   google: 'YOUR_GOOGLE_SITE_VERIFICATION_ID',
-  //   yandex: 'YOUR_YANDEX_VERIFICATION_ID',
-  // },
-  // alternates: { // If you have different language versions fully set up for SEO
-  //   canonical: process.env.NEXT_PUBLIC_APP_URL,
-  //   languages: {
-  //     'ca-ES': `${process.env.NEXT_PUBLIC_APP_URL}/ca`,
-  //     'es-ES': `${process.env.NEXT_PUBLIC_APP_URL}/es`,
-  //     'en-US': `${process.env.NEXT_PUBLIC_APP_URL}/en`,
-  //   },
-  // },
 };
 
 export const viewport: Viewport = {
@@ -103,13 +84,14 @@ export default function RootLayout({
   return (
     <html lang="ca" className="dark">
       <body
-        className={`${geistSans.variable} ${playfairDisplay.variable} ${cinzel.variable} antialiased`}
+        className={`${geistSans.variable} ${cinzel.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <LanguageProvider>
           <AppInitializer />
           {children}
           <Toaster />
+          <CookieConsentBanner />
         </LanguageProvider>
       </body>
     </html>
