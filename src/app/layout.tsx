@@ -67,6 +67,11 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  icons: {
+    icon: '/favicon.ico', // Standard path for favicon in public folder
+    // You can also add other icons here, e.g., apple-touch-icon
+    // apple: '/apple-touch-icon.png',
+  },
   // Verification (add your IDs if you use these services)
   // verification: {
   //   google: 'YOUR_GOOGLE_SITE_VERIFICATION_ID',
