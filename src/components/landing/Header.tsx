@@ -5,23 +5,37 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'; // Added SheetTitle
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu as MenuIcon, X as XIcon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import restaurantConfig from '@/config/restaurant.config';
 
-const navItemKeys = [
+const navItemKeysBase = [
   { labelKey: 'common:nav.ourMenu', href: '/#menu' },
   { labelKey: 'common:nav.fullMenu', href: '/menu' },
   { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
-  { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' },
+];
+
+const aiSommelierNavItem = { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' };
+
+const navItemKeysEnd = [
   { labelKey: 'common:nav.bookTable', href: '/#booking' },
   { labelKey: 'common:nav.contact', href: '/#contact-map' },
   { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
 ];
+
+const getNavItems = () => {
+  let items = [...navItemKeysBase];
+  if (restaurantConfig.showAISommelierSection) {
+    items.push(aiSommelierNavItem);
+  }
+  items.push(...navItemKeysEnd);
+  return items;
+};
+
 
 export default function Header() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -29,6 +43,7 @@ export default function Header() {
   const isMobile = useIsMobile();
   const { t, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
+  const navItems = getNavItems();
 
 
   useEffect(() => {
@@ -41,7 +56,7 @@ export default function Header() {
 
   const NavLinks = ({ inSheet = false }: { inSheet?: boolean }) => (
     <nav className={`flex ${inSheet ? 'flex-col space-y-3 items-start' : 'space-x-4 lg:space-x-6 items-center'}`}>
-      {navItemKeys.map((item) => (
+      {navItems.map((item) => (
         <Link
           key={item.labelKey}
           href={item.href}
@@ -78,15 +93,15 @@ export default function Header() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24 sm:h-28">
+        <div className="flex items-center justify-between h-28 sm:h-28"> {/* Increased height from h-24 to h-28 */}
           <Link href="/" className="flex items-center space-x-2">
             {restaurantConfig.logoUrl ? (
               <Image
                 src={restaurantConfig.logoUrl}
                 alt={`${restaurantName} Logo`}
-                width={288}
-                height={96}
-                className="h-20 sm:h-24 w-auto dark:filter dark:invert"
+                width={288} // Increased from 192
+                height={96} // Increased from 64
+                className="h-24 w-auto dark:filter dark:invert" // Increased from h-16 to h-24
                 priority
                 style={{ objectFit: 'contain' }}
               />
@@ -106,16 +121,16 @@ export default function Header() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-background p-6 flex flex-col">
-                  <SheetTitle className="sr-only">{t('common:nav.mobileMenuTitle')}</SheetTitle> {/* Visually hidden title */}
+                  <SheetTitle className="sr-only">{t('common:nav.mobileMenuTitle')}</SheetTitle>
                   <div className="flex justify-between items-center mb-6">
                       <Link href="/" className="flex items-center space-x-2" onClick={() => setIsSheetOpen(false)}>
                         {restaurantConfig.logoUrl ? (
                           <Image
                             src={restaurantConfig.logoUrl}
                             alt={`${restaurantName} Logo`}
-                            width={225}
-                            height={75}
-                            className="h-16 w-auto dark:filter dark:invert"
+                            width={225} // Increased from 150
+                            height={75}  // Increased from 50
+                            className="h-20 w-auto dark:filter dark:invert" // Increased from h-12 to h-20
                             style={{ objectFit: 'contain' }}
                           />
                         ) : (
@@ -144,4 +159,3 @@ export default function Header() {
     </header>
   );
 }
-    

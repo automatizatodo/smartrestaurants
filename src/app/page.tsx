@@ -3,7 +3,7 @@ import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
 import AboutUsSection from '@/components/landing/AboutUsSection';
 import InteractiveMenu from '@/components/landing/InteractiveMenu';
-import ServicesSection from '@/components/landing/ServicesSection'; // Import the new section
+import ServicesSection from '@/components/landing/ServicesSection';
 import AISommelierSection from '@/components/landing/AISommelierSection';
 import BookingSection from '@/components/landing/BookingSection';
 import ContactMapSection from '@/components/landing/ContactMapSection';
@@ -11,6 +11,7 @@ import TestimonialCarousel from '@/components/landing/TestimonialCarousel';
 import Footer from '@/components/landing/Footer';
 import { fetchMenuFromGoogleSheet } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
+import restaurantConfig from '@/config/restaurant.config'; // Import config
 import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,7 @@ export default async function HomePage() {
           <InteractiveMenu menuItems={menuItems} />
         </Suspense>
         <AboutUsSection /> {/* Moved AboutUsSection here */}
-        <AISommelierSection />
+        {restaurantConfig.showAISommelierSection && <AISommelierSection />}
         <BookingSection />
         <ContactMapSection />
         <TestimonialCarousel />
@@ -38,4 +39,3 @@ export default async function HomePage() {
     </div>
   );
 }
-

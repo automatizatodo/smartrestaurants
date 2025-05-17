@@ -44,6 +44,7 @@ interface RestaurantConfig {
   timeZone: string;
   theme: ThemeColors;
   showMenuItemImages: boolean;
+  showAISommelierSection: boolean; // New flag to control AI Sommelier visibility
   bookingMaxGuestsPerSlot?: number;
   bookingMethod: 'calendar' | 'whatsapp';
   whatsappBookingNumber?: string;
@@ -83,6 +84,7 @@ const restaurantConfig: RestaurantConfig = {
     primary: 'hsl(51, 100%, 50%)',
   },
   showMenuItemImages: true, // Changed to true to allow images from sheet link
+  showAISommelierSection: true, // Default to show AI Sommelier
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp',
   whatsappBookingNumber: '+34600000000',
