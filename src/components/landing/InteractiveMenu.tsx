@@ -63,7 +63,11 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
           </div>
            <div className="text-center mt-12 sm:mt-16">
             <Link href="/menu" passHref>
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105">
+              <Button 
+                size="lg" 
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105"
+                suppressHydrationWarning
+              >
                 <UtensilsCrossed className="mr-2 h-5 w-5" />
                 {t('common:button.viewFullMenu')}
               </Button>
@@ -104,7 +108,11 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
           </div>
            <div className="text-center mt-12 sm:mt-16">
             <Link href="/menu" passHref>
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105">
+              <Button 
+                size="lg" 
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105"
+                suppressHydrationWarning
+              >
                 <UtensilsCrossed className="mr-2 h-5 w-5" />
                 {t('common:button.viewFullMenu')}
               </Button>
@@ -179,7 +187,11 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
 
         <div className="text-center mt-12 sm:mt-16">
           <Link href="/menu" passHref>
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105">
+            <Button 
+              size="lg" 
+              className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105"
+              suppressHydrationWarning
+            >
               <UtensilsCrossed className="mr-2 h-5 w-5" />
               {t('common:button.viewFullMenu')}
             </Button>
@@ -189,3 +201,4 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     </section>
   );
 }
+

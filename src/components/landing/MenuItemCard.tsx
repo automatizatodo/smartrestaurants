@@ -17,7 +17,6 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   const displayName = item.name[language] || item.name.en;
   const displayDescription = item.description[language] || item.description.en;
 
-  // Condition to show image only if showMenuItemImages is true AND the URL is not a placeholder
   const shouldShowImage = restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co');
 
   return (
@@ -29,7 +28,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
         <Badge
           variant="default"
           className="absolute top-0 right-0 -mt-2 -mr-1.5 z-20 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5"
-          suppressHydrationWarning // Added to suppress hydration warning
+          suppressHydrationWarning
         >
            <Sparkles className="h-2.5 w-2.5" /> {t('menu:chefsSuggestion')}
         </Badge>
@@ -39,10 +38,13 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
         )}>
         
         {shouldShowImage && (
-          <div className="relative w-full aspect-video sm:aspect-[16/9] md:aspect-video overflow-hidden h-28 sm:h-32 md:h-28"> 
+          <div 
+            className="relative w-full aspect-video sm:aspect-[16/9] md:aspect-video overflow-hidden h-28 sm:h-32 md:h-28"
+            suppressHydrationWarning // Added to help with alt text mismatch
+          > 
             <Image
               src={imageUrl}
-              alt={displayName} // This alt text will still mismatch, but often isn't the primary cause of the hydration error itself
+              alt={displayName}
               data-ai-hint={item.imageHint}
               fill
               style={{ objectFit: 'cover' }}
