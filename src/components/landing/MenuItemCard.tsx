@@ -27,14 +27,15 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
       {item.isChefSuggestion && (
         <Badge
           variant="default"
-          className="absolute top-0 right-0 -mt-2 -mr-1.5 z-20 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5" 
+          className="absolute top-0 right-0 -mt-2 -mr-1.5 z-20 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5"
+          suppressHydrationWarning // Added to suppress hydration warning
         >
            <Sparkles className="h-2.5 w-2.5" /> {t('menu:chefsSuggestion')}
         </Badge>
       )}
       <Card className={cn(
           "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
-          item.isChefSuggestion && "border-2 border-primary/60" 
+          // item.isChefSuggestion && "border-2 border-primary/60" // Border is less necessary if badge is outside
         )}>
         
         {shouldShowImage && (
