@@ -9,25 +9,36 @@ import enCommon from '@/locales/en/common.json';
 import enLanding from '@/locales/en/landing.json';
 import enMenu from '@/locales/en/menu.json';
 import enTestimonials from '@/locales/en/testimonials.json';
+import enMenuPage from '@/locales/en/page-specific/menu.json';
+
 
 import esCommon from '@/locales/es/common.json';
 import esLanding from '@/locales/es/landing.json';
 import esMenu from '@/locales/es/menu.json';
 import esTestimonials from '@/locales/es/testimonials.json';
+import esMenuPage from '@/locales/es/page-specific/menu.json';
 
 import caCommon from '@/locales/ca/common.json';
 import caLanding from '@/locales/ca/landing.json';
 import caMenu from '@/locales/ca/menu.json';
 import caTestimonials from '@/locales/ca/testimonials.json';
+import caMenuPage from '@/locales/ca/page-specific/menu.json';
+
 
 type Locale = 'en' | 'es' | 'ca';
+
+interface PageSpecificTranslations {
+  menu: Record<string, string>;
+  // Add other page-specific translation types here if needed
+}
 
 interface Translations {
   common: Record<string, string>;
   landing: Record<string, string>;
   menu: Record<string, string>;
   testimonials: Record<string, string>;
-  [key: string]: Record<string, string>; // For dynamic namespace access
+  'page-specific': PageSpecificTranslations;
+  [key: string]: Record<string, string> | PageSpecificTranslations; // For dynamic namespace access
 }
 
 const translationsData: Record<Locale, Translations> = {
@@ -36,18 +47,27 @@ const translationsData: Record<Locale, Translations> = {
     landing: enLanding,
     menu: enMenu,
     testimonials: enTestimonials,
+    'page-specific': {
+      menu: enMenuPage,
+    },
   },
   es: {
     common: esCommon,
     landing: esLanding,
     menu: esMenu,
     testimonials: esTestimonials,
+    'page-specific': {
+      menu: esMenuPage,
+    },
   },
   ca: {
     common: caCommon,
     landing: caLanding,
     menu: caMenu,
     testimonials: caTestimonials,
+    'page-specific': {
+      menu: caMenuPage,
+    },
   },
 };
 
@@ -65,21 +85,17 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Locale>('ca');
   const [currentTranslations, setCurrentTranslations] = useState<Translations>(translationsData.ca);
 
-  useEffect(() => {
-    // This effect runs once on component mount to set the initial language based on browser settings
-    // Priority: Spanish > English > Catalan (application default)
-    if (typeof navigator !== 'undefined') {
-      const browserLang = navigator.language.split('-')[0] as Locale;
-
-      if (browserLang === 'es' && translationsData.es) {
-        setLanguage('es');
-      } else if (browserLang === 'en' && translationsData.en) {
-        setLanguage('en');
-      }
-      // If browserLang is 'ca' or any other language,
-      // it will remain 'ca' due to the initial useState default.
-    }
-  }, []); // Empty dependency array ensures this runs only once on mount
+  // Removed useEffect for browser language detection to enforce Catalan as default
+  // useEffect(() => {
+  //   if (typeof navigator !== 'undefined') {
+  //     const browserLang = navigator.language.split('-')[0] as Locale;
+  //     if (browserLang === 'es' && translationsData.es) {
+  //       setLanguage('es');
+  //     } else if (browserLang === 'en' && translationsData.en) {
+  //       setLanguage('en');
+  //     }
+  //   }
+  // }, []);
 
   useEffect(() => {
     // This effect updates translations whenever the language state changes
@@ -91,21 +107,30 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       const parts = keyWithNamespace.split(':');
       let namespace: string;
       let key: string;
+      let subKey: string | undefined;
 
-      if (parts.length === 2) {
+      if (parts.length === 3 && parts[0] === 'page-specific') {
+        // Handles keys like "page-specific:menu:title"
+        namespace = parts[0];
+        subKey = parts[1]; // e.g., "menu"
+        key = parts[2];     // e.g., "title"
+      } else if (parts.length === 2) {
         [namespace, key] = parts;
       } else {
-        // Default to 'common' namespace if not specified, or handle error
         namespace = 'common';
         key = keyWithNamespace;
       }
       
-      let translation = keyWithNamespace; // Fallback to the key itself
+      let translation = keyWithNamespace; 
 
-      if (currentTranslations[namespace] && typeof currentTranslations[namespace][key] === 'string') {
-        translation = currentTranslations[namespace][key];
+      if (namespace === 'page-specific' && subKey) {
+        const pageSpecificNamespace = currentTranslations[namespace] as PageSpecificTranslations | undefined;
+        if (pageSpecificNamespace && pageSpecificNamespace[subKey as keyof PageSpecificTranslations] && typeof pageSpecificNamespace[subKey as keyof PageSpecificTranslations][key] === 'string') {
+          translation = pageSpecificNamespace[subKey as keyof PageSpecificTranslations][key];
+        }
+      } else if (currentTranslations[namespace] && typeof (currentTranslations[namespace] as Record<string,string>)[key] === 'string') {
+        translation = (currentTranslations[namespace] as Record<string,string>)[key];
       } else if (currentTranslations.common && typeof currentTranslations.common[keyWithNamespace] === 'string') {
-        // Fallback to common namespace if full key (e.g. "button.submit") is there
          translation = currentTranslations.common[keyWithNamespace];
       }
 
