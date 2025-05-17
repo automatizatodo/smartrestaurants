@@ -9,7 +9,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair-display), serif; /* Changed from --font-lora */
+  font-family: var(--font-cinzel), serif; /* Changed from --font-playfair-display to --font-cinzel */
 }
 
 @layer base {

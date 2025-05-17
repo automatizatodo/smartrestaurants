@@ -12,7 +12,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['var(--font-geist-sans)'],
-        serif: ['var(--font-playfair-display)'], // Changed from Lora to Playfair Display
+        serif: ['var(--font-cinzel)'], // Changed from Playfair Display to Cinzel
       },
   		colors: {
   			background: 'hsl(var(--background))',
