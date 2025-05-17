@@ -104,7 +104,10 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     <section id="menu" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8"> {/* Reduced mb from 12/16 to 8 */}
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4">
+          <h2 
+            className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4"
+            suppressHydrationWarning // Added to suppress specific text mismatch due to i18n
+          >
             {t('landing:menu.sectionTitle')}
           </h2>
           {menuDelDiaPrice && (
@@ -161,3 +164,4 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     </section>
   );
 }
+
