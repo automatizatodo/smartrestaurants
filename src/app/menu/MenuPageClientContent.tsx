@@ -2,11 +2,27 @@
 "use client";
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import Header from '@/components/landing/Header';
 import Footer from '@/components/landing/Footer';
 import FullMenuDisplay from '@/components/menu/FullMenuDisplay';
 import { useLanguage } from '@/context/LanguageContext';
 import type { MenuItemData } from '@/data/menu';
+import { Button } from '@/components/ui/button';
+import restaurantConfig from '@/config/restaurant.config';
+import { StarIcon as GoogleIcon } from 'lucide-react'; // Using StarIcon for Google as a placeholder
+
+// Placeholder for TripAdvisor Icon - Re-using the one from TestimonialCarousel
+const TripAdvisorIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5">
+    <circle cx="12" cy="12" r="10"></circle>
+    <circle cx="12" cy="12" r="4"></circle>
+    <line x1="22" x2="18" y1="12" y2="12"></line>
+    <line x1="6" x2="2" y1="12" y2="12"></line>
+    <line x1="12" x2="12" y1="6" y2="2"></line>
+    <line x1="12" x2="12" y1="22" y2="18"></line>
+  </svg>
+);
 
 interface MenuPageClientContentProps {
   menuItems: MenuItemData[];
@@ -54,6 +70,28 @@ export default function MenuPageClientContent({
             </p>
           </div>
           <FullMenuDisplay menuItems={menuItems} />
+
+          {/* Review Buttons Section */}
+          {(restaurantConfig.googleReviewUrl || restaurantConfig.tripAdvisorReviewUrl) && (
+            <div className="mt-12 sm:mt-16 text-center flex flex-col items-center space-y-3 sm:flex-row sm:space-y-0 sm:justify-center sm:space-x-6">
+              {restaurantConfig.googleReviewUrl && (
+                <Link href={restaurantConfig.googleReviewUrl} target="_blank" rel="noopener noreferrer" passHref className="w-full sm:w-auto">
+                  <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto">
+                    <GoogleIcon className="mr-2 h-5 w-5" />
+                    {t('landing:testimonials.leaveGoogleReview')}
+                  </Button>
+                </Link>
+              )}
+              {restaurantConfig.tripAdvisorReviewUrl && (
+                <Link href={restaurantConfig.tripAdvisorReviewUrl} target="_blank" rel="noopener noreferrer" passHref className="w-full sm:w-auto">
+                  <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto">
+                    <TripAdvisorIcon />
+                    {t('landing:testimonials.leaveTripAdvisorReview')}
+                  </Button>
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       </main>
       <Footer />
