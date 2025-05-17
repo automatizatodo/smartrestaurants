@@ -7,7 +7,7 @@
   "hero.bookTableButton": "Reservar Mesa",
   "menu.sectionTitle": "Menú del Día",
   "menu.menuPriceLabel": "Precio del Menú:",
-  "menu.sectionDescription": "Cada plato se elabora con los mejores ingredientes y precisión artística. Explora sabores que deleitarán tus sentidos en nuestro restaurante en Sabadell. Muy pronto estrenaremos nuestra carta definitiva. Más sabores, más brasa, más Can Fanals.",
+  "menu.sectionDescription": "",
   "menu.loadingErrorTitle": "Menú No Disponible",
   "menu.loadingError": "Nuestro menú no está disponible actualmente o no se pudo cargar. Por favor, vuelve a intentarlo más tarde o contáctanos para obtener ayuda.",
   "menu.noCategoriesTitle": "Información del Menú Incompleta",
@@ -104,3 +104,5 @@
   "contactMap.hours.mon": "Lunes",
   "contactMap.hours.closed": "Cerrado"
 }
+
+    

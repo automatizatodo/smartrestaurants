@@ -7,7 +7,7 @@
   "hero.bookTableButton": "Book a Table",
   "menu.sectionTitle": "Menu of the Day",
   "menu.menuPriceLabel": "Menu Price:",
-  "menu.sectionDescription": "Each dish is crafted with the finest ingredients and artistic precision. Explore flavors that will tantalize your senses at our restaurant in Sabadell. We will soon release our definitive menu. More flavors, more grill, more Can Fanals.",
+  "menu.sectionDescription": "",
   "menu.loadingErrorTitle": "Menu Unavailable",
   "menu.loadingError": "Our menu is currently unavailable or could not be loaded. Please check back later or contact us for assistance.",
   "menu.noCategoriesTitle": "Menu Information Missing",
@@ -102,3 +102,5 @@
   "contactMap.hours.mon": "Monday",
   "contactMap.hours.closed": "Closed"
 }
+
+    

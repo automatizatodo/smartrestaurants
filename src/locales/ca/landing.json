@@ -7,7 +7,7 @@
   "hero.bookTableButton": "Reservar Taula",
   "menu.sectionTitle": "Menú del Dia",
   "menu.menuPriceLabel": "Preu del Menú:",
-  "menu.sectionDescription": "Cada plat s'elabora amb els millors ingredients i precisió artística. Explora sabors que delectaran els teus sentits al nostre restaurant a Sabadell. Molt aviat estrenarem la nostra carta definitiva. Més sabors, més brasa, més Can Fanals.",
+  "menu.sectionDescription": "",
   "menu.loadingErrorTitle": "Menú No Disponible",
   "menu.loadingError": "El nostre menú no està disponible actualment o no s'ha pogut carregar. Si us plau, torna-ho a provar més tard o contacta'ns per obtenir ajuda.",
   "menu.noCategoriesTitle": "Informació del Menú Incompleta",
@@ -104,3 +104,5 @@
   "contactMap.hours.mon": "Dilluns",
   "contactMap.hours.closed": "Tancat"
 }
+
+    
