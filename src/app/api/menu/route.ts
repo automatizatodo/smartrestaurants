@@ -129,20 +129,6 @@ function isValidHttpUrl(string: string): boolean {
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
-function transformGoogleDriveLink(url: string): string {
-  if (typeof url !== 'string') return url;
-  // Regex for Google Drive links like /file/d/.../view?usp=sharing or /view?usp=drive_link
-  const driveFileRegex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view(?:\?usp=sharing|\?usp=drive_link)?/i;
-  const match = url.match(driveFileRegex);
-  if (match && match[1]) {
-    const fileId = match[1];
-    const newUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-    console.log(`API_ROUTE_LOGIC_TRANSFORM_GDRIVE: Transformed Google Drive link from '${url}' to '${newUrl}'`);
-    return newUrl;
-  }
-  return url;
-}
-
 export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
   console.log(`API_ROUTE_LOGIC: fetchAndProcessMenuData called.`);
   if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes('YOUR_GOOGLE_SHEET') || GOOGLE_SHEET_CSV_URL.includes('YOUR_NEW_GOOGLE_SHEET')) {
@@ -202,7 +188,7 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       const descEN = item[DESCRIPTION_EN_COL];
       const categoryEN = item[CATEGORY_EN_COL];
       let price = item[PRECIO_COL];
-      let linkImagen = item[LINK_IMAGEN_COL] || "";
+      let linkImagenFromSheet = item[LINK_IMAGEN_COL] || "";
       const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
       const alergenosString = item[ALERGENOS_COL] || "";
 
@@ -211,15 +197,13 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
         return null;
       }
 
-      let finalImageUrl = `https://placehold.co/400x300.png`;
-      let originalLinkImagen = linkImagen;
-      if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && linkImagen.trim() !== "") {
-        linkImagen = transformGoogleDriveLink(linkImagen);
-        if (isValidHttpUrl(linkImagen)) {
-          finalImageUrl = linkImagen;
-          console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using valid image URL: '${finalImageUrl}' (Original from sheet: '${originalLinkImagen}')`);
+      let finalImageUrl = `https://placehold.co/400x300.png`; // Default placeholder
+      if (linkImagenFromSheet && linkImagenFromSheet.toUpperCase() !== "FALSE" && linkImagenFromSheet.trim() !== "") {
+        if (isValidHttpUrl(linkImagenFromSheet)) {
+          finalImageUrl = linkImagenFromSheet;
+          console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using valid image URL from sheet: '${finalImageUrl}'`);
         } else {
-          console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' has an invalid image URL from sheet: '${originalLinkImagen}' (Transformed: '${linkImagen}'). Using placeholder.`);
+          console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' has an invalid image URL from sheet: '${linkImagenFromSheet}'. Using placeholder.`);
         }
       }
       
@@ -227,8 +211,8 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       if (!imageHint || imageHint === "food item") {
         imageHint = (categoryEN || "food plate").toLowerCase();
       }
-      if (finalImageUrl.includes('placehold.co') && originalLinkImagen && !originalLinkImagen.toUpperCase().includes('FALSE') && originalLinkImagen.trim() !== '') {
-        console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' fell back to placeholder. Original link was: '${originalLinkImagen}', Hint: '${imageHint}'`);
+      if (finalImageUrl.includes('placehold.co') && linkImagenFromSheet && !linkImagenFromSheet.toUpperCase().includes('FALSE') && linkImagenFromSheet.trim() !== '') {
+        console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' fell back to placeholder. Original link was: '${linkImagenFromSheet}', Hint: '${imageHint}'`);
       } else if (finalImageUrl.includes('placehold.co')) {
          console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using placeholder by default. Hint: '${imageHint}'`);
       }
@@ -293,9 +277,9 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
 
 // This is the Next.js API route handler
 export async function GET() {
-  console.log("API_ROUTE_GET_HANDLER: /api/menu GET handler INVOKED.");
+  console.log("API_ROUTE_GET_MENU: /api/menu GET handler INVOKED.");
   const menuItems = await fetchAndProcessMenuData();
-  console.log(`API_ROUTE_GET_HANDLER: Responding with ${menuItems.length} menu items.`);
+  console.log(`API_ROUTE_GET_MENU: Responding with ${menuItems.length} menu items.`);
   const headers = new Headers();
   headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59'); 
 

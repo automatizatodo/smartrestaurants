@@ -19,13 +19,19 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'placehold.co', // Added placehold.co
+        hostname: 'placehold.co',
         port: '',
         pathname: '/**',
       },
-      { // Added for Google Drive, though view links are problematic
+      { 
         protocol: 'https',
-        hostname: 'drive.google.com',
+        hostname: 'drive.google.com', // Kept in case some old links remain, though not recommended
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com', // Added for Firebase Storage
         port: '',
         pathname: '/**',
       }
