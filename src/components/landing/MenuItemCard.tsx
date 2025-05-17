@@ -35,7 +35,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
       )}
       <Card className={cn(
           "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
-          // No conditional padding-top needed here if the space is managed by the parent in FullMenuDisplay
+          item.isChefSuggestion && "border-2 border-primary" // Added conditional border
         )}>
         
         {shouldShowImage && (
@@ -74,8 +74,8 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
           </CardDescription>
           
           {item.allergens && item.allergens.length > 0 && (
-            <div className="mt-1.5 mb-2 flex items-center flex-wrap">
-              {/* Removed the <p>{t('menu:allergensTitle')}</p> element */}
+            <div className="mt-1.5 mb-2 flex items-center flex-wrap gap-1">
+              {/* The <p>{t('menu:allergensTitle')}</p> element was removed as per user request */}
               <div className="flex flex-wrap gap-0.5 items-center"> {/* Reduced gap for icons */}
                 {item.allergens.map(allergen => {
                   const iconName = allergen
