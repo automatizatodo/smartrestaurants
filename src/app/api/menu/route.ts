@@ -97,16 +97,36 @@ function parseCSV(csvText: string): Record<string, string>[] {
   return jsonData;
 }
 
-function isValidHttpUrl(string: string) {
-  if (!string) return false;
+function isValidHttpUrl(string: string): boolean {
+  if (!string || typeof string !== 'string') return false;
   let url;
   try {
+    // If it doesn't start with http/https but looks like a domain, prepend https
+    if (!string.startsWith('http://') && !string.startsWith('https://') && string.includes('.') && !string.includes(' ')) {
+      string = `https://${string}`;
+      console.log(`API_ROUTE_LOGIC_IS_VALID_URL: Prepended https:// to: ${string}`);
+    }
     url = new URL(string);
-  } catch (_) {
+  } catch (e: any) {
+    console.warn(`API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '${string}'. Error: ${e.message}`);
     return false;
   }
   return url.protocol === "http:" || url.protocol === "https:";
 }
+
+function transformGoogleDriveLink(url: string): string {
+  if (typeof url !== 'string') return url;
+  const driveFileRegex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view(?:\?usp=sharing)?/i;
+  const match = url.match(driveFileRegex);
+  if (match && match[1]) {
+    const fileId = match[1];
+    const newUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    console.log(`API_ROUTE_LOGIC_TRANSFORM_GDRIVE: Transformed Google Drive link from '${url}' to '${newUrl}'`);
+    return newUrl;
+  }
+  return url;
+}
+
 
 // Extracted core logic
 export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
@@ -165,7 +185,7 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       const nameEN = item[NAME_EN_COL];
       const categoryEN = item[CATEGORY_EN_COL];
       let price = item[PRECIO_COL];
-      const linkImagen = item[LINK_IMAGEN_COL];
+      let linkImagen = item[LINK_IMAGEN_COL] || "";
       const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
       const alergenosString = item[ALERGENOS_COL] || "";
 
@@ -175,16 +195,27 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       }
 
       let finalImageUrl = `https://placehold.co/400x300.png`;
-      if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && isValidHttpUrl(linkImagen)) {
-        finalImageUrl = linkImagen;
+      let originalLinkImagen = linkImagen;
+      if (linkImagen && linkImagen.toUpperCase() !== "FALSE") {
+        linkImagen = transformGoogleDriveLink(linkImagen); // Attempt to transform GDrive links
+        if (isValidHttpUrl(linkImagen)) {
+          finalImageUrl = linkImagen;
+          console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using valid image URL: '${finalImageUrl}' (Original from sheet: '${originalLinkImagen}')`);
+        } else {
+          console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' has an invalid image URL from sheet: '${originalLinkImagen}' (Transformed: '${linkImagen}'). Using placeholder.`);
+        }
       }
+      
       let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
       if (!imageHint || imageHint === "food item") {
         imageHint = (categoryEN || "food plate").toLowerCase();
       }
-      if (finalImageUrl.includes('placehold.co')) {
-        console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using placeholder. Hint: '${imageHint}'`);
+      if (finalImageUrl.includes('placehold.co') && !originalLinkImagen.toUpperCase().includes('FALSE') && originalLinkImagen.trim() !== '') {
+        console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' fell back to placeholder. Original link was: '${originalLinkImagen}', Hint: '${imageHint}'`);
+      } else if (finalImageUrl.includes('placehold.co')) {
+         console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using placeholder by default. Hint: '${imageHint}'`);
       }
+
 
       let formattedPrice: string | undefined = undefined;
       if (price !== undefined && price !== null && price.trim() !== "" && price.toUpperCase() !== "FALSE" && price.toUpperCase() !== "N/A") {
