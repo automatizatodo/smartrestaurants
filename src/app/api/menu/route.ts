@@ -4,35 +4,47 @@ import type { MenuItemData } from '@/data/menu';
 
 // --- Configuration for Google Sheets ---
 // !! IMPORTANT: This URL should be the "Publish to web" CSV export URL of your Google Sheet !!
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
+let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
+
 
 // Column names from the Google Sheet structure (ensure these EXACTLY match your sheet headers)
 const VISIBLE_COL = "Visible";
+const CATEGORIA_CA_COL = "Categoría (CA)"; // New Catalan column
 const CATEGORIA_ES_COL = "Categoría (ES)";
 const CATEGORY_EN_COL = "Category (EN)";
+const NOM_CA_COL = "Nom (CA)"; // New Catalan column
 const NOMBRE_ES_COL = "Nombre (ES)";
 const NAME_EN_COL = "Name (EN)";
+const DESCRIPCIO_CA_COL = "Descripció (CA)"; // New Catalan column
 const DESCRIPCION_ES_COL = "Descripción (ES)";
 const DESCRIPTION_EN_COL = "Description (EN)";
 const PRECIO_COL = "Precio (€)";
 const LINK_IMAGEN_COL = "Link Imagen";
 const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
 const ALERGENOS_COL = "Alergenos";
-// const ELIMINAR_COL = "Eliminar"; // Not currently used in logic, but was in logs
+// const ELIMINAR_COL = "Eliminar"; // Not strictly needed in expected headers if we don't use it
 
-// Expected headers for validation - Reverted to original strict expectation.
-// User should fix their Google Sheet to match these headers.
+// Expected headers for validation - Updated to reflect the new Excel structure
 const EXPECTED_HEADERS = [
   VISIBLE_COL,
-  CATEGORIA_ES_COL, CATEGORY_EN_COL,
-  NOMBRE_ES_COL, NAME_EN_COL,
-  DESCRIPCION_ES_COL, DESCRIPTION_EN_COL,
+  CATEGORIA_CA_COL,
+  CATEGORIA_ES_COL,
+  CATEGORY_EN_COL,
+  NOM_CA_COL,
+  NOMBRE_ES_COL,
+  NAME_EN_COL,
+  DESCRIPCIO_CA_COL,
+  DESCRIPCION_ES_COL,
+  DESCRIPTION_EN_COL,
   PRECIO_COL,
-  LINK_IMAGEN_COL, SUGERENCIA_CHEF_COL, ALERGENOS_COL
+  LINK_IMAGEN_COL,
+  SUGERENCIA_CHEF_COL,
+  ALERGENOS_COL
 ];
 
 // Helper to map English category names from sheet to consistent categoryKeys
 function mapCategoryToKey(categoryEN: string): string {
+  if (!categoryEN) return 'other'; // Handle cases where categoryEN might be empty
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters':
@@ -70,9 +82,9 @@ function parseCSV(csvText: string): Record<string, string>[] {
     return [];
   }
 
-  const extraHeaders = headersFromSheet.filter(sh => !EXPECTED_HEADERS.includes(sh));
+  const extraHeaders = headersFromSheet.filter(sh => !EXPECTED_HEADERS.includes(sh) && sh.toLowerCase() !== "eliminar"); // Allow "Eliminar" without making it mandatory
   if (extraHeaders.length > 0) {
-    console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Warning: Sheet contains extra headers not in EXPECTED_HEADERS: [${extraHeaders.join(", ")}]. These will be ignored.`);
+    console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Warning: Sheet contains extra headers not in EXPECTED_HEADERS: [${extraHeaders.join(", ")}]. These will be ignored if not 'Eliminar'.`);
   }
 
   const jsonData = [];
@@ -83,14 +95,16 @@ function parseCSV(csvText: string): Record<string, string>[] {
     }
     const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(value => value.trim().replace(/^"|"$/g, ''));
 
-    if (values.length === headersFromSheet.length) {
+    if (values.length >= headersFromSheet.length) { // Allow more values than headers, but map only known headers
       const entry: Record<string, string> = {};
       headersFromSheet.forEach((header, index) => {
-        entry[header] = values[index];
+        if (values[index] !== undefined) { // Ensure value exists
+          entry[header] = values[index];
+        }
       });
       jsonData.push(entry);
     } else {
-      console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Skipping malformed CSV line ${i + 1}. Expected ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
+      console.warn(`API_ROUTE_LOGIC_PARSE_CSV: Skipping malformed CSV line ${i + 1}. Expected at least ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
     }
   }
   console.log(`API_ROUTE_LOGIC_PARSE_CSV: Parsed ${jsonData.length} data rows.`);
@@ -116,7 +130,7 @@ function isValidHttpUrl(string: string): boolean {
 
 function transformGoogleDriveLink(url: string): string {
   if (typeof url !== 'string') return url;
-  const driveFileRegex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view(?:\?usp=sharing)?/i;
+  const driveFileRegex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view(?:\?usp=sharing|\?usp=drive_link)?/i;
   const match = url.match(driveFileRegex);
   if (match && match[1]) {
     const fileId = match[1];
@@ -126,7 +140,6 @@ function transformGoogleDriveLink(url: string): string {
   }
   return url;
 }
-
 
 // Extracted core logic
 export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
@@ -153,10 +166,9 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
 
     const csvText = await response.text();
     console.log(`API_ROUTE_LOGIC: Successfully fetched CSV. Length: ${csvText.length}. Preview (first 500 chars): ${csvText.substring(0,500)}`);
-    if (csvText.length < 2000 && csvText.length > 0) { // Log full content only if it's reasonably short but not empty
+    if (csvText.length < 2000 && csvText.length > 0) {
       console.log(`API_ROUTE_LOGIC: Full fetched CSV content (short):\n${csvText}`);
     }
-
 
     if (!csvText.trim()) {
       console.warn(`API_ROUTE_LOGIC: Fetched CSV is empty. URL: ${fetchUrl}. Ensure sheet is published and has content.`);
@@ -173,7 +185,7 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
       if (!(visibleString.toUpperCase() === "TRUE" || visibleString === "1" || visibleString.toUpperCase() === "SÍ" || visibleString.toUpperCase() === "VERDADERO")) {
         console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE (Value: '${visibleString}'). Skipping.`);
         return null;
@@ -181,23 +193,27 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       visibleItemsCount++;
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' IS VISIBLE.`);
 
+      const nameCA = item[NOM_CA_COL];
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
+      const descCA = item[DESCRIPCIO_CA_COL];
+      const descES = item[DESCRIPCION_ES_COL];
+      const descEN = item[DESCRIPTION_EN_COL];
       const categoryEN = item[CATEGORY_EN_COL];
       let price = item[PRECIO_COL];
       let linkImagen = item[LINK_IMAGEN_COL] || "";
       const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
       const alergenosString = item[ALERGENOS_COL] || "";
 
-      if (!nameES || !nameEN || !categoryEN) {
-        console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row ${index + 2} (Visible) is MISSING ESSENTIAL DATA (Name ES/EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
+      if (!nameEN || !categoryEN) { // Still rely on English name for hint and EN category for key
+        console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row ${index + 2} (Visible) is MISSING ESSENTIAL DATA (Name EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
         return null;
       }
 
       let finalImageUrl = `https://placehold.co/400x300.png`;
       let originalLinkImagen = linkImagen;
-      if (linkImagen && linkImagen.toUpperCase() !== "FALSE") {
-        linkImagen = transformGoogleDriveLink(linkImagen); // Attempt to transform GDrive links
+      if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && linkImagen.trim() !== "") {
+        linkImagen = transformGoogleDriveLink(linkImagen);
         if (isValidHttpUrl(linkImagen)) {
           finalImageUrl = linkImagen;
           console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using valid image URL: '${finalImageUrl}' (Original from sheet: '${originalLinkImagen}')`);
@@ -210,12 +226,11 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       if (!imageHint || imageHint === "food item") {
         imageHint = (categoryEN || "food plate").toLowerCase();
       }
-      if (finalImageUrl.includes('placehold.co') && !originalLinkImagen.toUpperCase().includes('FALSE') && originalLinkImagen.trim() !== '') {
+      if (finalImageUrl.includes('placehold.co') && originalLinkImagen && !originalLinkImagen.toUpperCase().includes('FALSE') && originalLinkImagen.trim() !== '') {
         console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' fell back to placeholder. Original link was: '${originalLinkImagen}', Hint: '${imageHint}'`);
       } else if (finalImageUrl.includes('placehold.co')) {
          console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using placeholder by default. Hint: '${imageHint}'`);
       }
-
 
       let formattedPrice: string | undefined = undefined;
       if (price !== undefined && price !== null && price.trim() !== "" && price.toUpperCase() !== "FALSE" && price.toUpperCase() !== "N/A") {
@@ -236,11 +251,16 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
 
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item '${nameEN}'.`);
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`,
-        name: { en: nameEN.trim(), es: nameES.trim() },
+        id: `${categoryKey}-${index}-${Date.now()}`, // Unique ID
+        name: {
+          ca: (nameCA || nameES || nameEN || "Plat sense nom").trim(),
+          es: (nameES || nameEN || nameCA || "Plato sin nombre").trim(),
+          en: (nameEN || nameES || nameCA || "Unnamed Dish").trim(),
+        },
         description: {
-          en: (item[DESCRIPTION_EN_COL] || "No description available.").trim(),
-          es: (item[DESCRIPCION_ES_COL] || "Descripción no disponible.").trim()
+          ca: (descCA || descES || descEN || "Sense descripció.").trim(),
+          es: (descES || descEN || descCA || "Sin descripción.").trim(),
+          en: (descEN || descES || descCA || "No description available.").trim(),
         },
         price: formattedPrice,
         categoryKey: categoryKey,
@@ -264,7 +284,7 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
   } else if (allMenuItems.length === 0) {
     console.warn("API_ROUTE_LOGIC: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
   }
-  console.log(`API_ROUTE_LOGIC: Final allMenuItems before NextResponse.json:`, JSON.stringify(allMenuItems.slice(0, 2), null, 2)); // Log first 2 items
+  console.log(`API_ROUTE_LOGIC: Final allMenuItems before NextResponse.json (first 2):`, JSON.stringify(allMenuItems.slice(0, 2), null, 2));
   return allMenuItems;
 }
 
@@ -273,9 +293,8 @@ export async function GET() {
   console.log("API_ROUTE_GET_HANDLER: /api/menu GET handler INVOKED.");
   const menuItems = await fetchAndProcessMenuData();
   console.log(`API_ROUTE_GET_HANDLER: Responding with ${menuItems.length} menu items.`);
-  // Add cache control headers to prevent Vercel from caching an empty/error response for too long
   const headers = new Headers();
-  headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59'); // Cache for 1s, revalidate after 59s
+  headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
 
   return NextResponse.json(menuItems, { status: 200, headers });
 }

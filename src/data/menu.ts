@@ -1,5 +1,6 @@
 
 export interface MenuItemText {
+  ca: string; // Afegit per al català
   en: string;
   es: string;
 }
