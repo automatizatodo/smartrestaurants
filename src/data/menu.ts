@@ -27,8 +27,8 @@ export interface MenuCategory {
 // within "Segon Plat" (secondCourses) and won't appear as top-level items here.
 export const menuCategories: MenuCategory[] = [
   { key: 'starters', order: 1 },        // Entrants
-  { key: 'mainCourses', order: 2 },     // Primers Plats (Mapped from "Main Courses" in sheet)
-  { key: 'secondCourses', order: 3 },   // Segon Plat (Mapped from "Second Courses" in sheet)
+  { key: 'mainCourses', order: 2 },     // Primers Plats
+  { key: 'secondCourses', order: 3 },   // Segon Plat
   { key: 'desserts', order: 4 },       // Postres
   { key: 'breads', order: 5 },         // Pans
   { key: 'beverages', order: 6 },     // Begudes

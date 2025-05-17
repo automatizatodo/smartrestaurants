@@ -15,9 +15,9 @@ const CATEGORY_EN_COL = "Category (EN)";
 const NOM_CA_COL = "Nom (CA)";
 const NOMBRE_ES_COL = "Nombre (ES)";
 const NAME_EN_COL = "Name (EN)";
-const DESCRIPCIO_CA_COL = "Descripció CA"; // Updated
-const DESCRIPCION_ES_COL = "Descripción ES"; // Updated
-const DESCRIPTION_EN_COL = "Description EN"; // Updated
+const DESCRIPCIO_CA_COL = "Descripció CA";
+const DESCRIPCION_ES_COL = "Descripción ES";
+const DESCRIPTION_EN_COL = "Description EN";
 const PRECIO_COL = "Precio (€)";
 const LINK_IMAGEN_COL = "Link Imagen";
 const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
@@ -41,9 +41,9 @@ function mapCategoryToKey(categoryEN: string): string {
   switch (lowerCategory) {
     case 'starters':
       return 'starters';
-    case 'main courses':
+    case 'main courses': // For "Primers Plats"
       return 'mainCourses';
-    case 'second courses':
+    case 'second courses': // For "Segon Plat"
       return 'secondCourses';
     case 'grilled garnish':
       return 'grilledGarnish';
@@ -51,7 +51,7 @@ function mapCategoryToKey(categoryEN: string): string {
       return 'sauces';
     case 'desserts':
       return 'desserts';
-    case 'breads':
+    case 'breads': // Added for "Pans"
       return 'breads';
     case 'beverages':
       return 'beverages';
@@ -167,7 +167,7 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
 
     const csvText = await response.text();
     console.log(`API_ROUTE_LOGIC: Successfully fetched CSV. Length: ${csvText.length}. Preview (first 500 chars): ${csvText.substring(0,500)}`);
-    if (csvText.length < 2000 && csvText.length > 0) { // Log full content if it's short, for easier debugging of small sheets
+    if (csvText.length < 2000 && csvText.length > 0) {
       console.log(`API_ROUTE_LOGIC: Full fetched CSV content (short):\n${csvText}`);
     }
 
@@ -186,7 +186,7 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
     allMenuItems = parsedData.map((item: Record<string, string>, index: number) => {
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty for a row
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
       if (!(visibleString.toUpperCase() === "TRUE" || visibleString === "1" || visibleString.toUpperCase() === "SÍ" || visibleString.toUpperCase() === "VERDADERO")) {
         console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE (Value: '${visibleString}'). Skipping.`);
         return null;
@@ -206,16 +206,15 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
       const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
       const alergenosString = item[ALERGENOS_COL] || "";
 
-      // Essential data check (Name EN and Category EN are crucial for mapping and display logic)
       if (!nameEN || !categoryEN) {
         console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row ${index + 2} (Visible) is MISSING ESSENTIAL DATA (Name EN or Category EN). Skipping. Data: ${JSON.stringify(item)}`);
         return null;
       }
 
-      let finalImageUrl = `https://placehold.co/400x300.png`; // Default placeholder
-      let originalLinkImagen = linkImagen; // Store original for logging
+      let finalImageUrl = `https://placehold.co/400x300.png`;
+      let originalLinkImagen = linkImagen;
       if (linkImagen && linkImagen.toUpperCase() !== "FALSE" && linkImagen.trim() !== "") {
-        linkImagen = transformGoogleDriveLink(linkImagen); // Attempt to transform Google Drive links
+        linkImagen = transformGoogleDriveLink(linkImagen);
         if (isValidHttpUrl(linkImagen)) {
           finalImageUrl = linkImagen;
           console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' using valid image URL: '${finalImageUrl}' (Original from sheet: '${originalLinkImagen}')`);
@@ -224,12 +223,10 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
         }
       }
       
-      // Generate image hint for placeholders
       let imageHint = (nameEN || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
-      if (!imageHint || imageHint === "food item") { // Fallback to category if name is too generic or missing
+      if (!imageHint || imageHint === "food item") {
         imageHint = (categoryEN || "food plate").toLowerCase();
       }
-      // Log if placeholder is used for an item that had an original link
       if (finalImageUrl.includes('placehold.co') && originalLinkImagen && !originalLinkImagen.toUpperCase().includes('FALSE') && originalLinkImagen.trim() !== '') {
         console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${nameEN}' fell back to placeholder. Original link was: '${originalLinkImagen}', Hint: '${imageHint}'`);
       } else if (finalImageUrl.includes('placehold.co')) {
@@ -256,25 +253,25 @@ export async function fetchAndProcessMenuData(): Promise<MenuItemData[]> {
 
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item '${nameEN}'. Category Key: '${categoryKey}'`);
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`, // Generate a unique ID
+        id: `${categoryKey}-${index}-${Date.now()}`,
         name: {
-          ca: (nameCA || nameES || nameEN || "Plat sense nom").trim(), // Fallback logic for names
+          ca: (nameCA || nameES || nameEN || "Plat sense nom").trim(),
           es: (nameES || nameEN || nameCA || "Plato sin nombre").trim(),
           en: (nameEN || nameES || nameCA || "Unnamed Dish").trim(),
         },
         description: {
-          ca: (descCA || descES || descEN || "Sense descripció.").trim(), // Fallback logic for descriptions
+          ca: (descCA || descES || descEN || "Sense descripció.").trim(),
           es: (descES || descEN || descCA || "Sin descripción.").trim(),
           en: (descEN || descES || descCA || "No description available.").trim(),
         },
         price: formattedPrice,
         categoryKey: categoryKey,
         imageUrl: finalImageUrl,
-        imageHint: imageHint, // Added imageHint
+        imageHint: imageHint,
         allergens: allergens.length > 0 ? allergens : undefined,
         isChefSuggestion: isChefSuggestion,
       };
-    }).filter(item => item !== null) as MenuItemData[]; // Filter out nulls (skipped items)
+    }).filter(item => item !== null) as MenuItemData[];
     console.log(`API_ROUTE_LOGIC: Total items marked as visible: ${visibleItemsCount}`);
     console.log(`API_ROUTE_LOGIC: Mapped to ${allMenuItems.length} valid MenuItemData objects after filtering invisible and invalid items.`);
 
@@ -300,12 +297,7 @@ export async function GET() {
   const menuItems = await fetchAndProcessMenuData();
   console.log(`API_ROUTE_GET_HANDLER: Responding with ${menuItems.length} menu items.`);
   const headers = new Headers();
-  // Cache on CDN for 1s, stale for 59s. This helps with frequent updates if needed.
-  // For less frequent updates, you could increase s-maxage (e.g., 300 for 5 mins)
   headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59'); 
 
   return NextResponse.json(menuItems, { status: 200, headers });
 }
-
-// Legacy default export for Next.js pages router or older App Router patterns (not strictly needed for App Router route.ts handlers)
-// export default handler;
