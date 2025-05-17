@@ -82,27 +82,27 @@ const restaurantConfig: RestaurantConfig = {
   theme: {
     primary: 'hsl(51, 100%, 50%)',
   },
-  showMenuItemImages: false,
+  showMenuItemImages: true, // Changed to true to allow images from sheet link
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp',
   whatsappBookingNumber: '+34600000000',
   googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2987.891622017595!2d2.100059515416829!3d41.50661897925279!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12a4941a5d3c3c7b%3A0x6e26a1a51b08715!2sCarrer%20de%20la%20Font%20Nova%2C%2029%2C%2008202%20Sabadell%2C%20Barcelona%2C%20Spain!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus',
   googleMapsLink: 'https://maps.google.com/?q=Carrer+Font+Nova,+29,+08202+Sabadell,+Barcelona',
-  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID',
-  tripAdvisorReviewUrl: 'https://www.tripadvisor.com/UserReviewEdit-gXXXXXX-dYYYYYY-CanFanals.html',
+  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJrxjmUa-VpBIRenLu0Swg6cM',
+  tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_HERE', // Remember to update this
   openingHours: {
     tueWed: "08:00 - 17:00",
     thuSat: "08:00 - 24:00",
     sun: "08:00 - 19:00",
     mon: "landing:contactMap.hours.closed",
   },
-  menuDelDia: { // Example configuration for Menu del Dia
+  menuDelDia: {
     price: "18,50€",
-    priceDescriptionKey: "menu:menuDelDia.priceIncludes", // e.g., "IVA inclòs. Pa, beguda i postre o cafè."
-    notesKey: "menu:menuDelDia.notes", // e.g., "Disponible de dimarts a divendres al migdia, excepte festius."
+    priceDescriptionKey: "menu:menuDelDia.priceIncludes",
+    notesKey: "menu:menuDelDia.notes",
   },
   allergenConfig: {
-    showAsText: true, // Initially show allergens as text
+    showAsText: true,
   },
 };
 
