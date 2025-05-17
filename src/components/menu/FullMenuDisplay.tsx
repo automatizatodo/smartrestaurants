@@ -1,3 +1,4 @@
+
 "use client";
 
 import { menuCategories } from '@/data/menu';
@@ -54,7 +55,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
   }
 
   return (
-    <Accordion type="multiple" defaultValue={defaultOpenValue} className="w-full space-y-4">
+    <Accordion type="multiple" defaultValue={defaultOpenValue} className="w-full space-y-3 sm:space-y-4"> {/* Reduced space-y */}
       {sortedCategoryKeys.map((categoryKey) => {
         const itemsInCategory = groupedMenu[categoryKey];
         if (!itemsInCategory || itemsInCategory.length === 0) {
@@ -64,11 +65,11 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
         const categoryTitleKey = `menu:${categoryKey}`;
         return (
           <AccordionItem key={categoryKey} value={categoryKey} className="border-b-0 rounded-lg overflow-hidden shadow-md bg-card">
-            <AccordionTrigger className="px-6 py-4 text-xl font-serif text-primary hover:no-underline hover:bg-accent/50 transition-colors">
+            <AccordionTrigger className="px-4 py-3 sm:px-6 sm:py-4 text-lg sm:text-xl font-serif text-primary hover:no-underline hover:bg-accent/50 transition-colors"> {/* Reduced padding and font size */}
               {t(categoryTitleKey)}
             </AccordionTrigger>
-            <AccordionContent className="px-6 pb-6 pt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 items-start"> {/* Changed xl:grid-cols-3 to md:grid-cols-2, and gap-5 to gap-4 */}
+            <AccordionContent className="px-3 sm:px-4 pb-3 sm:pb-4 pt-0"> {/* Reduced padding */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 pt-3 sm:pt-4 items-start"> {/* Reduced gap */}
                 {itemsInCategory.map((item, index) => (
                   <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.05}s` }}>
                     <MenuItemCard item={item} />
@@ -82,5 +83,4 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
     </Accordion>
   );
 }
-
     

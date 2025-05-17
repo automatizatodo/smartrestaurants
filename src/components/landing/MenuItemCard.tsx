@@ -17,60 +17,59 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   const displayName = item.name[language] || item.name.en;
   const displayDescription = item.description[language] || item.description.en;
 
-  const hasRealImage = item.imageUrl && !item.imageUrl.includes('placehold.co');
-  const shouldShowImage = restaurantConfig.showMenuItemImages && hasRealImage;
+  const shouldShowImage = restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co');
 
   return (
     <div className={cn(
-        "transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1",
+        "transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-0.5", // Reduced translate-y
         item.isChefSuggestion && "relative" 
     )}>
       <Card className={cn(
-          "overflow-hidden flex flex-col group shadow-lg hover:shadow-xl bg-card text-card-foreground transition-all duration-300 ease-out", // Removed h-full if it was there
-          item.isChefSuggestion && "border-2 border-primary/70 pt-2" 
+          "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
+          item.isChefSuggestion && "border-2 border-primary/60 pt-1" // Reduced pt
         )}>
 
         {item.isChefSuggestion && (
           <Badge
             variant="default"
-            className="absolute top-0 right-0 -mt-3 -mr-2 z-10 bg-primary text-primary-foreground text-xs px-2 py-1 flex items-center gap-1"
+            className="absolute top-0 right-0 -mt-2 -mr-1.5 z-10 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5" // Smaller badge
           >
-             <Sparkles className="h-3 w-3" /> {t('menu:chefsSuggestion')}
+             <Sparkles className="h-2.5 w-2.5" /> {t('menu:chefsSuggestion')}
           </Badge>
         )}
         
         {shouldShowImage && (
-          <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[4/3] overflow-hidden">
+          <div className="relative w-full aspect-video sm:aspect-[16/9] md:aspect-video overflow-hidden h-28 sm:h-32 md:h-28"> {/* Reduced height significantly */}
             <Image
               src={imageUrl}
               alt={displayName} 
               data-ai-hint={item.imageHint}
               fill
               style={{ objectFit: 'cover' }}
-              className="transition-transform duration-500 ease-in-out group-hover:scale-110"
+              className="transition-transform duration-500 ease-in-out group-hover:scale-105" // Reduced group-hover:scale-110
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
         )}
         <CardHeader className={cn(
-            "pb-2", 
-            !shouldShowImage ? 'pt-6' : 'pt-4' 
+            "pb-1 pt-3 px-3 sm:px-4", // Reduced padding
+            !shouldShowImage ? 'pt-4' : 'pt-2 sm:pt-3' 
           )}>
-          <CardTitle className="text-xl lg:text-2xl font-serif group-hover:text-primary transition-colors duration-300">
+          <CardTitle className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight"> {/* Reduced font size */}
             {displayName}
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col justify-between flex-1"> {/* Added flex-1 here to ensure content area can grow if needed, but description won't over-expand */}
-          <CardDescription className="text-sm text-muted-foreground mb-3"> {/* Removed flex-grow */}
+        <CardContent className="flex flex-col justify-between flex-1 px-3 sm:px-4 pb-3 pt-0"> {/* Reduced padding */}
+          <CardDescription className="text-xs text-muted-foreground mb-2 line-clamp-3"> {/* Reduced font size, added line-clamp */}
             {displayDescription}
           </CardDescription>
           
           {item.allergens && item.allergens.length > 0 && (
-            <div className="mt-2 mb-3">
-              <p className="text-xs font-medium text-muted-foreground mb-1">{t('menu:allergensTitle')}</p>
+            <div className="mt-1.5 mb-2"> {/* Reduced margin */}
+              <p className="text-[10px] font-medium text-muted-foreground mb-0.5">{t('menu:allergensTitle')}</p> {/* Smaller font */}
               <div className="flex flex-wrap gap-1">
                 {item.allergens.map(allergen => (
-                  <Badge key={allergen} variant="outline" className="text-xs capitalize">
+                  <Badge key={allergen} variant="outline" className="text-[10px] capitalize px-1 py-0"> {/* Smaller badge font & padding */}
                     {allergen}
                   </Badge>
                 ))}
@@ -82,5 +81,4 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
     </div>
   );
 }
-
     
