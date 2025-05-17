@@ -9,7 +9,7 @@ import { es } from 'date-fns/locale'; // For Spanish day names
 
 // --- Configuration for Google Sheets ---
 // URL for the MAIN MENU sheet
-let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
+let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
 
 // !!! IMPORTANT: URL for the "preciosmenu" sheet !!!
 // You MUST get this by:
@@ -19,7 +19,7 @@ let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa
 // 4. Selecting "preciosmenu" sheet and "Comma-separated values (.csv)"
 // 5. Clicking "Publish" and copying the generated URL here.
 // It will look like: https://docs.google.com/spreadsheets/d/e/YOUR_DOC_ID/pub?gid=YOUR_PRECIOSMENU_SHEET_GID&single=true&output=csv
-let PRICES_SHEET_CSV_URL = 'YOUR_PRECIOSMENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
+let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
 
 
 // Column names from the MENU Google Sheet structure

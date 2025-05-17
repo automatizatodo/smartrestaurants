@@ -7,7 +7,7 @@ config(); // Load environment variables
 import { aiSommelier, type AISommelierInput, type AISommelierOutput } from "@/ai/flows/ai-sommelier";
 import { checkCalendarAvailability, type CheckCalendarAvailabilityInput, type CheckCalendarAvailabilityOutput } from "@/ai/flows/check-calendar-availability-flow";
 import { createCalendarEvent, type CreateCalendarEventInput, type CreateCalendarEventOutput } from "@/ai/flows/create-calendar-event-flow";
-import { fetchMenuFromGoogleSheet } from '@/services/menuService';
+import { fetchMenuDataWithPrice } from '@/services/menuService'; // Changed import
 import type { MenuItemData } from '@/data/menu';
 import { z } from "zod";
 import restaurantConfig from "@/config/restaurant.config";
@@ -34,7 +34,7 @@ const formatMenuForAI = (menuItems: MenuItemData[]): string => {
   }
   // Use English names and descriptions for the AI for consistency.
   return menuItems.map(item =>
-    `Dish: ${item.name.en}\nDescription: ${item.description.en}\nPrice: ${item.price}\nCategory: ${item.categoryKey}`
+    `Dish: ${item.name.en}\nDescription: ${item.description.en}\nPrice: ${item.price || 'N/A'}\nCategory: ${item.categoryKey}` // Handle optional price
   ).join("\n\n");
 };
 
@@ -61,8 +61,8 @@ export async function getAISommelierRecommendations(
   let menuInformationString = "Menu information is currently unavailable.";
   try {
     console.log("ACTIONS_AISOMMELIER: Fetching menu for AI Sommelier...");
-    const menuItems: MenuItemData[] = await fetchMenuFromGoogleSheet();
-    if (menuItems.length > 0) {
+    const { menuItems } = await fetchMenuDataWithPrice(); // Use new function and destructure
+    if (menuItems && menuItems.length > 0) { // Check if menuItems exists and has length
       menuInformationString = formatMenuForAI(menuItems);
       console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted.");
     } else {
@@ -185,9 +185,8 @@ export async function submitBooking(
       };
     }
 
-    const formattedDate = format(new Date(date), "PPP"); // e.g., May 15th, 2025
-    // Using restaurantDisplayName from restaurantConfig
-    const restaurantNameForMsg = restaurantConfig.restaurantDisplayName || 'el restaurante'; 
+    const formattedDate = format(new Date(date), "PPP"); 
+    const restaurantNameForMsg = restaurantConfig.restaurantDisplayName || 'el restaurante';
     const messageParts = [
       `Hola ${restaurantNameForMsg},`,
       `Quisiera solicitar una reserva:`,
@@ -211,7 +210,7 @@ export async function submitBooking(
       errors: null,
       messageParams: { name },
       bookingMethod: 'whatsapp',
-      whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''), 
+      whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''),
       whatsappMessage: whatsappMessage,
     };
 
@@ -248,6 +247,7 @@ export async function submitBooking(
       }
     } catch (error: any) {
       console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
+      console.error("SUBMIT_BOOKING_ACTION: Underlying error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       return {
         messageKey: "landing:booking.error.calendarCheckFailed",
         success: false,
@@ -317,3 +317,4 @@ export async function submitBooking(
     };
   }
 }
+
