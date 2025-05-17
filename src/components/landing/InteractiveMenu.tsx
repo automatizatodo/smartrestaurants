@@ -37,14 +37,22 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     return (
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
+          <h2 
+            className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4"
+            suppressHydrationWarning
+          >
             {t('landing:menu.sectionTitle')}
           </h2>
            {menuDelDiaPrice && (
             <div className="mb-8">
               <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
               {menuDelDiaPriceDescription && (
-                <p className="text-sm text-muted-foreground mt-1">{menuDelDiaPriceDescription}</p>
+                <p 
+                  className="text-sm text-muted-foreground mt-1"
+                  suppressHydrationWarning
+                >
+                  {menuDelDiaPriceDescription}
+                </p>
               )}
             </div>
           )}
@@ -70,14 +78,22 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
     return (
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
+          <h2 
+            className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4"
+            suppressHydrationWarning
+          >
             {t('landing:menu.sectionTitle')}
           </h2>
           {menuDelDiaPrice && (
             <div className="mb-8">
               <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
               {menuDelDiaPriceDescription && (
-                <p className="text-sm text-muted-foreground mt-1">{menuDelDiaPriceDescription}</p>
+                <p 
+                  className="text-sm text-muted-foreground mt-1"
+                  suppressHydrationWarning
+                >
+                  {menuDelDiaPriceDescription}
+                </p>
               )}
             </div>
           )}
@@ -106,7 +122,7 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
         <div className="text-center mb-8"> {/* Reduced mb from 12/16 to 8 */}
           <h2 
             className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4"
-            suppressHydrationWarning // Added to suppress specific text mismatch due to i18n
+            suppressHydrationWarning 
           >
             {t('landing:menu.sectionTitle')}
           </h2>
@@ -114,7 +130,12 @@ export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
             <div className="mb-6"> {/* Reduced mb from 8 to 6 */}
               <p className="text-3xl sm:text-4xl font-bold text-primary">{menuDelDiaPrice}</p>
                {menuDelDiaPriceDescription && (
-                <p className="text-sm text-muted-foreground mt-1">{menuDelDiaPriceDescription}</p>
+                <p 
+                  className="text-sm text-muted-foreground mt-1"
+                  suppressHydrationWarning
+                >
+                  {menuDelDiaPriceDescription}
+                </p>
               )}
             </div>
           )}
