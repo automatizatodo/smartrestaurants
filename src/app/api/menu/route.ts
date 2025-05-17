@@ -5,11 +5,11 @@ import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 import restaurantConfig from '@/config/restaurant.config'; // For fallback price
 import { format, parse as parseTime } from 'date-fns';
-import { es } from 'date-fns/locale'; // For Spanish day names
+// import { es } from 'date-fns/locale'; // For Spanish day names - Not currently used for day name matching
 
 // --- Configuration for Google Sheets ---
 // URL for the MAIN MENU sheet
-let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
+let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
 
 // !!! IMPORTANT: URL for the "preciosmenu" sheet !!!
 // You MUST get this by:
@@ -33,7 +33,7 @@ const NAME_EN_COL = "Name (EN)";
 const DESCRIPCIO_CA_COL = "Descripció CA";
 const DESCRIPCION_ES_COL = "Descripción ES";
 const DESCRIPTION_EN_COL = "Description EN";
-const PRECIO_COL = "Precio (€)"; // Price per item, might be optional now
+const PRECIO_COL = "Precio (€)"; // Price per item
 const LINK_IMAGEN_COL = "Link Imagen";
 const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
 const ALERGENOS_COL = "Alergenos";
@@ -69,8 +69,8 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses'; // For "Primers Plats"
-    case 'second courses': return 'secondCourses'; // For "Segon Plat"
+    case 'main courses': return 'mainCourses';
+    case 'second courses': return 'secondCourses';
     case 'grilled garnish': return 'grilledGarnish';
     case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
@@ -132,12 +132,10 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
   return jsonData;
 }
 
-
 function isValidHttpUrl(string: string): boolean {
   if (!string || typeof string !== 'string') return false;
   let url;
   try {
-    // Attempt to prepend https:// if it looks like a domain without a protocol
     if (!string.startsWith('http://') && !string.startsWith('https://') && string.includes('.') && !string.includes(' ')) {
       string = `https://${string}`;
       console.log(`API_ROUTE_LOGIC_IS_VALID_URL: Prepended https:// to: ${string}`);
@@ -149,7 +147,6 @@ function isValidHttpUrl(string: string): boolean {
   }
   return url.protocol === "http:" || url.protocol === "https:";
 }
-
 
 async function fetchRawCsvData(url: string, logPrefix: string): Promise<string | null> {
   if (!url || url.includes('YOUR_') || url.includes('SHEET_ID_HERE')) {
@@ -166,7 +163,11 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`${logPrefix}: Failed to fetch CSV. Status: ${response.status}. URL: ${fetchUrl}. Response: ${errorText.substring(0, 500)}...`);
+      let errorMessage = `${logPrefix}: Failed to fetch CSV. Status: ${response.status}. URL: ${fetchUrl}. Response: ${errorText.substring(0, 500)}...`;
+      if (response.status === 401 || response.status === 403) {
+        errorMessage += ` This often means the Google Sheet is not published correctly or access is restricted. Please check "File > Share > Publish to web" settings for the sheet and ensure it's public.`;
+      }
+      console.error(errorMessage);
       return null;
     }
 
@@ -212,16 +213,11 @@ async function getCurrentMenuPrice(): Promise<string | null> {
   }).filter(entry => entry.dia && entry.precio);
 
   const now = new Date();
-  // Adjust to Spain's timezone (assuming restaurantConfig.timeZone is 'Europe/Madrid')
-  // For server-side, direct Date operations use system time. If server is not in Spain, this needs more robust timezone handling.
-  // For simplicity here, we'll assume server or local dev matches desired timezone for day/time comparison.
-  // A library like date-fns-tz would be better for production if server timezone is uncertain.
-  
   const currentDayIndex = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
   const dayMapping: { [key: number]: string } = { 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 0: "Domingo" };
   const currentDayName = dayMapping[currentDayIndex];
   
-  const currentTimeFormatted = format(now, 'HH:mm'); // e.g., "14:30"
+  const currentTimeFormatted = format(now, 'HH:mm'); 
 
   console.log(`API_ROUTE_GET_PRICE: Current day: ${currentDayName}, Current time: ${currentTimeFormatted}`);
 
@@ -231,9 +227,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
         const entryStartTime = parseTime(entry.franjaStart, 'HH:mm', new Date());
         const entryEndTime = parseTime(entry.franjaEnd, 'HH:mm', new Date());
         const currentTime = parseTime(currentTimeFormatted, 'HH:mm', new Date());
-
-        // Handle overnight ranges if end time is before start time (e.g. 22:00 - 02:00)
-        // For this specific sheet structure, it seems time slots are within the same day.
+        
         if (currentTime >= entryStartTime && currentTime <= entryEndTime) {
           console.log(`API_ROUTE_GET_PRICE: Matched price slot: Day=${entry.dia}, Range=${entry.franjaStart}-${entry.franjaEnd}. Price: ${entry.precio}`);
           return entry.precio;
@@ -249,7 +243,6 @@ async function getCurrentMenuPrice(): Promise<string | null> {
 }
 
 
-// This function is intended to be called from Server Components or other server-side logic.
 export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemData[], currentMenuPrice: string | null }> {
   console.log(`API_ROUTE_LOGIC_MENU: fetchAndProcessMenuData called.`);
   
@@ -278,13 +271,13 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       const nameCA = item[NOM_CA_COL];
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
-      const descCA = item[DESCRIPCIO_CA_COL] || ""; // Fallback to empty string
-      const descES = item[DESCRIPCION_ES_COL] || ""; // Fallback to empty string
-      const descEN = item[DESCRIPTION_EN_COL] || ""; // Fallback to empty string
+      const descCA = item[DESCRIPCIO_CA_COL] || ""; 
+      const descES = item[DESCRIPCION_ES_COL] || ""; 
+      const descEN = item[DESCRIPTION_EN_COL] || "";
       const categoryCA = item[CATEGORIA_CA_COL];
       const categoryES = item[CATEGORIA_ES_COL];
       const categoryEN = item[CATEGORY_EN_COL];
-      let price = item[PRECIO_COL]; // Price per item, might be optional
+      let price = item[PRECIO_COL]; 
       let linkImagenFromSheet = item[LINK_IMAGEN_COL] || "";
       const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
       const alergenosString = item[ALERGENOS_COL] || "";
@@ -299,7 +292,6 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         return null;
       }
       
-      // Use English category as the key, fallback if not present
       const primaryCategoryEN = categoryEN || categoryES || categoryCA;
       if (!primaryCategoryEN) {
          console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row ${index + 2} (Visible) has NO CATEGORY AT ALL. Skipping. Data: ${JSON.stringify(item)}`);
@@ -307,9 +299,9 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       }
       const categoryKey = mapCategoryToKey(primaryCategoryEN);
       
-      const primaryNameEN = nameEN || nameES || nameCA; // Fallback for image hint if EN name is missing
+      const primaryNameEN = nameEN || nameES || nameCA; 
 
-      let finalImageUrl = `https://placehold.co/400x300.png`; // Default placeholder
+      let finalImageUrl = `https://placehold.co/400x300.png`; 
       if (linkImagenFromSheet && linkImagenFromSheet.toUpperCase() !== "FALSE" && linkImagenFromSheet.trim() !== "") {
         if (isValidHttpUrl(linkImagenFromSheet)) {
           finalImageUrl = linkImagenFromSheet;
@@ -347,18 +339,18 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
 
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item '${primaryNameEN}'. Category Key: '${categoryKey}'`);
       return {
-        id: `${categoryKey}-${index}-${Date.now()}`, // Ensure unique ID
+        id: `${categoryKey}-${index}-${Date.now()}`,
         name: {
           ca: (nameCA || nameES || nameEN || "Plat sense nom").trim(),
           es: (nameES || nameEN || nameCA || "Plato sin nombre").trim(),
           en: (nameEN || nameES || nameCA || "Unnamed Dish").trim(),
         },
         description: {
-          ca: descCA.trim(),
-          es: descES.trim(),
-          en: descEN.trim(),
+          ca: (descCA || descES || descEN || "").trim(),
+          es: (descES || descEN || descCA || "").trim(),
+          en: (descEN || descES || descCA || "").trim(),
         },
-        price: formattedPrice, // Individual item price, might be undefined
+        price: formattedPrice, 
         categoryKey: categoryKey,
         imageUrl: finalImageUrl,
         imageHint: imageHint,
@@ -391,7 +383,6 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
 }
 
 
-// This is the Next.js API route handler
 export async function GET() {
   console.log("API_ROUTE_GET_MENU: /api/menu GET handler INVOKED.");
   const { menuItems, currentMenuPrice } = await fetchAndProcessMenuData();
@@ -402,3 +393,4 @@ export async function GET() {
 
   return NextResponse.json({ menuItems, currentMenuPrice }, { status: 200, headers });
 }
+
