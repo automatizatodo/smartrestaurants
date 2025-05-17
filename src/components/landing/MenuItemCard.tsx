@@ -12,19 +12,20 @@ import { Sparkles } from 'lucide-react';
 export default function MenuItemCard({ item }: { item: MenuItemData }) {
   const { language, t } = useLanguage(); 
   
-  // Ensure imageUrl is a full URL if it's not already
   const imageUrl = item.imageUrl.startsWith('http') ? item.imageUrl : `https://${item.imageUrl}`;
 
   const displayName = item.name[language] || item.name.en;
   const displayDescription = item.description[language] || item.description.en;
 
+  const hasImage = restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co');
+
   return (
     <div className={cn(
-        "h-full transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1",
+        "transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1", // Removed h-full
         item.isChefSuggestion && "relative" 
     )}>
       <Card className={cn(
-          "overflow-hidden h-full flex flex-col group shadow-lg hover:shadow-xl bg-card text-card-foreground transition-all duration-300 ease-out",
+          "overflow-hidden flex flex-col group shadow-lg hover:shadow-xl bg-card text-card-foreground transition-all duration-300 ease-out", // Removed h-full
           item.isChefSuggestion && "border-2 border-primary/70 pt-2" 
         )}>
 
@@ -37,8 +38,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
           </Badge>
         )}
         
-        {/* Updated condition: Show image only if showMenuItemImages is true AND the URL is not a placeholder */}
-        {restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co') && (
+        {hasImage && (
           <div className="relative w-full h-56 sm:h-64 overflow-hidden">
             <Image
               src={imageUrl}
@@ -52,8 +52,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
         )}
         <CardHeader className={cn(
             "pb-2", 
-            // Adjust top padding if no image is shown
-            !(restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co')) ? 'pt-6' : 'pt-4' 
+            !hasImage ? 'pt-6' : 'pt-4' 
           )}>
           <CardTitle className="text-xl lg:text-2xl font-serif group-hover:text-primary transition-colors duration-300">
             {displayName}
@@ -85,3 +84,4 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
     </div>
   );
 }
+
