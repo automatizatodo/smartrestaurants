@@ -22,21 +22,22 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   return (
     <div className={cn(
         "transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-0.5", 
-        item.isChefSuggestion && "relative" 
+        item.isChefSuggestion && "relative" // This parent div is relative
     )}>
+      {item.isChefSuggestion && (
+        <Badge
+          variant="default"
+          // Positioned relative to the outer div, to overlap the Card
+          className="absolute top-0 right-0 -mt-2 -mr-1.5 z-20 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5" 
+        >
+           <Sparkles className="h-2.5 w-2.5" /> {t('menu:chefsSuggestion')}
+        </Badge>
+      )}
       <Card className={cn(
-          "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
-          item.isChefSuggestion && "border-2 border-primary/60 pt-1" 
+          "overflow-hidden flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out h-full",
+          // Increased padding top on the card to make space for the overlapping badge content-wise
+          item.isChefSuggestion && "border-2 border-primary/60 pt-2" 
         )}>
-
-        {item.isChefSuggestion && (
-          <Badge
-            variant="default"
-            className="absolute top-1 right-1 z-10 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5" 
-          >
-             <Sparkles className="h-2.5 w-2.5" /> {t('menu:chefsSuggestion')}
-          </Badge>
-        )}
         
         {shouldShowImage && (
           <div className="relative w-full aspect-video sm:aspect-[16/9] md:aspect-video overflow-hidden h-28 sm:h-32 md:h-28"> 
@@ -53,7 +54,9 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
         )}
         <CardHeader className={cn(
             "pb-1 pt-3 px-3 sm:px-4", 
-            !shouldShowImage ? 'pt-4' : 'pt-2 sm:pt-3' 
+            !shouldShowImage && !item.isChefSuggestion ? 'pt-4' : '', // Standard padding if no image and no badge
+            !shouldShowImage && item.isChefSuggestion ? 'pt-2' : '', // if no image but is suggestion, use the card's pt-2
+            shouldShowImage && item.isChefSuggestion ? 'pt-2 sm:pt-3' : 'pt-2 sm:pt-3' // if image and suggestion
           )}>
           <CardTitle className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight"> 
             {displayName}
