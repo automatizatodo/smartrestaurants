@@ -23,17 +23,18 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   const displayName = item.name[language] || item.name.en;
   const displayDescription = item.description[language] || item.description.en;
 
+  // Condition to show image: global config must be true AND imageUrl must exist AND imageUrl must NOT be a placeholder
   const shouldShowImage = restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co');
 
   return (
     <div className={cn(
         "transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-0.5", 
-        item.isChefSuggestion && "relative" 
+        item.isChefSuggestion && "relative"
     )}>
       {item.isChefSuggestion && (
         <Badge
           variant="default"
-          className="absolute top-0 right-0 -mt-2 -mr-1.5 z-20 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5"
+          className="absolute top-0 right-1 -mt-2 z-20 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5"
           suppressHydrationWarning
         >
            <Sparkles className="h-2.5 w-2.5" /> {t('menu:chefsSuggestion')}
@@ -41,12 +42,12 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
       )}
       <Card className={cn(
           "flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
-          item.isChefSuggestion && "border-2 border-primary"
+          item.isChefSuggestion && "border-2 border-primary" // This adds the yellow border
         )}>
         
         {shouldShowImage && (
           <div 
-            className="relative w-full aspect-video overflow-hidden h-28 sm:h-32"
+            className="relative w-full aspect-video overflow-hidden h-28 sm:h-32" // Reduced height
             suppressHydrationWarning 
           > 
             <Image
@@ -62,14 +63,14 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
           </div>
         )}
         <CardHeader className={cn(
-            "pb-1 pt-3 px-3 sm:px-4", 
+            "pb-1 pt-3 px-3 sm:px-4", // Reduced padding
             !shouldShowImage && item.isChefSuggestion ? 'pt-2 sm:pt-3' : '', 
             !shouldShowImage && !item.isChefSuggestion ? 'pt-4' : '',
             shouldShowImage && !item.isChefSuggestion ? 'pt-2 sm:pt-3' : ''
           )}>
           <CardTitle 
             suppressHydrationWarning
-            className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight"
+            className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight" // Reduced font size
           > 
             {displayName}
           </CardTitle>
@@ -94,12 +95,13 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
                   return (
                     <Tooltip key={allergen}>
                       <TooltipTrigger asChild>
-                        <div className="relative h-6 w-6 cursor-pointer">
+                        <div className="relative h-6 w-6 cursor-pointer"> {/* Icon size h-6 w-6 */}
                           <Image
                             src={`/alergenos/${iconName}.svg`}
                             alt={capitalizedAllergen}
                             fill
                             style={{ objectFit: 'contain' }}
+                            suppressHydrationWarning
                           />
                         </div>
                       </TooltipTrigger>
