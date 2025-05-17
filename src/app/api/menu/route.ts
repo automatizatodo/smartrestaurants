@@ -2,14 +2,20 @@
 'use server';
 
 import { NextResponse } from 'next/server';
-import type { MenuItemData } from '@/data/menu';
+import type { MenuItemData, MenuItemText } from '@/data/menu';
 import restaurantConfig from '@/config/restaurant.config'; // For fallback price
 import { format, parse as parseTime } from 'date-fns';
-// import { es } from 'date-fns/locale'; // For Spanish day names - Not currently used for day name matching
 
 // --- Configuration for Google Sheets ---
-// URL for the MAIN MENU sheet
-let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
+// !!! IMPORTANT: URL for the MAIN MENU sheet !!!
+// You MUST get this by:
+// 1. Opening your Google Sheet
+// 2. Selecting the sheet TAB that contains your MENU ITEMS
+// 3. Going to File > Share > Publish to web
+// 4. Selecting that specific menu sheet and "Comma-separated values (.csv)"
+// 5. Clicking "Publish" and copying the generated URL here.
+// It will likely include a "gid=YOUR_SHEET_GID" parameter.
+let GOOGLE_SHEET_CSV_URL = 'REPLACE_WITH_YOUR_MAIN_MENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
 
 // !!! IMPORTANT: URL for the "preciosmenu" sheet !!!
 // You MUST get this by:
@@ -18,11 +24,10 @@ let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa
 // 3. Going to File > Share > Publish to web
 // 4. Selecting "preciosmenu" sheet and "Comma-separated values (.csv)"
 // 5. Clicking "Publish" and copying the generated URL here.
-// It will look like: https://docs.google.com/spreadsheets/d/e/YOUR_DOC_ID/pub?gid=YOUR_PRECIOSMENU_SHEET_GID&single=true&output=csv
 let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
 
 
-// Column names from the MENU Google Sheet structure
+// --- Column Names for MENU Sheet ---
 const VISIBLE_COL = "Visible";
 const CATEGORIA_CA_COL = "Categoría (CA)";
 const CATEGORIA_ES_COL = "Categoría (ES)";
@@ -33,11 +38,12 @@ const NAME_EN_COL = "Name (EN)";
 const DESCRIPCIO_CA_COL = "Descripció CA";
 const DESCRIPCION_ES_COL = "Descripción ES";
 const DESCRIPTION_EN_COL = "Description EN";
-const PRECIO_COL = "Precio (€)"; // Price per item
+const PRECIO_COL = "Precio (€)";
 const LINK_IMAGEN_COL = "Link Imagen";
 const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
 const ALERGENOS_COL = "Alergenos";
 
+// Expected headers for MENU sheet validation
 const EXPECTED_MENU_HEADERS = [
   VISIBLE_COL,
   CATEGORIA_CA_COL, CATEGORIA_ES_COL, CATEGORY_EN_COL,
@@ -47,7 +53,7 @@ const EXPECTED_MENU_HEADERS = [
   LINK_IMAGEN_COL, SUGERENCIA_CHEF_COL, ALERGENOS_COL
 ];
 
-// Column names for the PRICES sheet
+// --- Column Names for PRICES Sheet ---
 const DIA_COL_PRICE = "Día";
 const FRANJA_HORARIA_COL_PRICE = "Franja horaria";
 const PRECIO_MENU_COL_PRICE = "Precio (€)";
@@ -69,8 +75,8 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses';
-    case 'second courses': return 'secondCourses';
+    case 'main courses': return 'mainCourses'; // For "Primers Plats"
+    case 'second courses': return 'secondCourses'; // For "Segon Plat"
     case 'grilled garnish': return 'grilledGarnish';
     case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
@@ -132,24 +138,26 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
   return jsonData;
 }
 
-function isValidHttpUrl(string: string): boolean {
-  if (!string || typeof string !== 'string') return false;
+
+function isValidHttpUrl(urlStr: string): boolean {
+  if (!urlStr || typeof urlStr !== 'string') return false;
   let url;
   try {
-    if (!string.startsWith('http://') && !string.startsWith('https://') && string.includes('.') && !string.includes(' ')) {
-      string = `https://${string}`;
-      console.log(`API_ROUTE_LOGIC_IS_VALID_URL: Prepended https:// to: ${string}`);
+    // Attempt to prepend https if protocol is missing and it looks like a domain
+    if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://') && urlStr.includes('.') && !urlStr.includes(' ')) {
+      urlStr = `https://${urlStr}`;
+      console.log(`API_ROUTE_LOGIC_IS_VALID_URL: Prepended https:// to: ${urlStr}`);
     }
-    url = new URL(string);
+    url = new URL(urlStr);
   } catch (e: any) {
-    console.warn(`API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '${string}'. Error: ${e.message}`);
+    console.warn(`API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '${urlStr}'. Error: ${e.message}`);
     return false;
   }
-  return url.protocol === "http:" || url.protocol === "https:";
+  return url.protocol === "http:" || url.protocol === "https://";
 }
 
 async function fetchRawCsvData(url: string, logPrefix: string): Promise<string | null> {
-  if (!url || url.includes('YOUR_') || url.includes('SHEET_ID_HERE')) {
+  if (!url || url.includes('YOUR_') || url.includes('REPLACE_WITH_')) {
     console.error(`${logPrefix}: CRITICAL - URL is not configured correctly: ${url}. Please update it in src/app/api/menu/route.ts`);
     return null;
   }
@@ -166,6 +174,8 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
       let errorMessage = `${logPrefix}: Failed to fetch CSV. Status: ${response.status}. URL: ${fetchUrl}. Response: ${errorText.substring(0, 500)}...`;
       if (response.status === 401 || response.status === 403) {
         errorMessage += ` This often means the Google Sheet is not published correctly or access is restricted. Please check "File > Share > Publish to web" settings for the sheet and ensure it's public.`;
+      } else if (response.status === 400 && errorText.toLowerCase().includes('page not found')) {
+        errorMessage += ` This "Page Not Found" error from Google Sheets usually means the specific published CSV link is incorrect, has changed, or the sheet/document is no longer published as expected. Verify the "Publish to web" CSV link for the specific sheet.`;
       }
       console.error(errorMessage);
       return null;
@@ -243,6 +253,8 @@ async function getCurrentMenuPrice(): Promise<string | null> {
 }
 
 
+// This function is the core logic for fetching and processing menu data.
+// It can be called by the GET handler or directly by server-side components via menuService.
 export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemData[], currentMenuPrice: string | null }> {
   console.log(`API_ROUTE_LOGIC_MENU: fetchAndProcessMenuData called.`);
   
@@ -260,7 +272,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
     allMenuItems = parsedMenuData.map((item: Record<string, string>, index: number) => {
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing/empty for some reason
       if (!(visibleString.toUpperCase() === "TRUE" || visibleString === "1" || visibleString.toUpperCase() === "SÍ" || visibleString.toUpperCase() === "VERDADERO")) {
         console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE (Value: '${visibleString}'). Skipping.`);
         return null;
@@ -337,9 +349,8 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
 
       const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE'].includes(sugerenciaChefString.toLowerCase());
 
-      console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item '${primaryNameEN}'. Category Key: '${categoryKey}'`);
-      return {
-        id: `${categoryKey}-${index}-${Date.now()}`,
+      const menuItem: MenuItemData = {
+        id: `${categoryKey}-${index}-${Date.now()}`, // Unique ID
         name: {
           ca: (nameCA || nameES || nameEN || "Plat sense nom").trim(),
           es: (nameES || nameEN || nameCA || "Plato sin nombre").trim(),
@@ -350,13 +361,15 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
           es: (descES || descEN || descCA || "").trim(),
           en: (descEN || descES || descCA || "").trim(),
         },
-        price: formattedPrice, 
+        price: formattedPrice,
         categoryKey: categoryKey,
         imageUrl: finalImageUrl,
         imageHint: imageHint,
         allergens: allergens.length > 0 ? allergens : undefined,
         isChefSuggestion: isChefSuggestion,
       };
+      console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item '${menuItem.name.en}'. Category Key: '${menuItem.categoryKey}'`);
+      return menuItem;
     }).filter(item => item !== null) as MenuItemData[];
 
     console.log(`API_ROUTE_LOGIC_MENU: Total items marked as visible: ${visibleItemsCount}`);
@@ -382,15 +395,17 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
   return result;
 }
 
-
+// GET handler for the /api/menu route
 export async function GET() {
   console.log("API_ROUTE_GET_MENU: /api/menu GET handler INVOKED.");
   const { menuItems, currentMenuPrice } = await fetchAndProcessMenuData();
   
   console.log(`API_ROUTE_GET_MENU: Responding with ${menuItems.length} menu items and price ${currentMenuPrice}.`);
   const headers = new Headers();
+  // Cache for 1 second on CDN, allow stale-while-revalidate for 59 seconds
+  // This means users get a fast response, potentially slightly stale, while Vercel revalidates in the background.
+  // Adjust s-maxage and stale-while-revalidate as needed.
   headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59'); 
 
   return NextResponse.json({ menuItems, currentMenuPrice }, { status: 200, headers });
 }
-
