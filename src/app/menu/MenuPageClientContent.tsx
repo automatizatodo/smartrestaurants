@@ -10,7 +10,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import type { MenuItemData } from '@/data/menu';
 import { Button } from '@/components/ui/button';
 import restaurantConfig from '@/config/restaurant.config';
-import { StarIcon as GoogleIcon } from 'lucide-react'; // Assuming StarIcon is appropriate for Google.
+import { StarIcon as GoogleIcon } from 'lucide-react'; 
 import { cn } from '@/lib/utils';
 
 const TripAdvisorIcon = () => (
@@ -40,7 +40,7 @@ export default function MenuPageClientContent({
 
   useEffect(() => {
     document.title = `${t('common:page.menu.title')} | ${restaurantName}`;
-  }, [t, restaurantName]);
+  }, [t, restaurantName, language]);
 
   const menuDelDiaPriceDescription = menuDelDiaPriceDescriptionKey
     ? t(menuDelDiaPriceDescriptionKey)
@@ -55,10 +55,10 @@ export default function MenuPageClientContent({
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow pt-24 sm:pt-32 pb-16 sm:pb-24"> {/* Reduced mobile pt from 32 to 24 */}
+      <main className="flex-grow pt-24 sm:pt-32 pb-16 sm:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-10 pt-0 lg:pt-12">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4" suppressHydrationWarning>
                {t('common:page.menu.title')}
             </h1>
             {currentMenuPrice && (
@@ -71,7 +71,7 @@ export default function MenuPageClientContent({
                 )}
               </div>
             )}
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto" suppressHydrationWarning>
                {t('common:page.menu.description', { restaurantName })}
             </p>
           </div>
@@ -87,6 +87,7 @@ export default function MenuPageClientContent({
                 className={cn(
                   language === langButton.code ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10'
                 )}
+                suppressHydrationWarning
               >
                 {langButton.name}
               </Button>
@@ -99,7 +100,7 @@ export default function MenuPageClientContent({
             <div className="mt-12 sm:mt-16 text-center flex flex-col items-center space-y-3 sm:flex-row sm:space-y-0 sm:justify-center sm:space-x-6">
               {restaurantConfig.googleReviewUrl && (
                 <Link href={restaurantConfig.googleReviewUrl} target="_blank" rel="noopener noreferrer" passHref className="w-full sm:w-auto">
-                  <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto">
+                  <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto" suppressHydrationWarning>
                     <GoogleIcon className="mr-2 h-5 w-5" />
                     {t('landing:testimonials.leaveGoogleReview')}
                   </Button>
@@ -107,7 +108,7 @@ export default function MenuPageClientContent({
               )}
               {restaurantConfig.tripAdvisorReviewUrl && (
                 <Link href={restaurantConfig.tripAdvisorReviewUrl} target="_blank" rel="noopener noreferrer" passHref className="w-full sm:w-auto">
-                  <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto">
+                  <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto" suppressHydrationWarning>
                     <TripAdvisorIcon />
                     {t('landing:testimonials.leaveTripAdvisorReview')}
                   </Button>
