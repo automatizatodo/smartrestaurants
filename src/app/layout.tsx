@@ -1,25 +1,25 @@
 
 import type { Metadata, Viewport } from 'next';
-import { Geist, Cinzel } from 'next/font/google'; // Changed from Geist_Sans
+import { Geist, Cinzel } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
 import AppInitializer from '@/components/AppInitializer';
-import caCommon from '@/locales/ca/common.json'; // For default metadata
+import caCommon from '@/locales/ca/common.json'; 
 import CookieConsentBanner from '@/components/common/CookieConsentBanner';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics'; // Import GA component
 
-const geist = Geist({ // Changed from geistSans and GeistSansFont
-  variable: '--font-geist-sans', // CSS variable name can remain
+const geist = Geist({ 
+  variable: '--font-geist-sans',
   subsets: ['latin'],
 });
 
-const cinzel = Cinzel({ // Changed from cinzelFont
+const cinzel = Cinzel({ 
   variable: '--font-cinzel',
   subsets: ['latin'],
   weight: ['400', '700'],
 });
 
-// Default metadata, primarily in Catalan as it's the default language
 export const metadata: Metadata = {
   title: {
     default: `${caCommon.restaurantName} | ${caCommon.seo.defaultTitleSuffix}`,
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     siteName: caCommon.restaurantName,
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/og-image.png`, // Default OG image
+        url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/og-image.png`, 
         width: 1200,
         height: 630,
         alt: `Logo de ${caCommon.restaurantName}`,
@@ -48,8 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${caCommon.restaurantName} | ${caCommon.seo.defaultTitleSuffix}`,
     description: caCommon.seo.defaultDescription,
-    images: [`${process.env.NEXT_PUBLIC_APP_URL || ''}/twitter-image.png`], // Default Twitter image
-    // site: '@yourTwitterHandle', // Uncomment and replace if you have a Twitter handle
+    images: [`${process.env.NEXT_PUBLIC_APP_URL || ''}/twitter-image.png`], 
   },
   robots: {
     index: true,
@@ -64,7 +63,6 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
-    // apple: '/apple-touch-icon.png', // Add if you have an apple touch icon
   },
 };
 
@@ -84,7 +82,7 @@ export default function RootLayout({
   return (
     <html lang="ca" className="dark">
       <body
-        className={`${geist.variable} ${cinzel.variable} antialiased`} // Updated to use geist.variable
+        className={`${geist.variable} ${cinzel.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <LanguageProvider>
@@ -92,6 +90,10 @@ export default function RootLayout({
           {children}
           <Toaster />
           <CookieConsentBanner />
+          {/* Add Google Analytics component here */}
+          {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID !== "YOUR_GA_MEASUREMENT_ID_HERE" && (
+            <GoogleAnalytics />
+          )}
         </LanguageProvider>
       </body>
     </html>
