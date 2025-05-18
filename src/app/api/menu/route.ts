@@ -7,7 +7,7 @@ import restaurantConfig from '@/config/restaurant.config';
 import { parse as parseTime, isValid as isValidDate, format as formatDate } from 'date-fns';
 
 // URL for the MAIN MENU sheet
-let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
+let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
 
 // URL for the "preciosmenu" sheet
 let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
@@ -61,8 +61,8 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses'; // For "Primers Plats"
-    case 'second courses': return 'secondCourses'; // For "Segon Plat"
+    case 'main courses': return 'mainCourses';
+    case 'second courses': return 'secondCourses';
     case 'grilled garnish': return 'grilledGarnish';
     case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
@@ -70,7 +70,7 @@ function mapCategoryToKey(categoryEN: string): string {
     case 'beverages': return 'beverages';
     case 'wines': return 'wines';
     default:
-      // console.warn("API_ROUTE_MAP_CATEGORY: Unmapped category EN: " + categoryEN + " - using direct key: " + lowerCategory.replace(/\s+/g, ''));
+      console.warn("API_ROUTE_MAP_CATEGORY: Unmapped category EN: " + categoryEN + " - using direct key: " + lowerCategory.replace(/\s+/g, ''));
       return lowerCategory.replace(/\s+/g, '') || 'other';
   }
 }
@@ -86,8 +86,8 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
   }
 
   const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''));
-  // console.log(logPrefix + ": Headers found in sheet: [" + headersFromSheet.join(", ") + "]");
-  // console.log(logPrefix + ": Expected headers: [" + expectedHeaders.join(", ") + "]");
+  console.log(logPrefix + ": Headers found in sheet: [" + headersFromSheet.join(", ") + "]");
+  console.log(logPrefix + ": Expected headers: [" + expectedHeaders.join(", ") + "]");
 
 
   const missingHeaders = expectedHeaders.filter(eh => !headersFromSheet.includes(eh));
@@ -131,17 +131,17 @@ function isValidHttpUrl(urlStr: string): boolean {
   try {
     // Attempt to prepend https if protocol is missing and it looks like a domain
     if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://') && urlStr.includes('.') && !urlStr.includes(' ')) {
-      // console.log(API_ROUTE_LOGIC_IS_VALID_URL: Prepending https:// to '${urlStr}');
+      console.log("API_ROUTE_LOGIC_IS_VALID_URL: Prepending https:// to '" + urlStr + "'");
       urlStr = 'https://' + urlStr;
     }
     url = new URL(urlStr);
   } catch (e: any) {
-    // console.warn("API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '" + urlStr + "'. Error: " + e.message);
+    console.warn("API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '" + urlStr + "'. Error: " + e.message);
     return false;
   }
   const isValid = url.protocol === "http:" || url.protocol === "https://";
-  // if (isValid) console.log(API_ROUTE_LOGIC_IS_VALID_URL: URL '${urlStr}' is valid.);
-  // else console.warn(API_ROUTE_LOGIC_IS_VALID_URL: URL '${urlStr}' is NOT valid (protocol: ${url.protocol}).);
+  if (isValid) console.log("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' is valid.");
+  else console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' is NOT valid (protocol: " + url.protocol + ").");
   return isValid;
 }
 
@@ -151,7 +151,7 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
     return null;
   }
 
-  const fetchUrl = url + '&timestamp=' + new Date().getTime(); // Cache busting
+  const fetchUrl = url.includes('?') ? url + '&timestamp=' + new Date().getTime() : url + '?timestamp=' + new Date().getTime(); // Cache busting
 
   try {
     const response = await fetch(fetchUrl, { cache: 'no-store' }); 
@@ -233,7 +233,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
   for (const entry of priceEntries) {
     if (entry.dia.toLowerCase() === currentDayNameInSpain.toLowerCase()) {
       try {
-        const baseDateStr = formatDate(nowUtc, 'yyyy-MM-dd'); // Use a consistent base date for parsing times
+        const baseDateStr = formatDate(nowUtc, 'yyyy-MM-dd'); 
         const entryStartTime = parseTime(baseDateStr + " " + entry.franjaStart, 'yyyy-MM-dd HH:mm', new Date());
         const entryEndTime = parseTime(baseDateStr + " " + entry.franjaEnd, 'yyyy-MM-dd HH:mm', new Date());
         const currentTime = parseTime(baseDateStr + " " + currentTimeFormattedInSpain, 'yyyy-MM-dd HH:mm', new Date());
@@ -257,7 +257,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
 
 
 export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemData[], currentMenuPrice: string | null }> {
-  // console.log("API_ROUTE_LOGIC_MENU: fetchAndProcessMenuData called.");
+  console.log("API_ROUTE_LOGIC_MENU: fetchAndProcessMenuData called.");
   
   const menuCsvText = await fetchRawCsvData(GOOGLE_SHEET_CSV_URL, "MENU_SHEET_FETCH");
   let allMenuItems: MenuItemData[] = [];
@@ -265,7 +265,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
   if (menuCsvText) {
     const parsedMenuData = parseCSV(menuCsvText, EXPECTED_HEADERS, "MENU_SHEET_PARSE");
     if (parsedMenuData.length === 0 && menuCsvText.trim().length > 0 && !menuCsvText.trim().startsWith(EXPECTED_HEADERS[0])) {
-        // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV parsing resulted in 0 items, but CSV text was not empty. This strongly suggests a header mismatch or structural issue with the CSV that parseCSV couldn't handle based on EXPECTED_HEADERS.");
+        console.warn("API_ROUTE_LOGIC_MENU: Menu CSV parsing resulted in 0 items, but CSV text was not empty. This strongly suggests a header mismatch or structural issue with the CSV that parseCSV couldn't handle based on EXPECTED_HEADERS.");
     }
 
     let visibleItemsCount = 0;
@@ -309,8 +309,9 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       
       const primaryNameEN = nameEN || nameES || nameCA || "Unnamed Dish"; 
       
-      let finalImageUrl = 'https://placehold.co/400x300.png'; // Default placeholder
+      let finalImageUrl = 'https://placehold.co/400x300.png'; 
       console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has image link from sheet: '" + linkImagenFromSheet + "'");
+      
       if (linkImagenFromSheet && linkImagenFromSheet.toUpperCase() !== "FALSE" && linkImagenFromSheet.trim() !== "") {
         if (isValidHttpUrl(linkImagenFromSheet)) {
           finalImageUrl = linkImagenFromSheet;
@@ -371,34 +372,33 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
     // console.log("API_ROUTE_LOGIC_MENU: Mapped to " + allMenuItems.length + " valid MenuItemData objects after filtering invisible and invalid items.");
   
   } else {
-     // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV text was null. No menu items processed.");
+     console.warn("API_ROUTE_LOGIC_MENU: Menu CSV text was null. No menu items processed.");
   }
 
   if (allMenuItems.length === 0 && menuCsvText) {
     // console.warn("API_ROUTE_LOGIC_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency, especially the 'Visible' column and essential fields like names/categories.");
   } else if (allMenuItems.length === 0) {
-    // console.warn("API_ROUTE_LOGIC_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
+    console.warn("API_ROUTE_LOGIC_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
   }
   
   const currentMenuPrice = await getCurrentMenuPrice();
   // console.log("API_ROUTE_LOGIC_MENU: Current menu price determined: " + currentMenuPrice);
 
   const result = { menuItems: allMenuItems, currentMenuPrice };
-  // console.log("API_ROUTE_LOGIC_MENU: Final result before NextResponse.json: " + JSON.stringify(result).substring(0, 300) + "...");
+  console.log("API_ROUTE_LOGIC_MENU: Final result before NextResponse.json. Items count: " + (result.menuItems ? result.menuItems.length : 0) + ". Price: " + result.currentMenuPrice);
   return result;
 }
 
 // GET handler for the /api/menu route
 export async function GET() {
-  // console.log("API_ROUTE_GET_MENU: /api/menu GET handler INVOKED.");
+  console.log("API_ROUTE_GET_MENU: /api/menu GET handler INVOKED.");
   const { menuItems, currentMenuPrice } = await fetchAndProcessMenuData();
   
   const headers = new Headers();
-  // Cache for 1 second on CDN, allow stale-while-revalidate for 59 seconds
-  // This means CDN will serve stale content for up to a minute while revalidating in the background
-  // Good for dynamic content that doesn't need to be real-time to the millisecond
   headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59'); 
 
-  // console.log("API_ROUTE_GET_MENU: Total menu items processed: " + menuItems.length + ". Sending response.");
+  console.log("API_ROUTE_GET_MENU: Total menu items processed: " + (menuItems ? menuItems.length : 0) + ". Sending response.");
   return NextResponse.json({ menuItems, currentMenuPrice }, { status: 200, headers });
 }
+
+    
