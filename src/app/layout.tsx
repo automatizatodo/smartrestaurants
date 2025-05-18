@@ -1,7 +1,6 @@
 
 import type { Metadata, Viewport } from 'next';
-import { Geist_Sans as GeistSans } from 'next/font/google'; // Updated import name
-import { Cinzel } from 'next/font/google';
+import { Geist_Sans as GeistSansFont, Cinzel as CinzelFont } from 'next/font/google'; // Using clearer aliases
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -9,12 +8,12 @@ import AppInitializer from '@/components/AppInitializer';
 import caCommon from '@/locales/ca/common.json'; // For default metadata
 import CookieConsentBanner from '@/components/common/CookieConsentBanner';
 
-const geistSans = GeistSans({ // Use updated import name
+const geistSans = GeistSansFont({ // Use the aliased font loader
   variable: '--font-geist-sans',
   subsets: ['latin'],
 });
 
-const cinzel = Cinzel({
+const cinzel = CinzelFont({ // Use the aliased font loader
   variable: '--font-cinzel',
   subsets: ['latin'],
   weight: ['400', '700'],
