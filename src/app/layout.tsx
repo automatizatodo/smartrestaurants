@@ -1,6 +1,6 @@
 
 import type { Metadata, Viewport } from 'next';
-import { Geist_Sans as GeistSansFont, Cinzel as CinzelFont } from 'next/font/google'; // Using clearer aliases
+import { Geist, Cinzel } from 'next/font/google'; // Changed from Geist_Sans
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -8,12 +8,12 @@ import AppInitializer from '@/components/AppInitializer';
 import caCommon from '@/locales/ca/common.json'; // For default metadata
 import CookieConsentBanner from '@/components/common/CookieConsentBanner';
 
-const geistSans = GeistSansFont({ // Use the aliased font loader
-  variable: '--font-geist-sans',
+const geist = Geist({ // Changed from geistSans and GeistSansFont
+  variable: '--font-geist-sans', // CSS variable name can remain
   subsets: ['latin'],
 });
 
-const cinzel = CinzelFont({ // Use the aliased font loader
+const cinzel = Cinzel({ // Changed from cinzelFont
   variable: '--font-cinzel',
   subsets: ['latin'],
   weight: ['400', '700'],
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico', // Changed to standard .ico
+    icon: '/favicon.ico',
     // apple: '/apple-touch-icon.png', // Add if you have an apple touch icon
   },
 };
@@ -84,7 +84,7 @@ export default function RootLayout({
   return (
     <html lang="ca" className="dark">
       <body
-        className={`${geistSans.variable} ${cinzel.variable} antialiased`}
+        className={`${geist.variable} ${cinzel.variable} antialiased`} // Updated to use geist.variable
         suppressHydrationWarning={true}
       >
         <LanguageProvider>
