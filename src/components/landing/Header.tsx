@@ -93,7 +93,7 @@ export default function Header() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-28 sm:h-28"> {/* Increased height from h-24 to h-28 */}
+        <div className="flex items-center justify-between h-20 sm:h-28"> {/* Reduced height for mobile to h-20, kept h-28 for sm and up */}
           <Link href="/" className="flex items-center space-x-2">
             {restaurantConfig.logoUrl ? (
               <Image
@@ -101,12 +101,12 @@ export default function Header() {
                 alt={`${restaurantName} Logo`}
                 width={288} 
                 height={96} 
-                className="h-24 w-auto dark:filter dark:invert" 
+                className="h-16 sm:h-24 w-auto dark:filter dark:invert"  // Reduced logo height on mobile to h-16, sm and up is h-24
                 priority
                 style={{ objectFit: 'contain' }}
               />
             ) : (
-              <span className="text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
+              <span className="text-xl sm:text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
             )}
 
           </Link>
@@ -128,9 +128,9 @@ export default function Header() {
                           <Image
                             src={restaurantConfig.logoUrl}
                             alt={`${restaurantName} Logo`}
-                            width={225} 
-                            height={75}  
-                            className="h-20 w-auto dark:filter dark:invert" 
+                            width={192} // Adjusted width for h-16 (maintaining approx 3:1 aspect ratio)
+                            height={64}  // Adjusted height for h-16
+                            className="h-16 w-auto dark:filter dark:invert" // Reduced logo height in sheet to h-16
                             style={{ objectFit: 'contain' }}
                           />
                         ) : (
