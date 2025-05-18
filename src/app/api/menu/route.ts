@@ -4,7 +4,7 @@
 import { NextResponse } from 'next/server';
 import type { MenuItemData, MenuItemText } from '@/data/menu';
 import restaurantConfig from '@/config/restaurant.config'; // For fallback price
-import { format, parse as parseTime } from 'date-fns';
+import { parse as parseTime } from 'date-fns'; // format from date-fns might not be needed if using Intl
 
 // --- Configuration for Google Sheets ---
 // !!! IMPORTANT: URL for the MAIN MENU sheet !!!
@@ -15,7 +15,8 @@ import { format, parse as parseTime } from 'date-fns';
 // 4. Selecting that specific menu sheet and "Comma-separated values (.csv)"
 // 5. Clicking "Publish" and copying the generated URL here.
 // It will likely include a "gid=YOUR_SHEET_GID" parameter.
-let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
+let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
+
 
 // !!! IMPORTANT: URL for the "preciosmenu" sheet !!!
 // You MUST get this by:
@@ -24,10 +25,11 @@ let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa
 // 3. Going to File > Share > Publish to web
 // 4. Selecting "preciosmenu" sheet and "Comma-separated values (.csv)"
 // 5. Clicking "Publish" and copying the generated URL here.
+// It will look like: https://docs.google.com/spreadsheets/d/e/YOUR_DOC_ID/pub?gid=YOUR_PRECIOSMENU_SHEET_GID&single=true&output=csv
 let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
 
 
-// --- Column Names for MENU Sheet ---
+// --- Column Names for MENU Sheet (matching the last provided structure) ---
 const VISIBLE_COL = "Visible";
 const CATEGORIA_CA_COL = "Categoría (CA)";
 const CATEGORIA_ES_COL = "Categoría (ES)";
@@ -35,9 +37,9 @@ const CATEGORY_EN_COL = "Category (EN)";
 const NOM_CA_COL = "Nom (CA)";
 const NOMBRE_ES_COL = "Nombre (ES)";
 const NAME_EN_COL = "Name (EN)";
-const DESCRIPCIO_CA_COL = "Descripció CA";
-const DESCRIPCION_ES_COL = "Descripción ES";
-const DESCRIPTION_EN_COL = "Description EN";
+const DESCRIPCIO_CA_COL = "Descripció CA"; // No parentheses
+const DESCRIPCION_ES_COL = "Descripción ES"; // No parentheses
+const DESCRIPTION_EN_COL = "Description EN"; // No parentheses
 const PRECIO_COL = "Precio (€)";
 const LINK_IMAGEN_COL = "Link Imagen";
 const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
@@ -52,6 +54,7 @@ const EXPECTED_MENU_HEADERS = [
   PRECIO_COL,
   LINK_IMAGEN_COL, SUGERENCIA_CHEF_COL, ALERGENOS_COL
 ];
+
 
 // --- Column Names for PRICES Sheet ---
 const DIA_COL_PRICE = "Día";
@@ -75,8 +78,8 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses'; // For "Primers Plats"
-    case 'second courses': return 'secondCourses'; // For "Segon Plat"
+    case 'main courses': return 'mainCourses';
+    case 'second courses': return 'secondCourses';
     case 'grilled garnish': return 'grilledGarnish';
     case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
@@ -138,7 +141,6 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
   return jsonData;
 }
 
-
 function isValidHttpUrl(urlStr: string): boolean {
   if (!urlStr || typeof urlStr !== 'string') return false;
   let url;
@@ -156,6 +158,7 @@ function isValidHttpUrl(urlStr: string): boolean {
   return url.protocol === "http:" || url.protocol === "https://";
 }
 
+
 async function fetchRawCsvData(url: string, logPrefix: string): Promise<string | null> {
   if (!url || url.includes('YOUR_') || url.includes('REPLACE_WITH_')) {
     console.error(`${logPrefix}: CRITICAL - URL is not configured correctly: ${url}. Please update it in src/app/api/menu/route.ts`);
@@ -166,7 +169,7 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
   console.log(`${logPrefix}: Fetching from URL: ${fetchUrl}`);
 
   try {
-    const response = await fetch(fetchUrl, { cache: 'no-store' });
+    const response = await fetch(fetchUrl, { cache: 'no-store' }); // Ensure no-store for fetching Google Sheet
     console.log(`${logPrefix}: Response status from Google Sheets: ${response.status} ${response.statusText}`);
 
     if (!response.ok) {
@@ -222,21 +225,43 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     };
   }).filter(entry => entry.dia && entry.precio);
 
-  const now = new Date();
-  const currentDayIndex = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
-  const dayMapping: { [key: number]: string } = { 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 0: "Domingo" };
-  const currentDayName = dayMapping[currentDayIndex];
-  
-  const currentTimeFormatted = format(now, 'HH:mm'); 
+  const timeZone = restaurantConfig.timeZone; // 'Europe/Madrid'
+  const nowUtc = new Date();
 
-  console.log(`API_ROUTE_GET_PRICE: Current day: ${currentDayName}, Current time: ${currentTimeFormatted}`);
+  // Get current day name in Spanish for Spain, capitalized
+  let currentDayNameInSpain;
+  try {
+    const dayFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'long', timeZone });
+    const dayNameLower = dayFormatter.format(nowUtc);
+    currentDayNameInSpain = dayNameLower.charAt(0).toUpperCase() + dayNameLower.slice(1);
+  } catch (e) {
+    console.error("API_ROUTE_GET_PRICE: Error formatting day for timezone", timeZone, e);
+    currentDayNameInSpain = new Date().toLocaleDateString('es-ES', { weekday: 'long' }); // Fallback to server's locale for day name
+    currentDayNameInSpain = currentDayNameInSpain.charAt(0).toUpperCase() + currentDayNameInSpain.slice(1);
+    console.warn("API_ROUTE_GET_PRICE: Using server's locale for day name as fallback:", currentDayNameInSpain);
+  }
+
+  // Get current time in HH:mm format for Spain
+  let currentTimeFormattedInSpain;
+  try {
+    const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone });
+    currentTimeFormattedInSpain = timeFormatter.format(nowUtc);
+  } catch (e) {
+    console.error("API_ROUTE_GET_PRICE: Error formatting time for timezone", timeZone, e);
+    const localNow = new Date();
+    currentTimeFormattedInSpain = `${String(localNow.getHours()).padStart(2, '0')}:${String(localNow.getMinutes()).padStart(2, '0')}`; // Fallback to server's local time
+    console.warn("API_ROUTE_GET_PRICE: Using server's local time as fallback:", currentTimeFormattedInSpain);
+  }
+  
+  console.log(`API_ROUTE_GET_PRICE: Current day in Spain (${timeZone}): ${currentDayNameInSpain}, Current time in Spain: ${currentTimeFormattedInSpain}`);
 
   for (const entry of priceEntries) {
-    if (entry.dia.toLowerCase() === currentDayName.toLowerCase()) {
+    // Compare day names case-insensitively
+    if (entry.dia.toLowerCase() === currentDayNameInSpain.toLowerCase()) {
       try {
-        const entryStartTime = parseTime(entry.franjaStart, 'HH:mm', new Date());
-        const entryEndTime = parseTime(entry.franjaEnd, 'HH:mm', new Date());
-        const currentTime = parseTime(currentTimeFormatted, 'HH:mm', new Date());
+        const entryStartTime = parseTime(entry.franjaStart, 'HH:mm', new Date(2000, 0, 1)); // Use a fixed base date for parsing HH:mm
+        const entryEndTime = parseTime(entry.franjaEnd, 'HH:mm', new Date(2000, 0, 1));
+        const currentTime = parseTime(currentTimeFormattedInSpain, 'HH:mm', new Date(2000, 0, 1));
         
         if (currentTime >= entryStartTime && currentTime <= entryEndTime) {
           console.log(`API_ROUTE_GET_PRICE: Matched price slot: Day=${entry.dia}, Range=${entry.franjaStart}-${entry.franjaEnd}. Price: ${entry.precio}`);
@@ -248,7 +273,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     }
   }
 
-  console.warn(`API_ROUTE_GET_PRICE: No matching price slot found for ${currentDayName} at ${currentTimeFormatted}. Using fallback price.`);
+  console.warn(`API_ROUTE_GET_PRICE: No matching price slot found for ${currentDayNameInSpain} at ${currentTimeFormattedInSpain}. Using fallback price.`);
   return restaurantConfig.menuDelDia?.price || null;
 }
 
@@ -272,7 +297,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
     allMenuItems = parsedMenuData.map((item: Record<string, string>, index: number) => {
       console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing/empty for some reason
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
       if (!(visibleString.toUpperCase() === "TRUE" || visibleString === "1" || visibleString.toUpperCase() === "SÍ" || visibleString.toUpperCase() === "VERDADERO")) {
         console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${item[NAME_EN_COL] || `Row ${index + 2}`}' is marked as NOT VISIBLE (Value: '${visibleString}'). Skipping.`);
         return null;
@@ -283,13 +308,13 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       const nameCA = item[NOM_CA_COL];
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
-      const descCA = item[DESCRIPCIO_CA_COL] || ""; 
-      const descES = item[DESCRIPCION_ES_COL] || ""; 
+      const descCA = item[DESCRIPCIO_CA_COL] || "";
+      const descES = item[DESCRIPCION_ES_COL] || "";
       const descEN = item[DESCRIPTION_EN_COL] || "";
       const categoryCA = item[CATEGORIA_CA_COL];
       const categoryES = item[CATEGORIA_ES_COL];
       const categoryEN = item[CATEGORY_EN_COL];
-      let price = item[PRECIO_COL]; 
+      let price = item[PRECIO_COL];
       let linkImagenFromSheet = item[LINK_IMAGEN_COL] || "";
       const sugerenciaChefString = item[SUGERENCIA_CHEF_COL] || "FALSE";
       const alergenosString = item[ALERGENOS_COL] || "";
@@ -409,3 +434,4 @@ export async function GET() {
 
   return NextResponse.json({ menuItems, currentMenuPrice }, { status: 200, headers });
 }
+
