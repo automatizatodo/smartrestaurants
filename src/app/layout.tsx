@@ -1,20 +1,20 @@
 
 import type { Metadata, Viewport } from 'next';
-import { Geist } from 'next/font/google';
+import { Geist_Sans as GeistSans } from 'next/font/google'; // Updated import name
 import { Cinzel } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
 import AppInitializer from '@/components/AppInitializer';
 import caCommon from '@/locales/ca/common.json'; // For default metadata
-import CookieConsentBanner from '@/components/common/CookieConsentBanner'; // Import the banner
+import CookieConsentBanner from '@/components/common/CookieConsentBanner';
 
-const geistSans = Geist({
+const geistSans = GeistSans({ // Use updated import name
   variable: '--font-geist-sans',
   subsets: ['latin'],
 });
 
-const cinzel = Cinzel({ 
+const cinzel = Cinzel({
   variable: '--font-cinzel',
   subsets: ['latin'],
   weight: ['400', '700'],
@@ -34,22 +34,23 @@ export const metadata: Metadata = {
     description: caCommon.seo.defaultDescription,
     url: process.env.NEXT_PUBLIC_APP_URL,
     siteName: caCommon.restaurantName,
-    // images: [ 
-    //   {
-    //     url: `${process.env.NEXT_PUBLIC_APP_URL}/og-image.png`, 
-    //     width: 1200,
-    //     height: 630,
-    //   },
-    // ],
-    locale: 'ca_ES', 
+    images: [
+      {
+        url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/og-image.png`, // Default OG image
+        width: 1200,
+        height: 630,
+        alt: `Logo de ${caCommon.restaurantName}`,
+      },
+    ],
+    locale: 'ca_ES',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: `${caCommon.restaurantName} | ${caCommon.seo.defaultTitleSuffix}`,
     description: caCommon.seo.defaultDescription,
-    // images: [`${process.env.NEXT_PUBLIC_APP_URL}/twitter-image.png`], 
-    // site: '@yourTwitterHandle', 
+    images: [`${process.env.NEXT_PUBLIC_APP_URL || ''}/twitter-image.png`], // Default Twitter image
+    // site: '@yourTwitterHandle', // Uncomment and replace if you have a Twitter handle
   },
   robots: {
     index: true,
@@ -63,8 +64,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/faviconCanFanals.svg', 
-    // apple: '/apple-touch-icon.png',
+    icon: '/favicon.ico', // Changed to standard .ico
+    // apple: '/apple-touch-icon.png', // Add if you have an apple touch icon
   },
 };
 

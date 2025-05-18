@@ -18,8 +18,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const { menuItems, currentMenuPrice } = await fetchMenuDataWithPrice();
-  console.log("HOMEPAGE_LOG: Received menuItems in HomePage:", JSON.stringify(menuItems.slice(0,2), null, 2));
-  console.log("HOMEPAGE_LOG: Received currentMenuPrice in HomePage:", currentMenuPrice);
+  // Removed HOMEPAGE_LOGs
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
