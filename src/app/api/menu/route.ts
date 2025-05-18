@@ -9,7 +9,14 @@ import { parse as parseTime, isValid as isValidDate, format as formatDate } from
 // URL for the MAIN MENU sheet
 let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
 
-// URL for the "preciosmenu" sheet
+// !!! IMPORTANT: URL for the "preciosmenu" sheet !!!
+// You MUST get this by:
+// 1. Opening your Google Sheet
+// 2. Selecting the "preciosmenu" tab
+// 3. Going to File > Share > Publish to web
+// 4. Selecting "preciosmenu" sheet and "Comma-separated values (.csv)"
+// 5. Clicking "Publish" and copying the generated URL here.
+// It will look like: https://docs.google.com/spreadsheets/d/e/YOUR_DOC_ID/pub?gid=YOUR_PRECIOSMENU_SHEET_GID&single=true&output=csv
 let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
 
 
@@ -29,8 +36,8 @@ const LINK_IMAGEN_COL = "Link Imagen";
 const SUGERENCIA_CHEF_COL = "Sugerencia Chef";
 const ALERGENOS_COL = "Alergenos";
 
-// Expected headers for validation
-const EXPECTED_HEADERS = [
+// Expected headers for validation for the main menu sheet
+const EXPECTED_MENU_HEADERS = [
   VISIBLE_COL,
   CATEGORIA_CA_COL, CATEGORIA_ES_COL, CATEGORY_EN_COL,
   NOM_CA_COL, NOMBRE_ES_COL, NAME_EN_COL,
@@ -49,7 +56,7 @@ const EXPECTED_PRICE_HEADERS = [
 ];
 
 interface PriceEntry {
-  dia: string;
+  dia: string; // Kept as original case for display, converted toLower for logic
   franjaStart: string;
   franjaEnd: string;
   precio: string;
@@ -66,8 +73,8 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses';
-    case 'second courses': return 'secondCourses';
+    case 'main courses': return 'mainCourses'; // Primers Plats
+    case 'second courses': return 'secondCourses'; // Segon Plat
     case 'grilled garnish': return 'grilledGarnish';
     case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
@@ -134,17 +141,18 @@ function isValidHttpUrl(urlStr: string): boolean {
   if (!urlStr || typeof urlStr !== 'string') return false;
   let urlToParse = urlStr;
   try {
+    // Attempt to prepend https:// if it looks like a domain without a protocol
     if (!urlToParse.startsWith('http://') && !urlToParse.startsWith('https://') && urlToParse.includes('.') && !urlToParse.includes(' ')) {
       urlToParse = 'https://' + urlToParse;
     }
     const url = new URL(urlToParse);
     const isValid = url.protocol === "http:" || url.protocol === "https:";
     // if (!isValid) {
-    //   console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
+      // console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' (parsed as '" + urlToParse + "') is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
     // }
     return isValid;
   } catch (e: any) {
-    // console.warn("API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '" + urlStr + "'. Error: " + e.message);
+    // console.warn("API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '" + urlStr + "' (attempted as '" + urlToParse + "'). Error: " + e.message);
     return false;
   }
 }
@@ -201,15 +209,25 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     return restaurantConfig.menuDelDia?.price || null;
   }
 
-  const priceEntries: PriceEntry[] = parsedPriceData.map(row => {
-    const [start, end] = (row[FRANJA_HORARIA_COL_PRICE] || "00:00-00:00").split(/\s*-\s*/);
-    return {
-      dia: (row[DIA_COL_PRICE] || "").trim(),
-      franjaStart: start.trim(),
-      franjaEnd: end.trim(),
-      precio: (row[PRECIO_MENU_COL_PRICE] || "").trim()
-    };
-  }).filter(entry => entry.dia && entry.precio);
+  const priceEntries: PriceEntry[] = parsedPriceData
+    .map(row => {
+      const diaRaw = row[DIA_COL_PRICE] || "";
+      const franjaHorariaRaw = row[FRANJA_HORARIA_COL_PRICE] || "";
+      const precioRaw = row[PRECIO_MENU_COL_PRICE] || "";
+
+      if (!diaRaw.trim() || !precioRaw.trim() || !franjaHorariaRaw.trim() || !franjaHorariaRaw.includes('-')) {
+        return null; // Mark as invalid if essential parts for pricing are missing
+      }
+      const [start, end] = franjaHorariaRaw.split(/\s*-\s*/);
+      return {
+        dia: diaRaw.trim(), // Keep original case for potential display, logic will use toLowerCase
+        franjaStart: start.trim(),
+        franjaEnd: end.trim(),
+        precio: precioRaw.trim()
+      };
+    })
+    .filter(entry => entry !== null) as PriceEntry[];
+
 
   const timeZone = restaurantConfig.timeZone;
   const nowUtc = new Date();
@@ -237,7 +255,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
 
 
   for (const entry of priceEntries) {
-    if (entry.dia.toLowerCase() === currentDayNameInSpain.toLowerCase()) {
+    if (entry.dia.toLowerCase() === currentDayNameInSpain.toLowerCase()) { // Compare in lower case
       try {
         const baseDateStr = formatDate(nowUtc, 'yyyy-MM-dd');
         const entryStartTime = parseTime(baseDateStr + " " + entry.franjaStart, 'yyyy-MM-dd HH:mm', new Date());
@@ -276,15 +294,24 @@ async function generatePriceSummary(): Promise<PriceSummary> {
     return priceSummary;
   }
 
-  const priceEntries: PriceEntry[] = parsedPriceData.map(row => {
-    const [start, end] = (row[FRANJA_HORARIA_COL_PRICE] || "00:00-00:00").split(/\s*-\s*/);
-    return {
-      dia: (row[DIA_COL_PRICE] || "").trim().toLowerCase(),
-      franjaStart: start.trim(),
-      franjaEnd: end.trim(),
-      precio: (row[PRECIO_MENU_COL_PRICE] || "").trim()
-    };
-  }).filter(entry => entry.dia && entry.precio);
+  const priceEntries: PriceEntry[] = parsedPriceData
+    .map(row => {
+      const diaRaw = row[DIA_COL_PRICE] || "";
+      const franjaHorariaRaw = row[FRANJA_HORARIA_COL_PRICE] || "";
+      const precioRaw = row[PRECIO_MENU_COL_PRICE] || "";
+
+      if (!diaRaw.trim() || !precioRaw.trim() || !franjaHorariaRaw.trim() || !franjaHorariaRaw.includes('-')) {
+        return null;
+      }
+      const [start, end] = franjaHorariaRaw.split(/\s*-\s*/);
+      return {
+        dia: diaRaw.trim().toLowerCase(),
+        franjaStart: start.trim(),
+        franjaEnd: end.trim(),
+        precio: precioRaw.trim()
+      };
+    })
+    .filter(entry => entry !== null) as PriceEntry[];
 
   const weekdays = ["lunes", "martes", "miércoles", "jueves", "viernes"];
   const weekends = ["sábado", "domingo"];
@@ -312,17 +339,18 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
   let allMenuItems: MenuItemData[] = [];
 
   if (menuCsvText) {
-    const parsedMenuData = parseCSV(menuCsvText, EXPECTED_HEADERS, "MENU_SHEET_PARSE");
-    // if (parsedMenuData.length === 0 && menuCsvText.trim().length > 0 && !menuCsvText.trim().startsWith(EXPECTED_HEADERS[0])) {
-        // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV parsing resulted in 0 items, but CSV text was not empty. This strongly suggests a header mismatch or structural issue with the CSV that parseCSV couldn't handle based on EXPECTED_HEADERS.");
+    const parsedMenuData = parseCSV(menuCsvText, EXPECTED_MENU_HEADERS, "MENU_SHEET_PARSE");
+    // if (parsedMenuData.length === 0 && menuCsvText.trim().length > 0 && !menuCsvText.trim().startsWith(EXPECTED_MENU_HEADERS[0])) {
+        // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV parsing resulted in 0 items, but CSV text was not empty. This strongly suggests a header mismatch or structural issue with the CSV that parseCSV couldn't handle based on EXPECTED_MENU_HEADERS.");
     // }
 
     // let visibleItemsCount = 0;
     allMenuItems = parsedMenuData.map((item: Record<string, string>, index: number) => {
       // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Row " + (index + 2) + " RAW: " + JSON.stringify(item));
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
-      const isVisible = (visibleString.toUpperCase() === "TRUE" || visibleString === "1" || visibleString.toUpperCase() === "SÍ" || visibleString.toUpperCase() === "VERDADERO");
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty
+      const isVisible = ["TRUE", "VERDADERO", "SÍ", "SI", "1"].includes(visibleString.toUpperCase());
+
 
       if (!isVisible) {
         // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " is marked as NOT VISIBLE ('" + visibleString + "'). Skipping.");
