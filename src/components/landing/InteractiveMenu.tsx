@@ -14,7 +14,7 @@ import restaurantConfig from '@/config/restaurant.config';
 
 interface InteractiveMenuProps {
   menuItems: MenuItemData[];
-  currentMenuPrice?: string | null; // Updated to accept dynamic price
+  currentMenuPrice?: string | null;
 }
 
 export default function InteractiveMenu({ menuItems, currentMenuPrice }: InteractiveMenuProps) {
@@ -38,13 +38,13 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2
-            className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4"
+            className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4"
             suppressHydrationWarning
           >
             {t('landing:menu.sectionTitle')}
           </h2>
-           {currentMenuPrice && ( // Use currentMenuPrice
-            <div className="mb-8">
+           {currentMenuPrice && (
+            <div className="mb-6">
               <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
               {menuDelDiaPriceDescription && (
                 <p
@@ -63,8 +63,8 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
           </div>
            <div className="text-center mt-12 sm:mt-16">
             <Link href="/menu" passHref>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105"
                 suppressHydrationWarning
               >
@@ -88,7 +88,7 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
           >
             {t('landing:menu.sectionTitle')}
           </h2>
-          {currentMenuPrice && ( // Use currentMenuPrice
+          {currentMenuPrice && (
             <div className="mb-8">
               <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
               {menuDelDiaPriceDescription && (
@@ -108,8 +108,8 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
           </div>
            <div className="text-center mt-12 sm:mt-16">
             <Link href="/menu" passHref>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105"
                 suppressHydrationWarning
               >
@@ -127,15 +127,15 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
   return (
     <section id="menu" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8"> {/* Reduced mb from 12/16 to 8 */}
+        <div className="text-center mb-8">
           <h2
             className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4"
             suppressHydrationWarning
           >
             {t('landing:menu.sectionTitle')}
           </h2>
-          {currentMenuPrice && ( // Use currentMenuPrice
-            <div className="mb-6"> {/* Reduced mb from 8 to 6 */}
+          {currentMenuPrice && (
+            <div className="mb-6">
               <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
                {menuDelDiaPriceDescription && (
                 <p
@@ -148,7 +148,7 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
             </div>
           )}
           <p
-            className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12" /* Reduced bottom margin for description */
+            className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12"
             suppressHydrationWarning
           >
             {t('landing:menu.sectionDescription')}
@@ -156,7 +156,7 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full flex items-center justify-start overflow-x-auto scrollbar-hide mb-10 sm:mb-12 sm:flex-wrap sm:justify-center sm:overflow-x-visible"> {/* Adjusted mb */}
+          <TabsList className="w-full flex items-center justify-start overflow-x-auto scrollbar-hide mb-10 sm:mb-12 sm:flex-wrap sm:justify-center sm:overflow-x-visible">
             {sortedCategories.map((category) => (
               <TabsTrigger
                 key={category.key}
@@ -171,10 +171,10 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
 
           {sortedCategories.map((category) => (
             <TabsContent key={category.key} value={category.key}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
                 {menuItems
                   .filter(item => item.categoryKey === category.key)
-                  .slice(0, 3) // Still showing only first 3 for homepage snippet
+                  .slice(0, 3)
                   .map((item, index) => (
                     <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                       <MenuItemCard item={item} />
@@ -187,8 +187,8 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
 
         <div className="text-center mt-12 sm:mt-16">
           <Link href="/menu" passHref>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-transform hover:scale-105"
               suppressHydrationWarning
             >
