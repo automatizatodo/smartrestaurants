@@ -2,7 +2,7 @@
 {
   "hero.title": "Can Fanals",
   "hero.tagline": "Brasa, Tradició i Sabor Sense Gluten a Sabadell",
-  "hero.altText": "Interior acollidor de Can Fanals, restaurant a Sabadell",
+  "hero.altText": "Interior acollidor de {restaurantName}, restaurant a Sabadell",
   "hero.viewMenuButton": "Veure El Nostre Menú",
   "hero.bookTableButton": "Reservar Taula",
   "menu.sectionTitle": "Menú del Dia",
@@ -83,11 +83,14 @@
   "testimonials.leaveGoogleReview": "Deixa'ns una ressenya a Google",
   "testimonials.leaveTripAdvisorReview": "Deixa'ns una ressenya a TripAdvisor",
   "aboutUs.title": "La Nostra Història",
-  "aboutUs.introduction": "A Can Fanals, el teu restaurant a Sabadell, cuinem amb passió, combinant la millor brasa i la tradició catalana amb productes de proximitat. La nostra cuina és 100% sense gluten, perquè tothom pugui gaudir-ne sense límits.",
-  "aboutUs.paragraph1": "Des dels nostres inicis, hem evolucionat per oferir una experiència culinària única, on cada plat explica una història d'ingredients frescos i de temporada. El nostre compromís és amb l'excel·lència i la satisfacció de cada comensal, fent de {restaurantName} un punt de trobada a Sabadell per als amants del bon menjar i les celebracions especials. Us convidem a descobrir la nostra essència.",
-  "aboutUs.imageAltExterior": "Exterior del restaurant Can Fanals a Sabadell",
-  "aboutUs.imageAltInterior": "Interior acollidor del restaurant Can Fanals a Sabadell",
-  "aboutUs.imageAltTerrace": "Terrassa del restaurant Can Fanals a Sabadell",
+  "aboutUs.whoWeAreTitle": "Qui som",
+  "aboutUs.introduction": "A {restaurantName} cuinem amb ànima. Som un restaurant familiar amb arrels profundes a Sabadell. Cada plat, cada detall, parla de la nostra passió per la tradició i per fer sentir bé a qui ens visita. Aquí, el menjar té memòria i caliu.",
+  "aboutUs.ourSpaceTitle": "El nostre espai",
+  "aboutUs.paragraph1": "{restaurantName} és un lloc únic que combina el rústic i acollidor per oferir un espai apte tant per menjars del dia a dia com per a qualsevol ocasió especial. El nostre compromís és amb l'excel·lència i la satisfacció de cada comensal, fent de {restaurantName} un punt de trobada a Sabadell.",
+  "aboutUs.meetTheTeamButton": "Coneix l'equip",
+  "aboutUs.imageAltExterior": "Exterior del restaurant {restaurantName} a Sabadell",
+  "aboutUs.imageAltInterior": "Interior acollidor del restaurant {restaurantName} a Sabadell",
+  "aboutUs.imageAltTerrace": "Terrassa del restaurant {restaurantName} a Sabadell",
   "contactMap.sectionTitle": "On Trobar-nos",
   "contactMap.sectionDescription": "Visita'ns per a una experiència gastronòmica inoblidable. Estem convenientment ubicats a Sabadell i esperem donar-te la benvinguda. Gaudeix del nostre ambient rústic i acollidor.",
   "contactMap.contactDetailsTitle": "Detalls de Contacte",
@@ -104,5 +107,3 @@
   "contactMap.hours.mon": "Dilluns",
   "contactMap.hours.closed": "Tancat"
 }
-
-    

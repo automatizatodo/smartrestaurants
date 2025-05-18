@@ -3,180 +3,101 @@
 
 import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
-import { cn } from '@/lib/utils';
-import { useState, useCallback, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import restaurantConfig from '@/config/restaurant.config'; // Import config for logo
+
+// Define component images array directly in the component or import if preferred
+const componentImages = [
+  {
+    src: "/façana.webp",
+    altKey: "landing:aboutUs.imageAltExterior",
+    hint: "restaurant exterior facade",
+    priority: true,
+  },
+  {
+    src: "/interior2.webp",
+    altKey: "landing:aboutUs.imageAltInterior",
+    hint: "restaurant interior dining",
+    priority: false,
+  },
+  // Terrassa image is not used in this new design based on the example.
+];
 
 export default function AboutUsSection() {
-  const { t, translations } = useLanguage();
-  const restaurantName = translations.common.restaurantName;
-
-  const componentImages = [
-    {
-      src: "/façana.webp", 
-      altKey: "landing:aboutUs.imageAltExterior",
-      hint: "restaurant exterior facade",
-      desktopClass: "relative z-10 w-10/12 md:w-9/12 aspect-[4/3] shadow-xl rounded-lg transform group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-500 ease-in-out rotate-[-1deg] mx-auto",
-      priority: true,
-    },
-    {
-      src: "/interior2.webp", 
-      altKey: "landing:aboutUs.imageAltInterior",
-      hint: "restaurant interior dining",
-      desktopClass: "absolute z-20 top-[-5%] right-[-5%] w-3/5 sm:w-7/12 aspect-[5/4] rotate-[6deg] group-hover:rotate-[2deg] group-hover:scale-105 transition-all duration-500 ease-in-out border-4 border-background dark:border-card shadow-2xl rounded-md",
-      priority: false,
-    },
-    {
-      src: "/terrassa1.webp",
-      altKey: "landing:aboutUs.imageAltTerrace",
-      hint: "restaurant terrace patio",
-      desktopClass: "", 
-      priority: false,
-    },
-  ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? componentImages.length - 1 : prevIndex - 1));
-  };
-
-  const nextSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex === componentImages.length - 1 ? 0 : prevIndex + 1));
-  }, [componentImages.length]);
-
-  useEffect(() => {
-    if (componentImages.length <=1) return;
-    const timer = setTimeout(nextSlide, 7000);
-    return () => clearTimeout(timer);
-  }, [currentIndex, nextSlide, componentImages.length]);
-
+  const { t } = useLanguage();
 
   return (
-    <section id="about-us" className="py-8 sm:py-10 bg-background relative z-30">
+    <section id="about-us" className="py-16 sm:py-20 bg-stone-800 text-gray-100 overflow-hidden"> {/* Dark background, light text */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
-            {t('landing:aboutUs.title')}
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            {t('landing:aboutUs.introduction', { restaurantName })}
-          </p>
-        </div>
+        <h2 className="text-4xl sm:text-5xl font-cinzel font-bold text-center mb-12 sm:mb-16">
+          {t('landing:aboutUs.title')}
+        </h2>
 
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="space-y-6 text-foreground/90 order-2 md:order-1 flex flex-col justify-center">
-            <p className="text-base sm:text-lg leading-relaxed">
-              {t('landing:aboutUs.paragraph1', { restaurantName })}
+        <div className="grid md:grid-cols-2 gap-x-10 lg:gap-x-16 gap-y-10 mb-12 sm:mb-16 items-start">
+          {/* Left Column: Qui som */}
+          <div className="relative">
+            {restaurantConfig.logoUrl && (
+              <div className="absolute inset-0 flex items-center justify-center -z-10 pointer-events-none select-none">
+                <Image
+                  src={restaurantConfig.logoUrl}
+                  alt="" // Decorative, alt handled by main logo instances
+                  width={300}
+                  height={300}
+                  className="object-contain opacity-5 md:opacity-[0.03]"
+                />
+              </div>
+            )}
+            <h3 className="text-3xl font-cinzel font-semibold mb-4 text-amber-500">
+              {t('landing:aboutUs.whoWeAreTitle')}
+            </h3>
+            <p className="text-base sm:text-lg leading-relaxed text-gray-300 mb-6">
+              {t('landing:aboutUs.introduction')}
+            </p>
+            <Button className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-md text-sm font-medium">
+              {t('landing:aboutUs.meetTheTeamButton')}
+            </Button>
+          </div>
+
+          {/* Right Column: El nostre espai */}
+          <div>
+            <h3 className="text-3xl font-cinzel font-semibold mb-4 text-amber-500">
+              {t('landing:aboutUs.ourSpaceTitle')}
+            </h3>
+            <p className="text-base sm:text-lg leading-relaxed text-gray-300">
+              {t('landing:aboutUs.paragraph1')}
             </p>
           </div>
-          
-          <div className="hidden md:flex md:col-span-1 order-1 md:order-2 items-center justify-center min-h-[280px] lg:min-h-[320px]">
-            <div className="relative w-full max-w-sm lg:max-w-md group">
-              <div
-                className={cn(
-                  componentImages[0].desktopClass
-                )}
-              >
-                <Image
-                  src={componentImages[0].src}
-                  alt={t(componentImages[0].altKey)}
-                  data-ai-hint={componentImages[0].hint}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  priority={componentImages[0].priority}
-                  className="rounded-lg"
-                />
-              </div>
+        </div>
 
-              {/* Commented out the third image for desktop view as per previous request to show only two */}
-              {/* <div
-                className={cn(
-                  componentImages[2].desktopClass 
-                )}
-              >
-                <Image
-                  src={componentImages[2].src}
-                  alt={t(componentImages[2].altKey)}
-                  data-ai-hint={componentImages[2].hint}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  className="rounded-md"
-                />
-              </div> */}
-              
-              <div
-                className={cn(
-                  componentImages[1].desktopClass
-                )}
-              >
-                <Image
-                  src={componentImages[1].src}
-                  alt={t(componentImages[1].altKey)}
-                  data-ai-hint={componentImages[1].hint}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  className="rounded-md"
-                />
-              </div>
-            </div>
+        {/* Image Section */}
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center md:items-end">
+          {/* Facade Image */}
+          <div className="relative w-full max-w-md mx-auto md:mx-0 md:max-w-none transform -rotate-2 hover:rotate-0 transition-transform duration-300 ease-in-out">
+            <Image
+              src={componentImages[0].src}
+              alt={t(componentImages[0].altKey)}
+              width={600}
+              height={450}
+              className="rounded-lg shadow-2xl object-cover aspect-[4/3]"
+              data-ai-hint={componentImages[0].hint}
+              priority={componentImages[0].priority}
+            />
           </div>
 
-          <div className="md:hidden order-1 md:order-2">
-            <div className="relative w-full max-w-md mx-auto aspect-[16/10] overflow-hidden rounded-lg shadow-xl group">
-              {componentImages.map((image, index) => (
-                <div
-                  key={image.src}
-                  className={cn(
-                    "absolute inset-0 transition-opacity duration-700 ease-in-out",
-                    index === currentIndex ? "opacity-100 z-10" : "opacity-0"
-                  )}
-                >
-                  <Image
-                    src={image.src}
-                    alt={t(image.altKey)}
-                    data-ai-hint={image.hint}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    className="rounded-lg"
-                    priority={index === 0 && image.priority} 
-                  />
-                </div>
-              ))}
-              {componentImages.length > 1 && (
-                <>
-                  <button
-                    onClick={prevSlide}
-                    className="absolute top-1/2 left-2 sm:left-3 transform -translate-y-1/2 bg-background/60 hover:bg-background/90 text-foreground p-2 rounded-full shadow-md z-20 transition-colors"
-                    aria-label={t('common:previous')}
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button
-                    onClick={nextSlide}
-                    className="absolute top-1/2 right-2 sm:right-3 transform -translate-y-1/2 bg-background/60 hover:bg-background/90 text-foreground p-2 rounded-full shadow-md z-20 transition-colors"
-                    aria-label={t('common:next')}
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                  <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1.5 z-20">
-                    {componentImages.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentIndex(index)}
-                        className={cn(
-                          "w-2 h-2 rounded-full transition-all duration-300",
-                          currentIndex === index ? "bg-primary ring-1 ring-primary-foreground/50 ring-offset-1 ring-offset-background/30" : "bg-muted/70 hover:bg-muted"
-                        )}
-                        aria-label={t('common:goToTestimonial', { number: index + 1})}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
+          {/* Interior Image with Border */}
+          <div className="relative w-full max-w-md mx-auto md:mx-0 md:max-w-none transform rotate-2 hover:rotate-0 transition-transform duration-300 ease-in-out">
+            <div className="p-2 sm:p-3 bg-white shadow-2xl rounded-sm">
+              <Image
+                src={componentImages[1].src}
+                alt={t(componentImages[1].altKey)}
+                width={600}
+                height={400}
+                className="object-cover aspect-[4/3]"
+                data-ai-hint={componentImages[1].hint}
+                priority={componentImages[1].priority}
+              />
             </div>
           </div>
-
         </div>
       </div>
     </section>

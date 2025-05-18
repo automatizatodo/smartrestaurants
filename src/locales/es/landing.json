@@ -2,7 +2,7 @@
 {
   "hero.title": "Can Fanals",
   "hero.tagline": "Brasa, Tradición y Sabor Sin Gluten en Sabadell",
-  "hero.altText": "Interior acogedor de Can Fanals, restaurante en Sabadell",
+  "hero.altText": "Interior acogedor de {restaurantName}, restaurante en Sabadell",
   "hero.viewMenuButton": "Ver Nuestro Menú",
   "hero.bookTableButton": "Reservar Mesa",
   "menu.sectionTitle": "Menú del Día",
@@ -38,7 +38,7 @@
   "aiSommelier.error.couldNotGenerate": "No se pudieron generar recomendaciones en este momento. Por favor, inténtalo de nuevo.",
   "aiSommelier.error.couldNotGenerate.es": "No se pudieron generar recomendaciones en este momento. Por favor, inténtalo de nuevo.",
   "booking.sectionTitle": "Reserva Tu Mesa",
-  "booking.sectionDescription": "Reserva tu lugar para una experiencia gastronómica inolvidable. Esperamos darte la bienvenida a Can Fanals, tu restaurante en Sabadell.",
+  "booking.sectionDescription": "Reserva tu lugar para una experiencia gastronómica inolvidable. Esperamos darte la bienvenida a {restaurantName}, tu restaurante en Sabadell.",
   "booking.cardTitle": "Detalles de la Reserva",
   "booking.cardDescription": "Completa tus datos para solicitar una mesa. Confirmaremos tu reserva por correo electrónico o teléfono.",
   "booking.cardDescriptionWhatsapp": "Completa tus datos. Después de enviar, se te pedirá que envíes tu solicitud por WhatsApp.",
@@ -83,11 +83,14 @@
   "testimonials.leaveGoogleReview": "Déjanos una reseña en Google",
   "testimonials.leaveTripAdvisorReview": "Déjanos una reseña en TripAdvisor",
   "aboutUs.title": "Nuestra Historia",
-  "aboutUs.introduction": "En Can Fanals, tu restaurante en Sabadell, cocinamos con pasión, combinando la mejor brasa y la tradición catalana con productos de proximidad. Nuestra cocina es 100% sin gluten, para que todos puedan disfrutar sin límites.",
-  "aboutUs.paragraph1": "Desde nuestros inicios, hemos evolucionado para ofrecer una experiencia culinaria única, donde cada plato cuenta una historia de ingredientes frescos y de temporada. Nuestro compromiso es con la excelencia y la satisfacción de cada comensal, haciendo de {restaurantName} un punto de encuentro en Sabadell para los amantes de la buena comida y las celebraciones especiales. Os invitamos a descubrir nuestra esencia.",
-  "aboutUs.imageAltExterior": "Exterior del restaurante Can Fanals en Sabadell",
-  "aboutUs.imageAltInterior": "Interior acogedor del restaurante Can Fanals en Sabadell",
-  "aboutUs.imageAltTerrace": "Terraza del restaurante Can Fanals en Sabadell",
+  "aboutUs.whoWeAreTitle": "Quiénes Somos",
+  "aboutUs.introduction": "En {restaurantName} cocinamos con alma. Somos un restaurante familiar con profundas raíces en Sabadell. Cada plato, cada detalle, habla de nuestra pasión por la tradición y por hacer sentir bien a quien nos visita. Aquí, la comida tiene memoria y calidez.",
+  "aboutUs.ourSpaceTitle": "Nuestro Espacio",
+  "aboutUs.paragraph1": "{restaurantName} es un lugar único que combina lo rústico y acogedor para ofrecer un espacio apto tanto para comidas del día a día como para cualquier ocasión especial. Nuestro compromiso es con la excelencia y la satisfacción de cada comensal, haciendo de {restaurantName} un punto de encuentro en Sabadell.",
+  "aboutUs.meetTheTeamButton": "Conoce al Equipo",
+  "aboutUs.imageAltExterior": "Exterior del restaurante {restaurantName} en Sabadell",
+  "aboutUs.imageAltInterior": "Interior acogedor del restaurante {restaurantName} en Sabadell",
+  "aboutUs.imageAltTerrace": "Terraza del restaurante {restaurantName} en Sabadell",
   "contactMap.sectionTitle": "Dónde Encontrarnos",
   "contactMap.sectionDescription": "Visítanos para una experiencia gastronómica inolvidable. Estamos convenientemente ubicados en Sabadell y esperamos darle la bienvenida. Disfruta de nuestro ambiente rústico y acogedor.",
   "contactMap.contactDetailsTitle": "Detalles de Contacto",
@@ -104,5 +107,3 @@
   "contactMap.hours.mon": "Lunes",
   "contactMap.hours.closed": "Cerrado"
 }
-
-    
