@@ -1,15 +1,18 @@
 
 {
-  "t1.name": "Alexandra Chen",
-  "t1.testimonial": "Una experiencia absolutamente sublime de principio a fin. El ambiente, el servicio y, por supuesto, la comida fueron impecables. ¡El Sommelier IA sugirió el maridaje perfecto!",
-  "t1.title": "Crítica Gastronómica, Revista Gourmet",
-  "t2.name": "Marcus Rodriguez",
-  "t2.testimonial": "{restaurantName} no es solo un restaurante; es un viaje culinario. Cada plato fue una obra de arte. Ya he reservado mi próxima visita.",
-  "t2.title": "Cliente Fiel",
-  "t3.name": "Sophie Dubois",
-  "t3.testimonial": "La atención al detalle es asombrosa. Desde la decoración hasta la presentación de cada plato, todo está cuidadosamente seleccionado. Muy recomendable para ocasiones especiales.",
-  "t3.title": "Cena de Aniversario",
-  "t4.name": "David Kim",
-  "t4.testimonial": "Un concepto gastronómico verdaderamente innovador. El menú interactivo fue divertido y la comida excepcional. El proceso de reserva online fue impecable.",
-  "t4.title": "Emprendedor Tecnológico"
+  "t1.name": "Claudia López",
+  "t1.testimonial": "Perfecto servicio, sin duda volvería a venir. Me ha encantado el trato, la comida y el ambiente.",
+  "t1.title": "Comida 5/5 · Servicio 5/5 · Ambiente 5/5",
+
+  "t2.name": "Sara Montalt",
+  "t2.testimonial": "Todo buenísimo, un servicio increíble. El ambiente muy casero, la comida fantástica. Repetiremos y muchas veces.",
+  "t2.title": "Ambiente tranquilo y sin esperas",
+
+  "t3.name": "Judit Aumatell Reina",
+  "t3.testimonial": "¡Restaurante casero sin gluten perfecto si eres celíaco! Servicio muy atento y comida buenísima.",
+  "t3.title": "Apto para celíacos · Calidad-precio inmejorable",
+
+  "t4.name": "Johanna Fernández",
+  "t4.testimonial": "¡El sitio que faltaba en Sabadell! Buen ambiente y muy buena comida. Recomiendo reservar.",
+  "t4.title": "Con espacio interior y patio exterior"
 }

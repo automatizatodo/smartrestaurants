@@ -1,15 +1,18 @@
 
 {
-  "t1.name": "Alexandra Chen",
-  "t1.testimonial": "An absolutely sublime experience from start to finish. The ambiance, service, and of course, the food were all impeccable. The AI Sommelier suggested the perfect wine pairing!",
-  "t1.title": "Food Critic, Gourmet Magazine",
-  "t2.name": "Marcus Rodriguez",
-  "t2.testimonial": "{restaurantName} isn't just a restaurant; it's a culinary journey. Every dish was a work of art. I've already booked my next visit.",
-  "t2.title": "Loyal Patron",
-  "t3.name": "Sophie Dubois",
-  "t3.testimonial": "The attention to detail is astounding. From the decor to the presentation of each plate, everything is thoughtfully curated. Highly recommended for special occasions.",
-  "t3.title": "Anniversary Dinner",
-  "t4.name": "David Kim",
-  "t4.testimonial": "A truly innovative dining concept. The interactive menu was fun, and the food was exceptional. The booking process online was seamless.",
-  "t4.title": "Tech Entrepreneur"
+  "t1.name": "Claudia López",
+  "t1.testimonial": "Perfect service, I would definitely come back. I loved the treatment, the food, and the atmosphere.",
+  "t1.title": "Food 5/5 · Service 5/5 · Atmosphere 5/5",
+
+  "t2.name": "Sara Montalt",
+  "t2.testimonial": "Everything was delicious, incredible service. The atmosphere was very homely, the food fantastic. We will repeat many times.",
+  "t2.title": "Quiet atmosphere and no waiting",
+
+  "t3.name": "Judit Aumatell Reina",
+  "t3.testimonial": "Perfect homemade gluten-free restaurant if you're celiac! Very attentive service and delicious food.",
+  "t3.title": "Suitable for celiacs · Unbeatable quality-price",
+
+  "t4.name": "Johanna Fernández",
+  "t4.testimonial": "The place that Sabadell was missing! Good atmosphere and very good food. I recommend booking.",
+  "t4.title": "With indoor space and outdoor patio"
 }
