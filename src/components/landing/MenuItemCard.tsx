@@ -20,28 +20,28 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   
   const imageUrl = item.imageUrl; 
 
-  const displayName = item.name[language] || item.name.en;
-  const displayDescription = item.description[language] || item.description.en;
+  const displayName = item.name[language] || item.name.en || item.name.ca || item.name.es || "";
+  const displayDescription = item.description[language] || item.description.en || item.description.ca || item.description.es || "";
 
   const shouldShowImage = restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co');
 
   return (
     <div className={cn(
-        "transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-0.5", 
-        item.isChefSuggestion && "relative" // This parent div needs to be relative for absolute positioning of the badge
+        "transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-0.5",
+        item.isChefSuggestion && "relative" 
     )}>
       {item.isChefSuggestion && (
         <Badge
           suppressHydrationWarning
           variant="default"
-          className="absolute top-0 right-1 -mt-3 z-20 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5"
+          className="absolute top-0 right-1 -mt-3 z-20 bg-primary text-primary-foreground text-[9px] px-1.5 py-0.5 flex items-center gap-0.5"
         >
            <Sparkles className="h-2.5 w-2.5" /> {t('menu:chefsSuggestion')}
         </Badge>
       )}
       <Card className={cn(
           "flex flex-col group shadow-md hover:shadow-lg bg-card text-card-foreground transition-all duration-300 ease-out",
-          item.isChefSuggestion && "border-2 border-primary"
+          item.isChefSuggestion && "border-2 border-primary" 
         )}>
         
         {shouldShowImage && (
@@ -67,21 +67,30 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
             !shouldShowImage && !item.isChefSuggestion ? 'pt-4' : '',
             shouldShowImage && !item.isChefSuggestion ? 'pt-2 sm:pt-3' : ''
           )}>
-          <CardTitle 
-            suppressHydrationWarning
-            className="text-lg lg:text-xl font-serif group-hover:text-primary transition-colors duration-300 leading-snug"
-          > 
-            {displayName}
-          </CardTitle>
+          <div className="flex justify-between items-baseline">
+            <CardTitle 
+              suppressHydrationWarning
+              className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-snug"
+            > 
+              {displayName}
+            </CardTitle>
+            {item.price && (
+              <span className="text-xs sm:text-sm text-primary font-semibold ml-2 whitespace-nowrap">
+                + {item.price}
+              </span>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="flex flex-col justify-between flex-1 px-3 sm:px-4 pb-3 pt-0"> 
-          <CardDescription suppressHydrationWarning className="text-xs text-muted-foreground mb-2 line-clamp-3"> 
-            {displayDescription}
-          </CardDescription>
+          {displayDescription && (
+            <CardDescription suppressHydrationWarning className="text-xs text-muted-foreground mb-2 line-clamp-3"> 
+              {displayDescription}
+            </CardDescription>
+          )}
           
           {item.allergens && item.allergens.length > 0 && (
             <TooltipProvider delayDuration={300}>
-              <div className="mt-1.5 mb-0.5 flex items-center flex-wrap gap-1.5">
+              <div className="mt-1.5 mb-0.5 flex items-center flex-wrap gap-1">
                 {item.allergens.map(allergen => {
                   const iconName = allergen
                     .toLowerCase()
