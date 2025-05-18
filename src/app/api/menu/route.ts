@@ -9,7 +9,7 @@ import { parse as parseTime, isValid as isValidDate, format as formatDate } from
 // URL for the MAIN MENU sheet
 let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?output=csv';
 
-// URL for the "preciosmenu" sheet - MAKE SURE THIS IS THE CORRECT PUBLISHED CSV LINK FOR THE "preciosmenu" TAB
+// URL for the "preciosmenu" sheet
 let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
 
 
@@ -80,8 +80,8 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
   // console.log(logPrefix + ": Received CSV text length: " + csvText.length);
 
   if (lines.length < 2) {
-    // console.warn(logPrefix + ": CSV content is too short (less than 2 lines) or headers are missing. Lines found: " + lines.length);
-    // if (lines.length === 1) console.warn(logPrefix + ": Headers received: " + lines[0]);
+    console.warn(logPrefix + ": CSV content is too short (less than 2 lines) or headers are missing. Lines found: " + lines.length);
+    if (lines.length === 1) console.warn(logPrefix + ": Headers received: " + lines[0]);
     return [];
   }
 
@@ -131,7 +131,7 @@ function isValidHttpUrl(urlStr: string): boolean {
   try {
     // Attempt to prepend https if protocol is missing and it looks like a domain
     if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://') && urlStr.includes('.') && !urlStr.includes(' ')) {
-      // console.log(`API_ROUTE_LOGIC_IS_VALID_URL: Prepending https:// to '${urlStr}'`);
+      // console.log(API_ROUTE_LOGIC_IS_VALID_URL: Prepending https:// to '${urlStr}');
       urlStr = 'https://' + urlStr;
     }
     url = new URL(urlStr);
@@ -140,26 +140,9 @@ function isValidHttpUrl(urlStr: string): boolean {
     return false;
   }
   const isValid = url.protocol === "http:" || url.protocol === "https://";
-  // if (isValid) console.log(`API_ROUTE_LOGIC_IS_VALID_URL: URL '${urlStr}' is valid.`);
-  // else console.warn(`API_ROUTE_LOGIC_IS_VALID_URL: URL '${urlStr}' is NOT valid (protocol: ${url.protocol}).`);
+  // if (isValid) console.log(API_ROUTE_LOGIC_IS_VALID_URL: URL '${urlStr}' is valid.);
+  // else console.warn(API_ROUTE_LOGIC_IS_VALID_URL: URL '${urlStr}' is NOT valid (protocol: ${url.protocol}).);
   return isValid;
-}
-
-function transformGoogleDriveLink(originalUrl: string): string | null {
-  // console.log(`API_ROUTE_LOGIC_TRANSFORM_GDRIVE: Attempting to transform Google Drive link: ${originalUrl}`);
-  if (originalUrl && originalUrl.includes('drive.google.com')) {
-    const fileIdMatch = originalUrl.match(/file\/d\/([a-zA-Z0-9_-]+)\/view/);
-    if (fileIdMatch && fileIdMatch[1]) {
-      const fileId = fileIdMatch[1];
-      // console.log(`API_ROUTE_LOGIC_TRANSFORM_GDRIVE: Matched Google Drive file/d/ link. File ID: ${fileId}`);
-      const transformed = `https://drive.google.com/uc?export=view&id=${fileId}`;
-      // console.log(`API_ROUTE_LOGIC_TRANSFORM_GDRIVE: Transformed Google Drive link to: ${transformed}`);
-      return transformed;
-    }
-    // console.log(`API_ROUTE_LOGIC_TRANSFORM_GDRIVE: Link is Google Drive but does not match file/d/ pattern: ${originalUrl}`);
-  }
-  // console.log(`API_ROUTE_LOGIC_TRANSFORM_GDRIVE: Link is not a transformable Google Drive link: ${originalUrl}`);
-  return originalUrl; // Return original if not a GDrive link or no match
 }
 
 async function fetchRawCsvData(url: string, logPrefix: string): Promise<string | null> {
@@ -287,16 +270,16 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
 
     let visibleItemsCount = 0;
     allMenuItems = parsedMenuData.map((item: Record<string, string>, index: number) => {
-      // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Row " + (index + 2) + " RAW: " + JSON.stringify(item));
+      console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Row " + (index + 2) + " RAW: " + JSON.stringify(item));
 
       const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); 
       const isVisible = (visibleString.toUpperCase() === "TRUE" || visibleString === "1" || visibleString.toUpperCase() === "SÍ" || visibleString.toUpperCase() === "VERDADERO");
       
       if (!isVisible) {
-        // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " is marked as NOT VISIBLE ('" + visibleString + "'). Skipping.");
+        console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " is marked as NOT VISIBLE ('" + visibleString + "'). Skipping.");
         return null;
       }
-      // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " IS VISIBLE.");
+      console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " IS VISIBLE.");
       visibleItemsCount++;
       
       const nameCA = item[NOM_CA_COL];
@@ -314,12 +297,12 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       const alergenosString = item[ALERGENOS_COL] || "";
 
       if (!nameCA && !nameES && !nameEN) {
-        // console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row " + (index + 2) + " (Visible) is MISSING ALL NAME DATA. Skipping. Data: " + JSON.stringify(item));
+        console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row " + (index + 2) + " (Visible) is MISSING ALL NAME DATA. Skipping. Data: " + JSON.stringify(item));
         return null;
       }
       const primaryCategoryEN = categoryEN || categoryES || categoryCA;
       if (!primaryCategoryEN) {
-        //  console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row " + (index + 2) + " (Visible) has NO CATEGORY AT ALL. Skipping. Data: " + JSON.stringify(item));
+         console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row " + (index + 2) + " (Visible) has NO CATEGORY AT ALL. Skipping. Data: " + JSON.stringify(item));
         return null;
       }
       const categoryKey = mapCategoryToKey(primaryCategoryEN);
@@ -329,14 +312,11 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       let finalImageUrl = 'https://placehold.co/400x300.png'; // Default placeholder
       console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has image link from sheet: '" + linkImagenFromSheet + "'");
       if (linkImagenFromSheet && linkImagenFromSheet.toUpperCase() !== "FALSE" && linkImagenFromSheet.trim() !== "") {
-        const transformedUrl = transformGoogleDriveLink(linkImagenFromSheet);
-        console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' transformed URL: '" + transformedUrl + "' (original: '" + linkImagenFromSheet + "')");
-        
-        if (transformedUrl && isValidHttpUrl(transformedUrl)) {
-          finalImageUrl = transformedUrl;
-          console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' using valid image URL from sheet (potentially transformed): '" + finalImageUrl + "'");
+        if (isValidHttpUrl(linkImagenFromSheet)) {
+          finalImageUrl = linkImagenFromSheet;
+          console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' using valid image URL from sheet: '" + finalImageUrl + "'");
         } else {
-            console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has an invalid or unusable image URL from sheet: '" + linkImagenFromSheet + "' (transformed: '" + transformedUrl + "'). Using placeholder.");
+            console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has an invalid or unusable image URL from sheet: '" + linkImagenFromSheet + "'. Using placeholder.");
         }
       } else {
         console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has no image link or is marked FALSE. Using placeholder.");
@@ -353,7 +333,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         if (!isNaN(numericPrice)) {
           formattedPrice = '€' + numericPrice.toFixed(2);
         } else {
-          // console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Could not parse price '${priceFromSheet}' for item '${primaryNameEN}' into a number.`);
+          // console.warn(API_ROUTE_LOGIC_ITEM_PROCESSING: Could not parse price '${priceFromSheet}' for item '${primaryNameEN}' into a number.);
         }
       }
 
@@ -362,7 +342,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         .filter(a => a.length > 0 && a !== "false" && a !== "n/a");
 
       const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE', 'VERDADERO', 'SÍ', 'SI'].includes(sugerenciaChefString.toLowerCase().trim());
-      // if (isChefSuggestion) console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${primaryNameEN}' IS a chef suggestion.`);
+      // if (isChefSuggestion) console.log(API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${primaryNameEN}' IS a chef suggestion.);
 
       const menuItem: MenuItemData = {
         id: categoryKey + '-' + index + '-' + Date.now(), 
@@ -383,7 +363,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         allergens: allergens.length > 0 ? allergens : undefined,
         isChefSuggestion: isChefSuggestion,
       };
-      // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item: " + JSON.stringify(menuItem));
+      console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item: " + JSON.stringify(menuItem));
       return menuItem;
     }).filter(item => item !== null) as MenuItemData[];
 
@@ -422,4 +402,3 @@ export async function GET() {
   // console.log("API_ROUTE_GET_MENU: Total menu items processed: " + menuItems.length + ". Sending response.");
   return NextResponse.json({ menuItems, currentMenuPrice }, { status: 200, headers });
 }
-
