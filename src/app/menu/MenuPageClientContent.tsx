@@ -65,17 +65,16 @@ export default function MenuPageClientContent({
                {t('common:page.menu.title')}
             </h1>
 
-            {/* Display Price Summary (moved above currentMenuPrice) */}
-            {(priceSummary.weekdayPrice || priceSummary.weekendPrice) && (
+            {priceSummary && (priceSummary.weekdayPrice || priceSummary.weekendPrice) && (
               <div className="mb-2 text-md text-foreground/80">
-                {priceSummary.weekdayPrice && (
+                {priceSummary.weekdayPrice && priceSummary.weekdayLabelKey && (
                   <span className="mr-3" suppressHydrationWarning>
-                    {t('menu:weekdaysPriceLabel')}: <span className="font-semibold">{priceSummary.weekdayPrice}</span>
+                    {t(priceSummary.weekdayLabelKey)}: <span className="font-semibold">{priceSummary.weekdayPrice}</span>
                   </span>
                 )}
-                {priceSummary.weekendPrice && (
+                {priceSummary.weekendPrice && priceSummary.weekendLabelKey && (
                   <span suppressHydrationWarning>
-                    {t('menu:weekendsPriceLabel')}: <span className="font-semibold">{priceSummary.weekendPrice}</span>
+                    {t(priceSummary.weekendLabelKey)}: <span className="font-semibold">{priceSummary.weekendPrice}</span>
                   </span>
                 )}
               </div>

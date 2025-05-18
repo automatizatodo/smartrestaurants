@@ -4,19 +4,12 @@
 import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
 import restaurantConfig from '@/config/restaurant.config';
-import { parse as parseTime, isValid as isValidDate, format as formatDate } from 'date-fns';
+import { parse as parseTime, isValid as isValidDate, format as formatDate, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday, isSunday } from 'date-fns';
 
 // URL for the MAIN MENU sheet
 let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
 
 // !!! IMPORTANT: URL for the "preciosmenu" sheet !!!
-// You MUST get this by:
-// 1. Opening your Google Sheet
-// 2. Selecting the "preciosmenu" tab
-// 3. Going to File > Share > Publish to web
-// 4. Selecting "preciosmenu" sheet and "Comma-separated values (.csv)"
-// 5. Clicking "Publish" and copying the generated URL here.
-// It will look like: https://docs.google.com/spreadsheets/d/e/YOUR_DOC_ID/pub?gid=YOUR_PRECIOSMENU_SHEET_GID&single=true&output=csv
 let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
 
 
@@ -64,7 +57,9 @@ interface PriceEntry {
 
 export interface PriceSummary {
   weekdayPrice?: string;
+  weekdayLabelKey?: string;
   weekendPrice?: string;
+  weekendLabelKey?: string;
 }
 
 // Helper to map English category names from sheet to consistent categoryKeys
@@ -73,8 +68,8 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses'; // Primers Plats
-    case 'second courses': return 'secondCourses'; // Segon Plat
+    case 'main courses': return 'mainCourses';
+    case 'second courses': return 'secondCourses';
     case 'grilled garnish': return 'grilledGarnish';
     case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
@@ -104,7 +99,7 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
 
   const missingHeaders = expectedHeaders.filter(eh => !headersFromSheet.includes(eh));
   if (missingHeaders.length > 0) {
-    // console.error(logPrefix + ": Critical header mismatch. Missing expected headers: [" + missingHeaders.join(", ") + "]. Sheet headers: [" + headersFromSheet.join(", ") + "]. Cannot process sheet.");
+    console.error(logPrefix + ": Critical header mismatch. Missing expected headers: [" + missingHeaders.join(", ") + "]. Sheet headers: [" + headersFromSheet.join(", ") + "]. Cannot process sheet.");
     return [];
   }
 
@@ -141,7 +136,6 @@ function isValidHttpUrl(urlStr: string): boolean {
   if (!urlStr || typeof urlStr !== 'string') return false;
   let urlToParse = urlStr;
   try {
-    // Attempt to prepend https:// if it looks like a domain without a protocol
     if (!urlToParse.startsWith('http://') && !urlToParse.startsWith('https://') && urlToParse.includes('.') && !urlToParse.includes(' ')) {
       urlToParse = 'https://' + urlToParse;
     }
@@ -160,7 +154,7 @@ function isValidHttpUrl(urlStr: string): boolean {
 
 async function fetchRawCsvData(url: string, logPrefix: string): Promise<string | null> {
   if (!url || url.includes('YOUR_') || url.includes('REPLACE_WITH_')) {
-    // console.error(logPrefix + ": CRITICAL - URL is not configured correctly: " + url + ". Please update it in src/app/api/menu/route.ts");
+    console.error(logPrefix + ": CRITICAL - URL is not configured correctly: " + url + ". Please update it in src/app/api/menu/route.ts");
     return null;
   }
 
@@ -178,7 +172,7 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
       } else if (response.status === 400 && errorText.toLowerCase().includes('page not found')) {
         errorMessage += " This 'Page Not Found' error from Google Sheets usually means the specific published CSV link is incorrect, has changed, or the sheet/document is no longer published as expected. Verify the 'Publish to web' CSV link for the specific sheet.";
       }
-      // console.error(errorMessage);
+      console.error(errorMessage);
       return null;
     }
 
@@ -191,7 +185,7 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
     }
     return csvText;
   } catch (error: any) {
-    // console.error(logPrefix + ": Unhandled error fetching CSV from " + fetchUrl + ": " + error.message, error.stack);
+    console.error(logPrefix + ": Unhandled error fetching CSV from " + fetchUrl + ": " + error.message, error.stack);
     return null;
   }
 }
@@ -216,11 +210,11 @@ async function getCurrentMenuPrice(): Promise<string | null> {
       const precioRaw = row[PRECIO_MENU_COL_PRICE] || "";
 
       if (!diaRaw.trim() || !precioRaw.trim() || !franjaHorariaRaw.trim() || !franjaHorariaRaw.includes('-')) {
-        return null; // Mark as invalid if essential parts for pricing are missing
+        return null; 
       }
       const [start, end] = franjaHorariaRaw.split(/\s*-\s*/);
       return {
-        dia: diaRaw.trim(), // Keep original case for potential display, logic will use toLowerCase
+        dia: diaRaw.trim(), 
         franjaStart: start.trim(),
         franjaEnd: end.trim(),
         precio: precioRaw.trim()
@@ -238,7 +232,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     const dayNameLower = dayFormatter.format(nowUtc);
     currentDayNameInSpain = dayNameLower.charAt(0).toUpperCase() + dayNameLower.slice(1);
   } catch (e) {
-    // console.error("API_ROUTE_GET_PRICE: Error formatting day for timezone", timeZone, e);
+    console.warn("API_ROUTE_GET_PRICE: Error formatting day for timezone", timeZone, e);
     currentDayNameInSpain = new Date().toLocaleDateString('es-ES', { weekday: 'long' }); // Fallback
     currentDayNameInSpain = currentDayNameInSpain.charAt(0).toUpperCase() + currentDayNameInSpain.slice(1);
   }
@@ -248,7 +242,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone });
     currentTimeFormattedInSpain = timeFormatter.format(nowUtc);
   } catch (e) {
-    // console.error("API_ROUTE_GET_PRICE: Error formatting time for timezone", timeZone, e);
+    console.warn("API_ROUTE_GET_PRICE: Error formatting time for timezone", timeZone, e);
     const localNow = new Date(); // Fallback
     currentTimeFormattedInSpain = String(localNow.getHours()).padStart(2, '0') + ':' + String(localNow.getMinutes()).padStart(2, '0');
   }
@@ -313,20 +307,39 @@ async function generatePriceSummary(): Promise<PriceSummary> {
     })
     .filter(entry => entry !== null) as PriceEntry[];
 
-  const weekdays = ["lunes", "martes", "miércoles", "jueves", "viernes"];
-  const weekends = ["sábado", "domingo"];
+  const weekdaysSpanish = ["lunes", "martes", "miércoles", "jueves", "viernes"];
+  const weekendsSpanish = ["sábado", "domingo"];
 
+  // Find weekday price and determine label
   for (const entry of priceEntries) {
-    if (!priceSummary.weekdayPrice && weekdays.includes(entry.dia)) {
+    if (!priceSummary.weekdayPrice && weekdaysSpanish.includes(entry.dia)) {
       priceSummary.weekdayPrice = entry.precio;
+      // Check if Monday has a price
+      const mondayHasPrice = priceEntries.some(pe => pe.dia === "lunes");
+      if (mondayHasPrice) {
+        priceSummary.weekdayLabelKey = "menu:weekdaysPriceLabel"; // Lunes-Viernes
+      } else {
+        priceSummary.weekdayLabelKey = "menu:tuesdayToFridayPriceLabel"; // Martes-Viernes
+      }
     }
-    if (!priceSummary.weekendPrice && weekends.includes(entry.dia)) {
-      priceSummary.weekendPrice = entry.precio;
-    }
-    if (priceSummary.weekdayPrice && priceSummary.weekendPrice) {
-      break; // Found both, no need to continue
-    }
+    if (priceSummary.weekdayPrice) break; // Found a weekday price and label, no need to continue for weekdays
   }
+  
+  // Find weekend price
+  for (const entry of priceEntries) {
+    if (!priceSummary.weekendPrice && weekendsSpanish.includes(entry.dia)) {
+      priceSummary.weekendPrice = entry.precio;
+      priceSummary.weekendLabelKey = "menu:weekendsPriceLabel";
+    }
+    if (priceSummary.weekendPrice) break; // Found a weekend price, no need to continue for weekends
+  }
+
+  if (priceSummary.weekdayPrice && !priceSummary.weekdayLabelKey) {
+    // Fallback if a weekday price was found but Monday specific check failed (should not happen with current logic)
+    priceSummary.weekdayLabelKey = "menu:weekdaysPriceLabel";
+  }
+
+
   // console.log("API_ROUTE_GENERATE_PRICE_SUMMARY: Generated summary:", priceSummary);
   return priceSummary;
 }
@@ -348,7 +361,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
     allMenuItems = parsedMenuData.map((item: Record<string, string>, index: number) => {
       // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Row " + (index + 2) + " RAW: " + JSON.stringify(item));
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); // Default to TRUE if column is missing or empty
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); 
       const isVisible = ["TRUE", "VERDADERO", "SÍ", "SI", "1"].includes(visibleString.toUpperCase());
 
 

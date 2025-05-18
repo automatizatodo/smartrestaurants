@@ -17,5 +17,6 @@
   "chefsSuggestion": "Sugerencia del Chef",
   "allergensTitle": "Alérgenos:",
   "weekdaysPriceLabel": "Lunes-Viernes",
+  "tuesdayToFridayPriceLabel": "Martes-Viernes",
   "weekendsPriceLabel": "Fines de Semana y Festivos"
 }
