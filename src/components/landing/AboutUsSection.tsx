@@ -4,9 +4,12 @@
 import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
 import { Button } from '@/components/ui/button';
-import restaurantConfig from '@/config/restaurant.config'; // Import config for logo
+import restaurantConfig from '@/config/restaurant.config';
+import { useState, useCallback, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-// Define component images array directly in the component or import if preferred
+// Definim les imatges aquí per a més claredat
 const componentImages = [
   {
     src: "/façana.webp",
@@ -20,82 +23,142 @@ const componentImages = [
     hint: "restaurant interior dining",
     priority: false,
   },
-  // Terrassa image is not used in this new design based on the example.
+  // La imatge de la terrassa no s'utilitzarà al carrusel de dues imatges
 ];
+
+const carouselImages = componentImages.slice(0, 2); // Només les dues primeres
 
 export default function AboutUsSection() {
   const { t } = useLanguage();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextImage = useCallback(() => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % carouselImages.length);
+  }, []);
+
+  const prevImage = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + carouselImages.length) % carouselImages.length);
+  };
+
+  const goToImage = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  useEffect(() => {
+    if (carouselImages.length <= 1) return;
+    const timer = setTimeout(nextImage, 7000); // Canvia la imatge cada 7 segons
+    return () => clearTimeout(timer);
+  }, [currentIndex, nextImage]);
+
 
   return (
-    <section id="about-us" className="py-16 sm:py-20 bg-stone-800 text-gray-100 overflow-hidden"> {/* Dark background, light text */}
+    <section id="about-us" className="py-12 sm:py-16 bg-stone-800 text-gray-100 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl sm:text-5xl font-cinzel font-bold text-center mb-12 sm:mb-16">
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-cinzel font-bold text-center mb-10 sm:mb-14">
           {t('landing:aboutUs.title')}
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-x-10 lg:gap-x-16 gap-y-10 mb-12 sm:mb-16 items-start">
-          {/* Left Column: Qui som */}
-          <div className="relative">
-            {restaurantConfig.logoUrl && (
-              <div className="absolute inset-0 flex items-center justify-center -z-10 pointer-events-none select-none">
-                <Image
-                  src={restaurantConfig.logoUrl}
-                  alt="" // Decorative, alt handled by main logo instances
-                  width={300}
-                  height={300}
-                  className="object-contain opacity-5 md:opacity-[0.03]"
-                />
+        <div className="grid md:grid-cols-2 gap-x-10 lg:gap-x-16 gap-y-10 items-center">
+          {/* Columna Esquerra: Textos */}
+          <div className="space-y-8 md:space-y-10">
+            {/* Qui som */}
+            <div className="relative">
+              {restaurantConfig.logoUrl && (
+                <div className="absolute inset-0 flex items-center justify-center -z-10 pointer-events-none select-none">
+                  <Image
+                    src={restaurantConfig.logoUrl}
+                    alt="" // Decoratiu
+                    width={300}
+                    height={300}
+                    className="object-contain opacity-5 md:opacity-[0.03]"
+                  />
+                </div>
+              )}
+              <h3 className="text-2xl lg:text-3xl font-cinzel font-semibold mb-3 text-amber-500">
+                {t('landing:aboutUs.whoWeAreTitle')}
+              </h3>
+              <p className="text-base sm:text-lg leading-relaxed text-gray-300 mb-5">
+                {t('landing:aboutUs.introduction')}
+              </p>
+              <Button className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-md text-sm font-medium">
+                {t('landing:aboutUs.meetTheTeamButton')}
+              </Button>
+            </div>
+
+            {/* El nostre espai */}
+            <div>
+              <h3 className="text-2xl lg:text-3xl font-cinzel font-semibold mb-3 text-amber-500">
+                {t('landing:aboutUs.ourSpaceTitle')}
+              </h3>
+              <p className="text-base sm:text-lg leading-relaxed text-gray-300">
+                {t('landing:aboutUs.paragraph1')}
+              </p>
+            </div>
+          </div>
+
+          {/* Columna Dreta: Carrusel d'Imatges amb Marc */}
+          <div className="flex justify-center items-center md:h-full">
+            <div className="w-full max-w-md lg:max-w-lg p-2 sm:p-3 bg-amber-50/10 border-4 border-amber-600/50 rounded-lg shadow-2xl aspect-[4/3]">
+              <div className="relative h-full w-full overflow-hidden rounded-md">
+                {carouselImages.map((image, index) => (
+                  <div
+                    key={image.src}
+                    className={cn(
+                      "absolute inset-0 transition-opacity duration-700 ease-in-out",
+                      index === currentIndex ? "opacity-100" : "opacity-0"
+                    )}
+                  >
+                    <Image
+                      src={image.src}
+                      alt={t(image.altKey)}
+                      fill
+                      className="object-cover"
+                      data-ai-hint={image.hint}
+                      priority={index === 0}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                    />
+                  </div>
+                ))}
+
+                {carouselImages.length > 1 && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={prevImage}
+                      className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/30 hover:bg-black/50 text-white"
+                      aria-label={t('common:previous')}
+                    >
+                      <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={nextImage}
+                      className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/30 hover:bg-black/50 text-white"
+                      aria-label={t('common:next')}
+                    >
+                      <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </Button>
+                  </>
+                )}
               </div>
-            )}
-            <h3 className="text-3xl font-cinzel font-semibold mb-4 text-amber-500">
-              {t('landing:aboutUs.whoWeAreTitle')}
-            </h3>
-            <p className="text-base sm:text-lg leading-relaxed text-gray-300 mb-6">
-              {t('landing:aboutUs.introduction')}
-            </p>
-            <Button className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-md text-sm font-medium">
-              {t('landing:aboutUs.meetTheTeamButton')}
-            </Button>
-          </div>
-
-          {/* Right Column: El nostre espai */}
-          <div>
-            <h3 className="text-3xl font-cinzel font-semibold mb-4 text-amber-500">
-              {t('landing:aboutUs.ourSpaceTitle')}
-            </h3>
-            <p className="text-base sm:text-lg leading-relaxed text-gray-300">
-              {t('landing:aboutUs.paragraph1')}
-            </p>
-          </div>
-        </div>
-
-        {/* Image Section */}
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center md:items-end">
-          {/* Facade Image */}
-          <div className="relative w-full max-w-md mx-auto md:mx-0 md:max-w-none transform -rotate-2 hover:rotate-0 transition-transform duration-300 ease-in-out">
-            <Image
-              src={componentImages[0].src}
-              alt={t(componentImages[0].altKey)}
-              width={600}
-              height={450}
-              className="rounded-lg shadow-2xl object-cover aspect-[4/3]"
-              data-ai-hint={componentImages[0].hint}
-              priority={componentImages[0].priority}
-            />
-          </div>
-
-          {/* Interior Image with Border */}
-          <div className="relative w-full max-w-md mx-auto md:mx-0 md:max-w-none transform rotate-2 hover:rotate-0 transition-transform duration-300 ease-in-out">
-            <div className="p-2 sm:p-3 bg-white shadow-2xl rounded-sm">
-              <Image
-                src={componentImages[1].src}
-                alt={t(componentImages[1].altKey)}
-                width={600}
-                height={400}
-                className="object-cover aspect-[4/3]"
-                data-ai-hint={componentImages[1].hint}
-                priority={componentImages[1].priority}
-              />
+              {/* Indicadors de Punts */}
+              {carouselImages.length > 1 && (
+                <div className="absolute bottom-[-25px] left-1/2 -translate-x-1/2 flex space-x-2 p-1">
+                  {carouselImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToImage(index)}
+                      aria-label={t('common:goToSlide', { number: index + 1 })}
+                      className={cn(
+                        "h-2 w-2 rounded-full transition-all duration-300",
+                        currentIndex === index ? "bg-amber-500 scale-125" : "bg-gray-400/70 hover:bg-gray-300/90"
+                      )}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
