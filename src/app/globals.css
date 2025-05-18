@@ -134,10 +134,16 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Parallax utility */
 .parallax-bg {
-  background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  background-attachment: scroll; /* Default for mobile */
+}
+
+@media (min-width: 768px) { /* Apply 'fixed' attachment for medium screens and up (Tailwind's 'md' breakpoint) */
+  .parallax-bg {
+    background-attachment: fixed;
+  }
 }
 
 /* Utility to hide scrollbars */
