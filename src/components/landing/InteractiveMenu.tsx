@@ -11,13 +11,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { UtensilsCrossed, AlertTriangle } from 'lucide-react';
 import restaurantConfig from '@/config/restaurant.config';
+import type { PriceSummary } from '@/app/api/menu/route';
 
 interface InteractiveMenuProps {
   menuItems: MenuItemData[];
   currentMenuPrice?: string | null;
+  priceSummary: PriceSummary;
 }
 
-export default function InteractiveMenu({ menuItems, currentMenuPrice }: InteractiveMenuProps) {
+export default function InteractiveMenu({ menuItems, currentMenuPrice, priceSummary }: InteractiveMenuProps) {
   const { t } = useLanguage();
 
   const availableCategoryKeys = Array.from(new Set(menuItems.map(item => item.categoryKey).filter(Boolean)));
@@ -34,7 +36,7 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
     : "";
 
   if (!menuItems || menuItems.length === 0) {
-    return (
+    return ( // Ensure parentheses for multi-line JSX
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2
@@ -79,7 +81,7 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
   }
 
   if (sortedCategories.length === 0) {
-    return (
+    return ( // Ensure parentheses for multi-line JSX
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2
@@ -124,16 +126,30 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
   }
 
 
-  return (
+  return ( // Ensure parentheses for multi-line JSX
     <section id="menu" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h2
-            className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4"
-            suppressHydrationWarning
-          >
+        <div className="text-center mb-8"> {/* Reduced mb from 12/16 to 8 */}
+          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4" suppressHydrationWarning>
             {t('landing:menu.sectionTitle')}
           </h2>
+
+          {/* Price Summary Display - Copied from MenuPageClientContent */}
+          {priceSummary && (priceSummary.weekdayPrice || priceSummary.weekendPrice) && (
+              <div className="mb-2 text-md text-foreground/80">
+                {priceSummary.weekdayPrice && priceSummary.weekdayLabelKey && (
+                  <span className="mr-3" suppressHydrationWarning>
+                    {t(priceSummary.weekdayLabelKey)}: <span className="font-semibold">{priceSummary.weekdayPrice}</span>
+                  </span>
+                )}
+                {priceSummary.weekendPrice && priceSummary.weekendLabelKey && (
+                  <span suppressHydrationWarning>
+                    {t(priceSummary.weekendLabelKey)}: <span className="font-semibold">{priceSummary.weekendPrice}</span>
+                  </span>
+                )}
+              </div>
+            )}
+
           {currentMenuPrice && (
             <div className="mb-6">
               <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
@@ -147,12 +163,11 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
               )}
             </div>
           )}
-          <p
-            className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12"
-            suppressHydrationWarning
-          >
-            {t('landing:menu.sectionDescription')}
-          </p>
+          {t('landing:menu.sectionDescription').trim() && (
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12" suppressHydrationWarning>
+              {t('landing:menu.sectionDescription')}
+            </p>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -174,7 +189,7 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
                 {menuItems
                   .filter(item => item.categoryKey === category.key)
-                  .slice(0, 3)
+                  .slice(0, 3) // Show only 3 items per category on the homepage
                   .map((item, index) => (
                     <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                       <MenuItemCard item={item} />
@@ -201,3 +216,5 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice }: Interac
     </section>
   );
 }
+
+    

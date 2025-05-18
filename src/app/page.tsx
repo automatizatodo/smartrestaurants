@@ -13,12 +13,12 @@ import { fetchMenuDataWithPrice } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import restaurantConfig from '@/config/restaurant.config'; // Import config
 import { Suspense } from 'react';
+import type { PriceSummary } from '@/app/api/menu/route';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const { menuItems, currentMenuPrice } = await fetchMenuDataWithPrice();
-  // Removed HOMEPAGE_LOGs
+  const { menuItems, currentMenuPrice, priceSummary } = await fetchMenuDataWithPrice();
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -27,7 +27,7 @@ export default async function HomePage() {
         <HeroSection />
         <ServicesSection />
         <Suspense fallback={<div className="text-center py-10">Loading menu...</div>}>
-          <InteractiveMenu menuItems={menuItems} currentMenuPrice={currentMenuPrice} />
+          <InteractiveMenu menuItems={menuItems} currentMenuPrice={currentMenuPrice} priceSummary={priceSummary} />
         </Suspense>
         <AboutUsSection />
         {restaurantConfig.showAISommelierSection && <AISommelierSection />}
