@@ -49,6 +49,8 @@ export default function MenuPageClientContent({
     ? t(menuDelDiaPriceDescriptionKey)
     : "";
 
+  const menuPageDescription = t('common:page.menu.description', { restaurantName });
+
   const languageButtons = [
     { code: 'ca', name: 'Català' },
     { code: 'es', name: 'Español' },
@@ -90,9 +92,11 @@ export default function MenuPageClientContent({
                 )}
               </div>
             )}
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto" suppressHydrationWarning>
-               {t('common:page.menu.description', { restaurantName })}
-            </p>
+            {menuPageDescription && menuPageDescription.trim() !== '' && (
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto" suppressHydrationWarning>
+                {menuPageDescription}
+              </p>
+            )}
           </div>
 
           {/* Language Selector Buttons */}
@@ -141,3 +145,4 @@ export default function MenuPageClientContent({
     </div>
   );
 }
+
