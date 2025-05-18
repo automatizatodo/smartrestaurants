@@ -12,13 +12,13 @@ import { cn } from '@/lib/utils';
 // Definim les imatges aquí per a més claredat
 const componentImages = [
   {
-    src: "/façana.webp",
+    src: "/façana.webp", // Façana
     altKey: "landing:aboutUs.imageAltExterior",
     hint: "restaurant exterior facade",
     priority: true,
   },
   {
-    src: "/interior2.webp",
+    src: "/interior2.webp", // Interior
     altKey: "landing:aboutUs.imageAltInterior",
     hint: "restaurant interior dining",
     priority: false,
@@ -71,23 +71,24 @@ export default function AboutUsSection() {
                     width={300}
                     height={300}
                     className="object-contain opacity-5 md:opacity-[0.03]"
+                    priority={false}
                   />
                 </div>
               )}
-              <h3 className="text-2xl lg:text-3xl font-cinzel font-semibold mb-3 text-amber-500">
+              <h3 className="text-2xl lg:text-3xl font-cinzel font-semibold mb-3 text-primary">
                 {t('landing:aboutUs.whoWeAreTitle')}
               </h3>
               <p className="text-base sm:text-lg leading-relaxed text-gray-300 mb-5">
                 {t('landing:aboutUs.introduction')}
               </p>
-              <Button className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-md text-sm font-medium">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-2.5 rounded-md text-sm font-medium shadow-md hover:shadow-lg transition-shadow">
                 {t('landing:aboutUs.meetTheTeamButton')}
               </Button>
             </div>
 
             {/* El nostre espai */}
             <div>
-              <h3 className="text-2xl lg:text-3xl font-cinzel font-semibold mb-3 text-amber-500">
+              <h3 className="text-2xl lg:text-3xl font-cinzel font-semibold mb-3 text-primary">
                 {t('landing:aboutUs.ourSpaceTitle')}
               </h3>
               <p className="text-base sm:text-lg leading-relaxed text-gray-300">
@@ -96,9 +97,13 @@ export default function AboutUsSection() {
             </div>
           </div>
 
-          {/* Columna Dreta: Carrusel d'Imatges amb Marc */}
+          {/* Columna Dreta: Carrusel d'Imatges amb Marc inclinat */}
           <div className="flex justify-center items-center md:h-full">
-            <div className="w-full max-w-md lg:max-w-lg p-2 sm:p-3 bg-amber-50/10 border-4 border-amber-600/50 rounded-lg shadow-2xl aspect-[4/3]">
+            <div className={cn(
+              "w-full max-w-md lg:max-w-lg p-1.5 sm:p-2 rounded-lg shadow-2xl aspect-[4/3]",
+              "transform rotate-[-2deg] group-hover:rotate-[-3deg] transition-transform duration-300",
+              "bg-secondary/20 border-2 border-primary/70" // Marc subtil amb color primari
+            )}>
               <div className="relative h-full w-full overflow-hidden rounded-md">
                 {carouselImages.map((image, index) => (
                   <div
@@ -114,7 +119,7 @@ export default function AboutUsSection() {
                       fill
                       className="object-cover"
                       data-ai-hint={image.hint}
-                      priority={index === 0}
+                      priority={image.priority}
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
                     />
                   </div>
@@ -153,7 +158,7 @@ export default function AboutUsSection() {
                       aria-label={t('common:goToSlide', { number: index + 1 })}
                       className={cn(
                         "h-2 w-2 rounded-full transition-all duration-300",
-                        currentIndex === index ? "bg-amber-500 scale-125" : "bg-gray-400/70 hover:bg-gray-300/90"
+                        currentIndex === index ? "bg-primary scale-125" : "bg-gray-400/70 hover:bg-gray-300/90"
                       )}
                     />
                   ))}
@@ -166,3 +171,4 @@ export default function AboutUsSection() {
     </section>
   );
 }
+
