@@ -23,7 +23,6 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   const displayName = item.name[language] || item.name.en;
   const displayDescription = item.description[language] || item.description.en;
 
-  // Condition to show image: global config must be true AND imageUrl must exist AND imageUrl must NOT be a placeholder
   const shouldShowImage = restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co');
 
   return (
@@ -33,9 +32,9 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
     )}>
       {item.isChefSuggestion && (
         <Badge
+          suppressHydrationWarning
           variant="default"
           className="absolute top-0 right-1 -mt-3 z-20 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 flex items-center gap-0.5"
-          suppressHydrationWarning
         >
            <Sparkles className="h-2.5 w-2.5" /> {t('menu:chefsSuggestion')}
         </Badge>
@@ -70,7 +69,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
           )}>
           <CardTitle 
             suppressHydrationWarning
-            className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-tight"
+            className="text-lg lg:text-xl font-serif group-hover:text-primary transition-colors duration-300 leading-snug"
           > 
             {displayName}
           </CardTitle>
