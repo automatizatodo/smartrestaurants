@@ -34,7 +34,8 @@ const componentImages = [
 const carouselImages = componentImages; // Utilitzem totes les imatges per al carrusel
 
 export default function AboutUsSection() {
-  const { t } = useLanguage();
+  const { t, translations } = useLanguage();
+  const restaurantName = translations.common.restaurantName; // Get restaurant name from common translations
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextImage = useCallback(() => {
@@ -65,7 +66,7 @@ export default function AboutUsSection() {
 
         <div className="grid md:grid-cols-2 gap-x-10 lg:gap-x-16 gap-y-10 items-center">
           {/* Columna Esquerra: Textos */}
-          <div className="space-y-8 md:space-y-10">
+          <div className="space-y-8 md:space-y-10 order-2 md:order-1">
             {/* Qui som */}
             <div className="relative">
               {restaurantConfig.logoUrl && (
@@ -84,7 +85,7 @@ export default function AboutUsSection() {
                 {t('landing:aboutUs.whoWeAreTitle')}
               </h3>
               <p className="text-base sm:text-lg leading-relaxed text-gray-300 mb-5">
-                {t('landing:aboutUs.introduction')}
+                {t('landing:aboutUs.introduction', { restaurantName })}
               </p>
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-2.5 rounded-md text-sm font-medium shadow-md hover:shadow-lg transition-shadow">
                 {t('landing:aboutUs.meetTheTeamButton')}
@@ -97,17 +98,17 @@ export default function AboutUsSection() {
                 {t('landing:aboutUs.ourSpaceTitle')}
               </h3>
               <p className="text-base sm:text-lg leading-relaxed text-gray-300">
-                {t('landing:aboutUs.paragraph1')}
+                {t('landing:aboutUs.paragraph1', { restaurantName })}
               </p>
             </div>
           </div>
 
           {/* Columna Dreta: Carrusel d'Imatges amb Marc inclinat */}
-          <div className="flex justify-center items-center md:h-full">
+          <div className="flex justify-center items-center md:h-full order-1 md:order-2">
             <div className={cn(
-              "w-full max-w-md lg:max-w-lg p-1.5 sm:p-2 rounded-lg shadow-xl aspect-[4/3]", // Reduït shadow a xl des de 2xl
+              "w-full max-w-md lg:max-w-lg p-1.5 sm:p-2 rounded-lg shadow-xl aspect-[4/3]", 
               "transform rotate-[-2deg] group-hover:rotate-[-3deg] transition-transform duration-300",
-              "bg-secondary/20 border-2 border-primary/70" // Marc subtil amb color primari
+              "bg-secondary/20 border-2 border-primary/70" 
             )}>
               <div className="relative h-full w-full overflow-hidden rounded-md">
                 {carouselImages.map((image, index) => (
@@ -120,7 +121,7 @@ export default function AboutUsSection() {
                   >
                     <Image
                       src={image.src}
-                      alt={t(image.altKey)}
+                      alt={t(image.altKey, { restaurantName })}
                       fill
                       className="object-cover"
                       data-ai-hint={image.hint}
@@ -176,3 +177,4 @@ export default function AboutUsSection() {
     </section>
   );
 }
+
