@@ -14,5 +14,8 @@
   "menuDelDia.priceTitle": "Preu del Menú",
   "menuDelDia.priceIncludes": "IVA inclòs. Pa, beguda i postre o cafè.",
   "menuDelDia.notes": "Disponible de dimarts a divendres al migdia, excepte festius.",
-  "chefsSuggestion": "Suggeriment del Xef"
+  "chefsSuggestion": "Suggeriment del Xef",
+  "allergensTitle": "Al·lèrgens:",
+  "weekdaysPriceLabel": "Dilluns-Divendres",
+  "weekendsPriceLabel": "Caps de Setmana i Festius"
 }

@@ -1,7 +1,7 @@
 
 {
   "starters": "Starters",
-  "mainCourses": "Main Courses",
+  "mainCourses": "First Courses",
   "secondCourses": "Second Courses",
   "grilledGarnish": "Grilled Garnish",
   "sauces": "Sauces",
@@ -14,5 +14,8 @@
   "menuDelDia.priceTitle": "Menu Price",
   "menuDelDia.priceIncludes": "VAT included. Bread, drink and dessert or coffee.",
   "menuDelDia.notes": "Available Tuesday to Friday midday, excluding holidays.",
-  "chefsSuggestion": "Chef's Suggestion"
+  "chefsSuggestion": "Chef's Suggestion",
+  "allergensTitle": "Allergens:",
+  "weekdaysPriceLabel": "Monday-Friday",
+  "weekendsPriceLabel": "Weekends & Holidays"
 }

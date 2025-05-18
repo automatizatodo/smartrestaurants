@@ -55,14 +55,19 @@ interface PriceEntry {
   precio: string;
 }
 
+export interface PriceSummary {
+  weekdayPrice?: string;
+  weekendPrice?: string;
+}
+
 // Helper to map English category names from sheet to consistent categoryKeys
 function mapCategoryToKey(categoryEN: string): string {
   if (!categoryEN) return 'other';
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses'; // For "Primers Plats"
-    case 'second courses': return 'secondCourses'; // For "Segon Plat"
+    case 'main courses': return 'mainCourses';
+    case 'second courses': return 'secondCourses';
     case 'grilled garnish': return 'grilledGarnish';
     case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
@@ -70,7 +75,7 @@ function mapCategoryToKey(categoryEN: string): string {
     case 'beverages': return 'beverages';
     case 'wines': return 'wines';
     default:
-      console.warn("API_ROUTE_MAP_CATEGORY: Unmapped category EN: " + categoryEN + " - using direct key: " + lowerCategory.replace(/\s+/g, ''));
+      // console.warn("API_ROUTE_MAP_CATEGORY: Unmapped category EN: " + categoryEN + " - using direct key: " + lowerCategory.replace(/\s+/g, ''));
       return lowerCategory.replace(/\s+/g, '') || 'other';
   }
 }
@@ -80,8 +85,8 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
   // console.log(logPrefix + ": Received CSV text length: " + csvText.length);
 
   if (lines.length < 2) {
-    console.warn(logPrefix + ": CSV content is too short (less than 2 lines) or headers are missing. Lines found: " + lines.length);
-    if (lines.length === 1) console.warn(logPrefix + ": Headers received: " + lines[0]);
+    // console.warn(logPrefix + ": CSV content is too short (less than 2 lines) or headers are missing. Lines found: " + lines.length);
+    // if (lines.length === 1) console.warn(logPrefix + ": Headers received: " + lines[0]);
     return [];
   }
 
@@ -92,7 +97,7 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
 
   const missingHeaders = expectedHeaders.filter(eh => !headersFromSheet.includes(eh));
   if (missingHeaders.length > 0) {
-    console.error(logPrefix + ": Critical header mismatch. Missing expected headers: [" + missingHeaders.join(", ") + "]. Sheet headers: [" + headersFromSheet.join(", ") + "]. Cannot process sheet.");
+    // console.error(logPrefix + ": Critical header mismatch. Missing expected headers: [" + missingHeaders.join(", ") + "]. Sheet headers: [" + headersFromSheet.join(", ") + "]. Cannot process sheet.");
     return [];
   }
 
@@ -129,19 +134,14 @@ function isValidHttpUrl(urlStr: string): boolean {
   if (!urlStr || typeof urlStr !== 'string') return false;
   let urlToParse = urlStr;
   try {
-    // Attempt to prepend https if protocol is missing and it looks like a domain
     if (!urlToParse.startsWith('http://') && !urlToParse.startsWith('https://') && urlToParse.includes('.') && !urlToParse.includes(' ')) {
-      // console.log("API_ROUTE_LOGIC_IS_VALID_URL: Prepending https:// to '" + urlToParse + "'");
       urlToParse = 'https://' + urlToParse;
     }
     const url = new URL(urlToParse);
-    // More robust check for http or https protocols
     const isValid = url.protocol === "http:" || url.protocol === "https:";
-    if (isValid) {
-      // console.log("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' is valid (protocol: " + url.protocol + ").");
-    } else {
-      console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
-    }
+    // if (!isValid) {
+    //   console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
+    // }
     return isValid;
   } catch (e: any) {
     // console.warn("API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '" + urlStr + "'. Error: " + e.message);
@@ -152,15 +152,14 @@ function isValidHttpUrl(urlStr: string): boolean {
 
 async function fetchRawCsvData(url: string, logPrefix: string): Promise<string | null> {
   if (!url || url.includes('YOUR_') || url.includes('REPLACE_WITH_')) {
-    console.error(logPrefix + ": CRITICAL - URL is not configured correctly: " + url + ". Please update it in src/app/api/menu/route.ts");
+    // console.error(logPrefix + ": CRITICAL - URL is not configured correctly: " + url + ". Please update it in src/app/api/menu/route.ts");
     return null;
   }
 
-  // Append a timestamp to try and bypass Google Sheets caching for CSV export
   const fetchUrl = url.includes('?') ? url + '&timestamp=' + new Date().getTime() : url + '?timestamp=' + new Date().getTime();
 
   try {
-    const response = await fetch(fetchUrl, { cache: 'no-store' }); 
+    const response = await fetch(fetchUrl, { cache: 'no-store' });
     // console.log(logPrefix + ": Response status from Google Sheets: " + response.status + " " + response.statusText);
 
     if (!response.ok) {
@@ -171,7 +170,7 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
       } else if (response.status === 400 && errorText.toLowerCase().includes('page not found')) {
         errorMessage += " This 'Page Not Found' error from Google Sheets usually means the specific published CSV link is incorrect, has changed, or the sheet/document is no longer published as expected. Verify the 'Publish to web' CSV link for the specific sheet.";
       }
-      console.error(errorMessage);
+      // console.error(errorMessage);
       return null;
     }
 
@@ -184,7 +183,7 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
     }
     return csvText;
   } catch (error: any) {
-    console.error(logPrefix + ": Unhandled error fetching CSV from " + fetchUrl + ": " + error.message, error.stack);
+    // console.error(logPrefix + ": Unhandled error fetching CSV from " + fetchUrl + ": " + error.message, error.stack);
     return null;
   }
 }
@@ -221,7 +220,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     const dayNameLower = dayFormatter.format(nowUtc);
     currentDayNameInSpain = dayNameLower.charAt(0).toUpperCase() + dayNameLower.slice(1);
   } catch (e) {
-    console.error("API_ROUTE_GET_PRICE: Error formatting day for timezone", timeZone, e);
+    // console.error("API_ROUTE_GET_PRICE: Error formatting day for timezone", timeZone, e);
     currentDayNameInSpain = new Date().toLocaleDateString('es-ES', { weekday: 'long' }); // Fallback
     currentDayNameInSpain = currentDayNameInSpain.charAt(0).toUpperCase() + currentDayNameInSpain.slice(1);
   }
@@ -231,20 +230,20 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone });
     currentTimeFormattedInSpain = timeFormatter.format(nowUtc);
   } catch (e) {
-    console.error("API_ROUTE_GET_PRICE: Error formatting time for timezone", timeZone, e);
+    // console.error("API_ROUTE_GET_PRICE: Error formatting time for timezone", timeZone, e);
     const localNow = new Date(); // Fallback
     currentTimeFormattedInSpain = String(localNow.getHours()).padStart(2, '0') + ':' + String(localNow.getMinutes()).padStart(2, '0');
   }
-  
+
 
   for (const entry of priceEntries) {
     if (entry.dia.toLowerCase() === currentDayNameInSpain.toLowerCase()) {
       try {
-        const baseDateStr = formatDate(nowUtc, 'yyyy-MM-dd'); 
+        const baseDateStr = formatDate(nowUtc, 'yyyy-MM-dd');
         const entryStartTime = parseTime(baseDateStr + " " + entry.franjaStart, 'yyyy-MM-dd HH:mm', new Date());
         const entryEndTime = parseTime(baseDateStr + " " + entry.franjaEnd, 'yyyy-MM-dd HH:mm', new Date());
         const currentTime = parseTime(baseDateStr + " " + currentTimeFormattedInSpain, 'yyyy-MM-dd HH:mm', new Date());
-        
+
         if (isValidDate(entryStartTime) && isValidDate(entryEndTime) && isValidDate(currentTime)) {
             if (currentTime >= entryStartTime && currentTime <= entryEndTime) {
               // console.log("API_ROUTE_GET_PRICE: Matched price entry for " + entry.dia + " " + entry.franjaStart + "-" + entry.franjaEnd + ": " + entry.precio);
@@ -262,33 +261,76 @@ async function getCurrentMenuPrice(): Promise<string | null> {
   return restaurantConfig.menuDelDia?.price || null;
 }
 
+async function generatePriceSummary(): Promise<PriceSummary> {
+  const csvText = await fetchRawCsvData(PRICES_SHEET_CSV_URL, "PRICE_SUMMARY_FETCH");
+  const priceSummary: PriceSummary = {};
 
-export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemData[], currentMenuPrice: string | null }> {
+  if (!csvText) {
+    // console.warn("API_ROUTE_GENERATE_PRICE_SUMMARY: Failed to fetch price sheet CSV for summary.");
+    return priceSummary; // Return empty summary
+  }
+
+  const parsedPriceData = parseCSV(csvText, EXPECTED_PRICE_HEADERS, "PRICE_SUMMARY_PARSE");
+  if (parsedPriceData.length === 0) {
+    // console.warn("API_ROUTE_GENERATE_PRICE_SUMMARY: No data rows parsed from price sheet for summary.");
+    return priceSummary;
+  }
+
+  const priceEntries: PriceEntry[] = parsedPriceData.map(row => {
+    const [start, end] = (row[FRANJA_HORARIA_COL_PRICE] || "00:00-00:00").split(/\s*-\s*/);
+    return {
+      dia: (row[DIA_COL_PRICE] || "").trim().toLowerCase(),
+      franjaStart: start.trim(),
+      franjaEnd: end.trim(),
+      precio: (row[PRECIO_MENU_COL_PRICE] || "").trim()
+    };
+  }).filter(entry => entry.dia && entry.precio);
+
+  const weekdays = ["lunes", "martes", "miércoles", "jueves", "viernes"];
+  const weekends = ["sábado", "domingo"];
+
+  for (const entry of priceEntries) {
+    if (!priceSummary.weekdayPrice && weekdays.includes(entry.dia)) {
+      priceSummary.weekdayPrice = entry.precio;
+    }
+    if (!priceSummary.weekendPrice && weekends.includes(entry.dia)) {
+      priceSummary.weekendPrice = entry.precio;
+    }
+    if (priceSummary.weekdayPrice && priceSummary.weekendPrice) {
+      break; // Found both, no need to continue
+    }
+  }
+  // console.log("API_ROUTE_GENERATE_PRICE_SUMMARY: Generated summary:", priceSummary);
+  return priceSummary;
+}
+
+
+export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemData[], currentMenuPrice: string | null, priceSummary: PriceSummary }> {
   // console.log("API_ROUTE_LOGIC_MENU: fetchAndProcessMenuData called.");
-  
+
   const menuCsvText = await fetchRawCsvData(GOOGLE_SHEET_CSV_URL, "MENU_SHEET_FETCH");
   let allMenuItems: MenuItemData[] = [];
 
   if (menuCsvText) {
     const parsedMenuData = parseCSV(menuCsvText, EXPECTED_HEADERS, "MENU_SHEET_PARSE");
-    if (parsedMenuData.length === 0 && menuCsvText.trim().length > 0 && !menuCsvText.trim().startsWith(EXPECTED_HEADERS[0])) {
-        console.warn("API_ROUTE_LOGIC_MENU: Menu CSV parsing resulted in 0 items, but CSV text was not empty. This strongly suggests a header mismatch or structural issue with the CSV that parseCSV couldn't handle based on EXPECTED_HEADERS.");
-    }
+    // if (parsedMenuData.length === 0 && menuCsvText.trim().length > 0 && !menuCsvText.trim().startsWith(EXPECTED_HEADERS[0])) {
+        // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV parsing resulted in 0 items, but CSV text was not empty. This strongly suggests a header mismatch or structural issue with the CSV that parseCSV couldn't handle based on EXPECTED_HEADERS.");
+    // }
 
-    let visibleItemsCount = 0;
+    // let visibleItemsCount = 0;
     allMenuItems = parsedMenuData.map((item: Record<string, string>, index: number) => {
       // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Row " + (index + 2) + " RAW: " + JSON.stringify(item));
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); 
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
       const isVisible = (visibleString.toUpperCase() === "TRUE" || visibleString === "1" || visibleString.toUpperCase() === "SÍ" || visibleString.toUpperCase() === "VERDADERO");
-      
+
       if (!isVisible) {
         // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " is marked as NOT VISIBLE ('" + visibleString + "'). Skipping.");
         return null;
       }
       // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " IS VISIBLE.");
-      visibleItemsCount++;
-      
+      // visibleItemsCount++;
+
       const nameCA = item[NOM_CA_COL];
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
@@ -313,12 +355,12 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         return null;
       }
       const categoryKey = mapCategoryToKey(primaryCategoryEN);
-      
-      const primaryNameEN = nameEN || nameES || nameCA || "Unnamed Dish"; 
-      
-      let finalImageUrl = 'https://placehold.co/400x300.png'; 
+
+      const primaryNameEN = nameEN || nameES || nameCA || "Unnamed Dish";
+
+      let finalImageUrl = 'https://placehold.co/400x300.png';
       // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has image link from sheet: '" + linkImagenFromSheet + "'");
-      
+
       if (linkImagenFromSheet && linkImagenFromSheet.toUpperCase() !== "FALSE" && linkImagenFromSheet.trim() !== "") {
         if (isValidHttpUrl(linkImagenFromSheet)) {
           finalImageUrl = linkImagenFromSheet;
@@ -329,7 +371,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       } else {
         // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has no image link or is marked FALSE. Using placeholder.");
       }
-      
+
       let imageHint = (nameEN || nameES || nameCA || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
       if (!imageHint || imageHint === "food item") {
         imageHint = (categoryEN || categoryES || categoryCA || "food plate").toLowerCase();
@@ -341,7 +383,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         if (!isNaN(numericPrice)) {
           formattedPrice = '€' + numericPrice.toFixed(2);
         } else {
-          // console.warn(API_ROUTE_LOGIC_ITEM_PROCESSING: Could not parse price '${priceFromSheet}' for item '${primaryNameEN}' into a number.);
+          // console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Could not parse price '" + priceFromSheet + "' for item '" + primaryNameEN + "' into a number.");
         }
       }
 
@@ -350,10 +392,10 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         .filter(a => a.length > 0 && a !== "false" && a !== "n/a");
 
       const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE', 'VERDADERO', 'SÍ', 'SI'].includes(sugerenciaChefString.toLowerCase().trim());
-      // if (isChefSuggestion) console.log(API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${primaryNameEN}' IS a chef suggestion.);
+      // if (isChefSuggestion) console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' IS a chef suggestion.");
 
       const menuItem: MenuItemData = {
-        id: categoryKey + '-' + index + '-' + Date.now(), 
+        id: categoryKey + '-' + index + '-' + Date.now(),
         name: {
           ca: (nameCA || nameES || nameEN || "").trim(),
           es: (nameES || nameCA || nameEN || "").trim(),
@@ -377,37 +419,35 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
 
     // console.log("API_ROUTE_LOGIC_MENU: Total items marked as visible: " + visibleItemsCount);
     // console.log("API_ROUTE_LOGIC_MENU: Mapped to " + allMenuItems.length + " valid MenuItemData objects after filtering invisible and invalid items.");
-  
+
   } else {
-     console.warn("API_ROUTE_LOGIC_MENU: Menu CSV text was null. No menu items processed.");
+    // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV text was null. No menu items processed.");
   }
 
-  if (allMenuItems.length === 0 && menuCsvText) {
+  // if (allMenuItems.length === 0 && menuCsvText) {
     // console.warn("API_ROUTE_LOGIC_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency, especially the 'Visible' column and essential fields like names/categories.");
-  } else if (allMenuItems.length === 0) {
-    console.warn("API_ROUTE_LOGIC_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
-  }
-  
-  const currentMenuPrice = await getCurrentMenuPrice();
-  // console.log("API_ROUTE_LOGIC_MENU: Current menu price determined: " + currentMenuPrice);
+  // } else if (allMenuItems.length === 0) {
+    // console.warn("API_ROUTE_LOGIC_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
+  // }
 
-  const result = { menuItems: allMenuItems, currentMenuPrice };
-  // console.log("API_ROUTE_LOGIC_MENU: Final result before NextResponse.json. Items count: " + (result.menuItems ? result.menuItems.length : 0) + ". Price: " + result.currentMenuPrice);
+  const currentMenuPrice = await getCurrentMenuPrice();
+  const priceSummaryData = await generatePriceSummary();
+  // console.log("API_ROUTE_LOGIC_MENU: Current menu price determined: " + currentMenuPrice);
+  // console.log("API_ROUTE_LOGIC_MENU: Price summary determined: " + JSON.stringify(priceSummaryData));
+
+  const result = { menuItems: allMenuItems, currentMenuPrice, priceSummary: priceSummaryData };
+  // console.log("API_ROUTE_LOGIC_MENU: Final result before NextResponse.json. Items count: " + (result.menuItems ? result.menuItems.length : 0) + ". Price: " + result.currentMenuPrice + ". Summary: " + JSON.stringify(result.priceSummary));
   return result;
 }
 
 // GET handler for the /api/menu route
 export async function GET() {
   // console.log("API_ROUTE_GET_MENU: /api/menu GET handler INVOKED.");
-  const { menuItems, currentMenuPrice } = await fetchAndProcessMenuData();
-  
+  const { menuItems, currentMenuPrice, priceSummary } = await fetchAndProcessMenuData();
+
   const headers = new Headers();
-  headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59'); 
+  headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
 
-  // console.log("API_ROUTE_GET_MENU: Total menu items processed: " + (menuItems ? menuItems.length : 0) + ". Sending response.");
-  return NextResponse.json({ menuItems, currentMenuPrice }, { status: 200, headers });
+  // console.log("API_ROUTE_GET_MENU: Total menu items processed: " + (menuItems ? menuItems.length : 0) + ". Current price: " + currentMenuPrice + ". Sending response with price summary: " + JSON.stringify(priceSummary));
+  return NextResponse.json({ menuItems, currentMenuPrice, priceSummary }, { status: 200, headers });
 }
-
-    
-
-    

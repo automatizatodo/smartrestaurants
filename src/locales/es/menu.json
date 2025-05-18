@@ -14,5 +14,8 @@
   "menuDelDia.priceTitle": "Precio del Menú",
   "menuDelDia.priceIncludes": "IVA incluido. Pan, bebida y postre o café.",
   "menuDelDia.notes": "Disponible de martes a viernes a mediodía, excepto festivos.",
-  "chefsSuggestion": "Sugerencia del Chef"
+  "chefsSuggestion": "Sugerencia del Chef",
+  "allergensTitle": "Alérgenos:",
+  "weekdaysPriceLabel": "Lunes-Viernes",
+  "weekendsPriceLabel": "Fines de Semana y Festivos"
 }

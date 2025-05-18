@@ -10,8 +10,9 @@ import { useLanguage } from '@/context/LanguageContext';
 import type { MenuItemData } from '@/data/menu';
 import { Button } from '@/components/ui/button';
 import restaurantConfig from '@/config/restaurant.config';
-import { StarIcon as GoogleIcon } from 'lucide-react'; 
+import { StarIcon as GoogleIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { PriceSummary } from '@/app/api/menu/route'; // Import PriceSummary type
 
 const TripAdvisorIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5">
@@ -28,18 +29,20 @@ interface MenuPageClientContentProps {
   menuItems: MenuItemData[];
   currentMenuPrice?: string | null;
   menuDelDiaPriceDescriptionKey?: string;
+  priceSummary: PriceSummary; // Add priceSummary prop
 }
 
 export default function MenuPageClientContent({
   menuItems,
   currentMenuPrice,
   menuDelDiaPriceDescriptionKey,
+  priceSummary, // Destructure priceSummary
 }: MenuPageClientContentProps) {
   const { t, language, setLanguage, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
 
   useEffect(() => {
-    document.title = `${t('common:page.menu.title')} | ${restaurantName}`;
+    document.title = t('common:page.menu.title') + " | " + restaurantName;
   }, [t, restaurantName, language]);
 
   const menuDelDiaPriceDescription = menuDelDiaPriceDescriptionKey
@@ -62,12 +65,27 @@ export default function MenuPageClientContent({
                {t('common:page.menu.title')}
             </h1>
             {currentMenuPrice && (
-              <div className="mb-6">
+              <div className="mb-2">
                 <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
                 {menuDelDiaPriceDescription && (
                   <p className="text-sm text-muted-foreground mt-1" suppressHydrationWarning>
                     {menuDelDiaPriceDescription}
                   </p>
+                )}
+              </div>
+            )}
+            {/* Display Price Summary */}
+            {(priceSummary.weekdayPrice || priceSummary.weekendPrice) && (
+              <div className="mb-6 text-md text-foreground/80">
+                {priceSummary.weekdayPrice && (
+                  <span className="mr-3" suppressHydrationWarning>
+                    {t('menu:weekdaysPriceLabel')}: <span className="font-semibold">{priceSummary.weekdayPrice}</span>
+                  </span>
+                )}
+                {priceSummary.weekendPrice && (
+                  <span suppressHydrationWarning>
+                    {t('menu:weekendsPriceLabel')}: <span className="font-semibold">{priceSummary.weekendPrice}</span>
+                  </span>
                 )}
               </div>
             )}

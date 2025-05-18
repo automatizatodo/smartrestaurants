@@ -44,7 +44,7 @@ interface RestaurantConfig {
   timeZone: string;
   theme: ThemeColors;
   showMenuItemImages: boolean;
-  showAISommelierSection: boolean; // New flag to control AI Sommelier visibility
+  showAISommelierSection: boolean;
   bookingMaxGuestsPerSlot?: number;
   bookingMethod: 'calendar' | 'whatsapp';
   whatsappBookingNumber?: string;
@@ -63,7 +63,7 @@ const restaurantConfig: RestaurantConfig = {
   logoUrl: '/can-fanals-logo.png',
   address: 'Carrer Font Nova, 29, 08202 Sabadell, Barcelona',
   phone: '930 256 434',
-  phoneHref: 'tel:+1234567890',
+  phoneHref: 'tel:+34930256434', // Corrected phone href
   email: 'reservations@canfanals.com',
   emailHref: 'mailto:reservations@canfanals.com',
   socialMediaLinks: {
@@ -75,15 +75,15 @@ const restaurantConfig: RestaurantConfig = {
   heroImageUrl: '/background_rest.jpg',
   heroImageHint: 'restaurant interior dining',
   bookingTimeSlots: [
-    "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM",
-    "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM"
+    "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM",
+    "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM", "10:00 PM"
   ],
   bookingSlotDurationMinutes: 120,
   timeZone: 'Europe/Madrid', // Example, adjust to your restaurant's timezone
   theme: {
     primary: 'hsl(51, 100%, 50%)',
   },
-  showMenuItemImages: true, 
+  showMenuItemImages: true,
   showAISommelierSection: false,
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp',
@@ -104,7 +104,7 @@ const restaurantConfig: RestaurantConfig = {
     notesKey: "menu:menuDelDia.notes",
   },
   allergenConfig: {
-    showAsText: true,
+    showAsText: false, // Changed to false to prioritize icons
   },
 };
 
