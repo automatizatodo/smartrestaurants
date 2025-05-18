@@ -23,10 +23,15 @@ const componentImages = [
     hint: "restaurant interior dining",
     priority: false,
   },
-  // La imatge de la terrassa no s'utilitzarà al carrusel de dues imatges
+  {
+    src: "/terrassa1.webp", // Terrassa - Aquesta es mostrarà només al carrusel
+    altKey: "landing:aboutUs.imageAltTerrace",
+    hint: "restaurant terrace patio",
+    priority: false,
+  },
 ];
 
-const carouselImages = componentImages.slice(0, 2); // Només les dues primeres
+const carouselImages = componentImages; // Utilitzem totes les imatges per al carrusel
 
 export default function AboutUsSection() {
   const { t } = useLanguage();
@@ -100,7 +105,7 @@ export default function AboutUsSection() {
           {/* Columna Dreta: Carrusel d'Imatges amb Marc inclinat */}
           <div className="flex justify-center items-center md:h-full">
             <div className={cn(
-              "w-full max-w-md lg:max-w-lg p-1.5 sm:p-2 rounded-lg shadow-2xl aspect-[4/3]",
+              "w-full max-w-md lg:max-w-lg p-1.5 sm:p-2 rounded-lg shadow-xl aspect-[4/3]", // Reduït shadow a xl des de 2xl
               "transform rotate-[-2deg] group-hover:rotate-[-3deg] transition-transform duration-300",
               "bg-secondary/20 border-2 border-primary/70" // Marc subtil amb color primari
             )}>
@@ -171,4 +176,3 @@ export default function AboutUsSection() {
     </section>
   );
 }
-
