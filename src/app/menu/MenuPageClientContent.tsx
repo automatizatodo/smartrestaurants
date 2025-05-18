@@ -55,9 +55,9 @@ export default function MenuPageClientContent({
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow pt-24 pb-16 sm:pb-24">
+      <main className="flex-grow pt-32 pb-16 sm:pb-24"> {/* Increased pt from 24 to 32 */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-10 pt-0 lg:pt-8"> {/* Reduced bottom margin from 12/16 to 8/10 */}
+          <div className="text-center mb-8 sm:mb-10 pt-0 lg:pt-12"> {/* Increased lg:pt from 8 to 12 */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4">
                {t('common:page.menu.title')}
             </h1>
