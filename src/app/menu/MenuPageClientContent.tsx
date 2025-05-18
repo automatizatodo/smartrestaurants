@@ -55,14 +55,14 @@ export default function MenuPageClientContent({
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow pt-32 pb-16 sm:pb-24"> {/* Increased pt from 24 to 32 */}
+      <main className="flex-grow pt-24 sm:pt-32 pb-16 sm:pb-24"> {/* Reduced mobile pt from 32 to 24 */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-10 pt-0 lg:pt-12"> {/* Increased lg:pt from 8 to 12 */}
+          <div className="text-center mb-8 sm:mb-10 pt-0 lg:pt-12">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4">
                {t('common:page.menu.title')}
             </h1>
             {currentMenuPrice && (
-              <div className="mb-6"> {/* Reduced bottom margin from 8 to 6 */}
+              <div className="mb-6">
                 <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
                 {menuDelDiaPriceDescription && (
                   <p className="text-sm text-muted-foreground mt-1" suppressHydrationWarning>
