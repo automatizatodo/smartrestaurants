@@ -11,7 +11,7 @@ import { fetchMenuDataWithPrice } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import { z } from "zod";
 import restaurantConfig from "@/config/restaurant.config";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 const SommelierRequestSchema = z.object({
   tastePreferences: z.string().min(10, "landing:aiSommelier.error.preferencesRequired").max(500, "landing:aiSommelier.error.preferencesTooLong"),
@@ -31,7 +31,10 @@ const formatMenuForAI = (menuItems: MenuItemData[]): string => {
     return "No menu items available.";
   }
   return menuItems.map(item =>
-    \`Dish: \${item.name.en}\nDescription: \${item.description.en}\nPrice: \${item.price || 'N/A'}\nCategory: \${item.categoryKey}\`
+    "Dish: " + item.name.en +
+    "\nDescription: " + item.description.en +
+    "\nPrice: " + (item.price || 'N/A') +
+    "\nCategory: " + item.categoryKey
   ).join("\n\n");
 };
 
@@ -46,7 +49,7 @@ export async function getAISommelierRecommendations(
   });
 
   if (!validatedFields.success) {
-    console.warn("ACTIONS_AISOMMELIER: Validation failed:", validatedFields.error.flatten().fieldErrors);
+    // console.warn("ACTIONS_AISOMMELIER: Validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       messageKey: "common:form.error.invalidInput",
       recommendations: null,
@@ -58,12 +61,12 @@ export async function getAISommelierRecommendations(
   let menuInformationString = "Menu information is currently unavailable.";
   try {
     // console.log("ACTIONS_AISOMMELIER: Fetching menu for AI Sommelier...");
-    const { menuItems } = await fetchMenuDataWithPrice();
+    const { menuItems } = await fetchMenuDataWithPrice(); // Corrected function call
     if (menuItems && menuItems.length > 0) {
       menuInformationString = formatMenuForAI(menuItems);
       // console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted.");
     } else {
-      console.warn("ACTIONS_AISOMMELIER: No menu items fetched for AI Sommelier.");
+      // console.warn("ACTIONS_AISOMMELIER: No menu items fetched for AI Sommelier.");
     }
   } catch (error) {
     console.error("ACTIONS_AISOMMELIER: Failed to fetch menu for AI Sommelier:", error);
@@ -158,7 +161,7 @@ export async function submitBooking(
   const validatedFields = BookingSchema.safeParse(rawFormData);
 
   if (!validatedFields.success) {
-    console.warn("ACTIONS_BOOKING: Form validation failed:", validatedFields.error.flatten().fieldErrors);
+    // console.warn("ACTIONS_BOOKING: Form validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       messageKey: "common:form.error.invalidInput",
       success: false,
@@ -182,20 +185,27 @@ export async function submitBooking(
       };
     }
 
-    const formattedDate = format(parseISO(date), "PPP"); // Use parseISO for YYYY-MM-DD
+    let formattedDate = date; // Default to YYYY-MM-DD
+    try {
+        const parsedDateObj = parseISO(date);
+        formattedDate = format(parsedDateObj, "PPP"); // Use a locale-friendly format if parseISO succeeds
+    } catch (e) {
+        // console.warn(\`ACTIONS_BOOKING_WHATSAPP: Could not parse date '\${date}' with parseISO. Using original string.\`);
+    }
+
     const restaurantNameForMsg = restaurantConfig.restaurantDisplayName || 'el restaurante';
     const messageParts = [
-      \`Hola \${restaurantNameForMsg},\`,
-      \`Quisiera solicitar una reserva:\`,
-      \`- Nombre: \${name}\`,
-      \`- Email: \${email}\`,
-      \`- Teléfono: \${phone}\`,
-      \`- Fecha: \${formattedDate}\`,
-      \`- Hora: \${time}\`,
-      \`- Comensales: \${guests}\`,
+      "Hola " + restaurantNameForMsg + ",",
+      "Quisiera solicitar una reserva:",
+      "- Nombre: " + name,
+      "- Email: " + email,
+      "- Teléfono: " + phone,
+      "- Fecha: " + formattedDate,
+      "- Hora: " + time,
+      "- Comensales: " + guests,
     ];
     if (notes) {
-      messageParts.push(\`- Notas: \${notes}\`);
+      messageParts.push("- Notas: " + notes);
     }
     const whatsappMessage = messageParts.join("\n");
 
@@ -221,7 +231,7 @@ export async function submitBooking(
       // console.log("ACTIONS_BOOKING: checkCalendarAvailability flow response:", availabilityResult);
 
       if (!availabilityResult || typeof availabilityResult.isAvailable === 'undefined') {
-          console.error("ACTIONS_BOOKING: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
+          console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
           return {
               messageKey: "landing:booking.error.calendarCheckFailed",
               success: false,
@@ -234,7 +244,7 @@ export async function submitBooking(
         const messageParams = availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests'
           ? { time, date, guests: String(guests), maxGuestsForSlot: String(availabilityResult.maxGuestsForSlot || 0) }
           : { time, date };
-        console.warn("ACTIONS_BOOKING: Slot not available according to checkCalendarAvailability flow.", availabilityResult);
+        // console.warn("ACTIONS_BOOKING: Slot not available according to checkCalendarAvailability flow.", availabilityResult);
         return {
           messageKey: availabilityResult.reasonKey || "landing:booking.error.slotUnavailable",
           success: false,
@@ -244,7 +254,6 @@ export async function submitBooking(
       }
     } catch (error: any) {
       console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
-      // console.error("SUBMIT_BOOKING_ACTION: Underlying error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       return {
         messageKey: "landing:booking.error.calendarCheckFailed",
         success: false,
@@ -261,7 +270,7 @@ export async function submitBooking(
       // console.log("ACTIONS_BOOKING: createCalendarEvent flow response:", eventResult);
 
       if (!eventResult || typeof eventResult.success === 'undefined') {
-          console.error("ACTIONS_BOOKING: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
+          console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
           return {
               messageKey: "landing:booking.error.calendarError",
               success: false,
@@ -271,7 +280,7 @@ export async function submitBooking(
       }
 
       if (!eventResult.success) {
-        console.warn("ACTIONS_BOOKING: Failed to create calendar event according to createCalendarEvent flow.", eventResult);
+        // console.warn("ACTIONS_BOOKING: Failed to create calendar event according to createCalendarEvent flow.", eventResult);
         return {
           messageKey: eventResult.errorKey || "landing:booking.error.calendarError",
           success: false,
@@ -279,6 +288,13 @@ export async function submitBooking(
           messageParams: null,
         };
       }
+      let formattedDate = date;
+        try {
+            const parsedDateObj = parseISO(date);
+            formattedDate = format(parsedDateObj, "PPP");
+        } catch (e) {
+            // console.warn(\`ACTIONS_BOOKING_CALENDAR_SUCCESS: Could not parse date '\${date}' with parseISO for success message. Using original string.\`);
+        }
 
       // console.log("ACTIONS_BOOKING: Booking successful. Event ID:", eventResult.eventId);
       return {
@@ -286,7 +302,7 @@ export async function submitBooking(
         messageParams: {
           name: validatedFields.data.name,
           guests: String(validatedFields.data.guests),
-          date: format(parseISO(validatedFields.data.date), "PPP"), // Format for display
+          date: formattedDate, // Format for display
           time: validatedFields.data.time
         },
         success: true,
@@ -296,7 +312,6 @@ export async function submitBooking(
 
     } catch (error: any) {
       console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
-      // console.error("SUBMIT_BOOKING_ACTION: Underlying error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       return {
         messageKey: "landing:booking.error.calendarError",
         success: false,
