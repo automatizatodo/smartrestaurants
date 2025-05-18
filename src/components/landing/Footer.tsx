@@ -6,11 +6,36 @@ import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'luci
 import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from '@/context/LanguageContext';
 
+// Replicated nav item logic from Header.tsx
+const navItemKeysBase = [
+  { labelKey: 'common:nav.fullMenu', href: '/menu' },
+  { labelKey: 'common:nav.services', href: '/#services' },
+  { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
+];
+
+const aiSommelierNavItem = { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' };
+
+const navItemKeysEnd = [
+  { labelKey: 'common:nav.contact', href: '/#contact-map' },
+  { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
+];
+
+const getNavItems = () => {
+  let items = [...navItemKeysBase];
+  if (restaurantConfig.showAISommelierSection) {
+    items.push(aiSommelierNavItem);
+  }
+  items.push(...navItemKeysEnd);
+  return items;
+};
+
+
 export default function Footer() {
   const { t, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
   const tagline = translations.common.tagline;
   const currentYear = new Date().getFullYear();
+  const footerNavItems = getNavItems();
 
   return (
     <footer className="bg-secondary text-muted-foreground border-t border-border/50">
@@ -21,7 +46,7 @@ export default function Footer() {
                 {restaurantConfig.logoUrl ? (
                   <Image
                     src={restaurantConfig.logoUrl}
-                    alt={`${restaurantName} Logo - ${t('footer.seoText', { restaurantName })}`}
+                    alt={`${restaurantName} Logo - ${t('common:footer.seoText', { restaurantName })}`}
                     width={432}
                     height={144}
                     className="h-36 w-auto dark:filter dark:invert"
@@ -40,10 +65,13 @@ export default function Footer() {
             <h5 className="font-serif text-lg font-semibold text-foreground mb-4">{t('common:footer.quickLinks')}</h5>
             <ul className="space-y-2 text-sm">
               <li><Link href="/" className="hover:text-primary transition-colors">{t('common:footer.home')}</Link></li>
-              <li><Link href="/menu" className="hover:text-primary transition-colors">{t('common:footer.menu')}</Link></li>
-              <li><Link href="/#ai-sommelier" className="hover:text-primary transition-colors">{t('common:footer.aiSommelierLink')}</Link></li>
-              <li><Link href="/#booking" className="hover:text-primary transition-colors">{t('common:footer.bookTableLink')}</Link></li>
-              <li><Link href="/#testimonials" className="hover:text-primary transition-colors">{t('common:footer.testimonialsLink')}</Link></li>
+              {footerNavItems.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="hover:text-primary transition-colors">
+                    {t(item.labelKey)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
