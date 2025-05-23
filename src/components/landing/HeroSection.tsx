@@ -20,21 +20,24 @@ export default function HeroSection() {
   }, []);
 
   const fullSeoTitle = t('landing:hero.seoTitle'); 
-  let mainTitle = restaurantName; 
+  let mainTitlePart = restaurantName; 
   let subTitlePart = "";
 
   const separator = ": ";
   const separatorIndex = fullSeoTitle.indexOf(separator);
 
   if (separatorIndex !== -1) {
-    mainTitle = fullSeoTitle.substring(0, separatorIndex);
+    mainTitlePart = fullSeoTitle.substring(0, separatorIndex);
     subTitlePart = fullSeoTitle.substring(separatorIndex + separator.length);
-  } else if (fullSeoTitle.startsWith(restaurantName)) {
-    mainTitle = restaurantName;
+  } else if (fullSeoTitle.startsWith(restaurantName)) { // Fallback if colon is missing but starts with restaurant name
+    mainTitlePart = restaurantName;
     subTitlePart = fullSeoTitle.substring(restaurantName.length).trim();
-    if (subTitlePart.startsWith(':')) { 
+    // Further cleanup if the remaining part starts with a common separator character
+    if (subTitlePart.startsWith(':') || subTitlePart.startsWith('-') || subTitlePart.startsWith('|')) {
         subTitlePart = subTitlePart.substring(1).trim();
     }
+  } else { // If no separator and doesn't start with restaurant name, use the whole string as subtitle (or handle as error)
+    subTitlePart = fullSeoTitle; // Or consider mainTitlePart = fullSeoTitle and subTitlePart = ""
   }
 
 
@@ -65,12 +68,12 @@ export default function HeroSection() {
           className="font-bold text-white shadow-text uppercase"
           suppressHydrationWarning
         >
-          <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-2" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
-            {mainTitle}
+          <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
+            {mainTitlePart}
           </span>
           {subTitlePart && (
             <span 
-              className="block text-xl sm:text-2xl md:text-3xl text-gray-200 font-normal normal-case mt-3 sm:mt-4 max-w-3xl mx-auto" 
+              className="block text-xl sm:text-2xl md:text-3xl text-gray-200 font-normal normal-case mt-4 sm:mt-5 max-w-3xl mx-auto"
               style={{ fontFamily: 'var(--font-cinzel), serif' }}
             >
               {subTitlePart}
@@ -78,7 +81,7 @@ export default function HeroSection() {
           )}
         </h1>
         
-        <div className="flex flex-col space-y-4 items-center sm:flex-row sm:space-y-0 sm:space-x-4 justify-center mt-10">
+        <div className="flex flex-col space-y-4 items-center sm:flex-row sm:space-y-0 sm:space-x-4 justify-center mt-12">
           <Link href="/menu" passHref>
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105 w-full sm:w-auto">
               {t('landing:hero.viewMenuButton')}
@@ -99,3 +102,4 @@ export default function HeroSection() {
     </section>
   );
 }
+
