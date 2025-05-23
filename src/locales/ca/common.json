@@ -40,7 +40,8 @@
   "page.menu.description": "",
   "allCategories": "Totes",
   "seo": {
-    "defaultTitleSuffix": "Restaurant a Sabadell - Brasa i Cuina Tradicional",
+    "mainKeywords": "Restaurant a Sabadell - Brasa i Cuina Tradicional",
+    "pageContext": "Restaurant a Sabadell",
     "defaultDescription": "Descobreix Can Fanals, el teu restaurant a Sabadell especialitzat en carns a la brasa, cuina tradicional catalana i opcions sense gluten. Reserva la teva taula!"
   },
   "cookieConsent.text": "Aquest lloc web utilitza galetes per proporcionar la funcionalitat necessària del lloc i per millorar la teva experiència. En utilitzar aquest lloc web, acceptes el nostre ús de galetes.",

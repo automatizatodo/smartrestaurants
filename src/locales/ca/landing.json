@@ -1,6 +1,7 @@
 
 {
   "hero.title": "Can Fanals",
+  "hero.seoTitle": "{restaurantName}: Restaurant a Sabadell de Brasa i Cuina Tradicional",
   "hero.tagline": "Brasa, Tradició i Sabor Sense Gluten a Sabadell",
   "hero.altText": "Interior acollidor de {restaurantName}, restaurant a Sabadell",
   "hero.viewMenuButton": "Veure El Nostre Menú",
@@ -16,10 +17,10 @@
   "services.sectionDescription": "Gaudeix d'una varietat d'experiències culinàries dissenyades per delectar el teu paladar durant tot el dia al nostre restaurant a Sabadell.",
   "services.breakfasts.title": "Esmorzars Saborosos",
   "services.breakfasts.description": "Comença el teu dia amb els nostres esmorzars saborosos i productes frescos, elaborats amb ingredients de la millor qualitat. Exemples: entrepans de pa de pagès al forn.",
-  "services.setMenus.title": "Menús de Migdia i Cap de Setmana",
-  "services.setMenus.description": "Oferim menús de migdia entre setmana i menús especials per al cap de setmana. La nostra carta de vins és tan especial com la nostra cuina.",
   "services.traditionalAndGrilled.title": "Cuina Tradicional i Sopars a la Brasa",
   "services.traditionalAndGrilled.description": "Assaboreix plats típics catalans com les Mongetes amb botifarra, pica-pica per compartir, i gaudeix d'especialitats perfectament rostides al vespre, incloent la nostra millor selecció de carns cuinades a foc obert.",
+  "services.setMenus.title": "Menús de Migdia i Cap de Setmana",
+  "services.setMenus.description": "Oferim menús de migdia entre setmana i menús especials per al cap de setmana. La nostra carta de vins és tan especial com la nostra cuina.",
   "aiSommelier.sectionTitle": "Sommelier IA",
   "aiSommelier.sectionDescription": "Explica'ns les teves preferències de sabor i el nostre Sommelier IA et suggerirà els plats perfectes del nostre restaurant a Sabadell.",
   "aiSommelier.cardTitle": "Descobreix El Teu Proper Plat Preferit",
@@ -110,5 +111,3 @@
   "contactMap.hours.mon": "Dilluns",
   "contactMap.hours.closed": "Tancat"
 }
-
-    

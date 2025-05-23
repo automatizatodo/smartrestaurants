@@ -1,6 +1,7 @@
 
 {
   "hero.title": "Can Fanals",
+  "hero.seoTitle": "{restaurantName}: Sabadell Restaurant - Grill & Traditional Cuisine",
   "hero.tagline": "Grill, Tradition and Gluten-Free Flavor in Sabadell",
   "hero.altText": "Cozy interior of {restaurantName}, restaurant in Sabadell",
   "hero.viewMenuButton": "View Our Menu",
@@ -16,10 +17,10 @@
   "services.sectionDescription": "Indulge in a variety of culinary experiences tailored to delight your palate throughout the day at our restaurant in Sabadell.",
   "services.breakfasts.title": "Flavorful Breakfasts",
   "services.breakfasts.description": "Start your day with our flavorful breakfasts and fresh products, made with the best quality ingredients. Examples: baked bread sandwiches.",
-  "services.setMenus.title": "Lunch and Weekend Menus",
-  "services.setMenus.description": "We offer weekday lunch menus and special weekend menus. Our wine list is as special as our cuisine.",
   "services.traditionalAndGrilled.title": "Traditional Cuisine & Grilled Dinners",
   "services.traditionalAndGrilled.description": "Savor typical Catalan dishes like 'Mongetes amb botifarra', shareable tapas, and enjoy perfectly grilled specialties in the evening, including our best selection of meats cooked over an open flame.",
+  "services.setMenus.title": "Lunch and Weekend Menus",
+  "services.setMenus.description": "We offer weekday lunch menus and special weekend menus. Our wine list is as special as our cuisine.",
   "aiSommelier.sectionTitle": "AI Sommelier",
   "aiSommelier.sectionDescription": "Tell us your taste preferences, and our AI Sommelier will suggest the perfect dishes from our restaurant in Sabadell.",
   "aiSommelier.cardTitle": "Discover Your Next Favorite Dish",
@@ -108,5 +109,3 @@
   "contactMap.hours.mon": "Monday",
   "contactMap.hours.closed": "Closed"
 }
-
-    

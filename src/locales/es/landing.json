@@ -1,6 +1,7 @@
 
 {
   "hero.title": "Can Fanals",
+  "hero.seoTitle": "{restaurantName}: Restaurante en Sabadell de Brasa y Cocina Tradicional",
   "hero.tagline": "Brasa, Tradición y Sabor Sin Gluten en Sabadell",
   "hero.altText": "Interior acogedor de {restaurantName}, restaurante en Sabadell",
   "hero.viewMenuButton": "Ver Nuestro Menú",
@@ -16,10 +17,10 @@
   "services.sectionDescription": "Deléitate con una variedad de experiencias culinarias diseñadas para satisfacer tu paladar durante todo el día en nuestro restaurante en Sabadell.",
   "services.breakfasts.title": "Desayunos Sabrosos",
   "services.breakfasts.description": "Comienza tu día con nuestros sabrosos desayunos y productos frescos, elaborados con ingredientes de la mejor calidad. Ejemplos: bocadillos de pan de payés horneado.",
-  "services.setMenus.title": "Menús de Mediodía y Fin de Semana",
-  "services.setMenus.description": "Ofrecemos menús de mediodía entre semana y menús especiales para el fin de semana. Nuestra carta de vinos es tan especial como nuestra cocina.",
   "services.traditionalAndGrilled.title": "Cocina Tradicional y Cenas a la Brasa",
   "services.traditionalAndGrilled.description": "Saborea platos típicos catalanes como las 'Mongetes amb botifarra', tapas para compartir, y disfruta de especialidades perfectamente asadas por la noche, incluyendo nuestra mejor selección de carnes cocinadas a fuego abierto.",
+  "services.setMenus.title": "Menús de Mediodía y Fin de Semana",
+  "services.setMenus.description": "Ofrecemos menús de mediodía entre semana y menús especiales para el fin de semana. Nuestra carta de vinos es tan especial como nuestra cocina.",
   "aiSommelier.sectionTitle": "Sommelier IA",
   "aiSommelier.sectionDescription": "Cuéntanos tus preferencias de sabor y nuestro Sommelier IA te sugerirá los platos perfectos de nuestro restaurante en Sabadell.",
   "aiSommelier.cardTitle": "Descubre Tu Próximo Plato Favorito",
@@ -110,5 +111,3 @@
   "contactMap.hours.mon": "Lunes",
   "contactMap.hours.closed": "Cerrado"
 }
-
-    

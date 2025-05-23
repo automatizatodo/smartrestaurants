@@ -8,20 +8,24 @@ import restaurantConfig from '@/config/restaurant.config';
 import caCommon from '@/locales/ca/common.json';
 import caMenuPage from '@/locales/ca/page-specific/menu.json';
 
+// Construct title for metadata
+const menuPageTitle = caMenuPage.titleWithoutBrand || 'Menú del Dia i Carta';
+const restaurantContext = caCommon.seo.pageContext || 'Restaurant a Sabadell';
+
 export const metadata: Metadata = {
-  title: caMenuPage.title + " | " + caCommon.restaurantName,
+  title: `${menuPageTitle} | ${caCommon.restaurantName} - ${restaurantContext}`,
   description: caMenuPage.description,
   alternates: {
     canonical: '/menu',
   },
   openGraph: {
-    title: caMenuPage.title + " | " + caCommon.restaurantName,
+    title: `${menuPageTitle} | ${caCommon.restaurantName} - ${restaurantContext}`,
     description: caMenuPage.description,
     url: (process.env.NEXT_PUBLIC_APP_URL || '') + '/menu',
     type: 'website',
   },
   twitter: {
-    title: caMenuPage.title + " | " + caCommon.restaurantName,
+    title: `${menuPageTitle} | ${caCommon.restaurantName} - ${restaurantContext}`,
     description: caMenuPage.description,
   },
 };
@@ -37,7 +41,7 @@ export default async function MenuPage() {
       menuItems={menuItems}
       currentMenuPrice={currentMenuPrice}
       menuDelDiaPriceDescriptionKey={menuDelDiaPriceDescriptionKey}
-      priceSummary={priceSummary} // Pass the price summary
+      priceSummary={priceSummary} 
     />
   );
 }
