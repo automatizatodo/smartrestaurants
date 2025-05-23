@@ -74,9 +74,10 @@ const restaurantConfig: RestaurantConfig = {
   },
   heroImageUrl: '/background_rest.jpg',
   heroImageHint: 'restaurant interior dining',
-  bookingTimeSlots: [
-    "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM",
-    "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM", "10:00 PM"
+  bookingTimeSlots: [ // Example: ensure these are reasonable and cover potential opening hours
+    "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+    "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM",
+    "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM", "10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM"
   ],
   bookingSlotDurationMinutes: 120,
   timeZone: 'Europe/Madrid', // Example, adjust to your restaurant's timezone
@@ -92,11 +93,11 @@ const restaurantConfig: RestaurantConfig = {
   googleMapsLink: 'https://maps.google.com/?q=Carrer+Font+Nova,+29,+08202+Sabadell,+Barcelona',
   googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJrxjmUa-VpBIRenLu0Swg6cM',
   tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_HERE', // Remember to update this
-  openingHours: {
+  openingHours: { // String format: "HH:mm - HH:mm" or "CLOSED"
     tueWed: "08:00 - 17:00",
-    thuSat: "08:00 - 24:00",
+    thuSat: "08:00 - 24:00", // "24:00" implies end of the day
     sun: "08:00 - 19:00",
-    mon: "landing:contactMap.hours.closed",
+    mon: "CLOSED", // Using "CLOSED" keyword
   },
   menuDelDia: {
     price: "14,50€", // This is now a FALLBACK price

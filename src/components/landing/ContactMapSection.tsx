@@ -65,12 +65,16 @@ export default function ContactMapSection() {
               </h3>
               <ul className="text-foreground/90 space-y-1.5">
                 {openingHoursOrder.map(dayKey => {
-                  const dayLabelKey = `landing:contactMap.hours.${dayKey}`;
+                  // @ts-ignore // TODO: Fix type for configHours index
                   const hours = restaurantConfig.openingHours[dayKey];
+                  const dayLabelKey = `landing:contactMap.hours.${dayKey}`;
+                  
                   return (
                     <li key={dayKey} className="flex justify-between text-sm">
                       <span>{t(dayLabelKey)}:</span>
-                      <span className="font-medium text-right">{hours === "landing:contactMap.hours.closed" ? t(hours) : hours}</span>
+                      <span className="font-medium text-right">
+                        {hours === "CLOSED" ? t('landing:contactMap.hours.closed') : hours}
+                      </span>
                     </li>
                   );
                 })}

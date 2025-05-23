@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useActionState } from 'react'; // React's own useActionState
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useActionState } from 'react'; 
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +12,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon, Users, Clock, Loader2 } from "lucide-react";
+import { format, getDay, parse as parseTime, setHours, setMinutes, setSeconds, setMilliseconds, isWithinInterval } from "date-fns";
+import { es, enUS as en, ca } from 'date-fns/locale';
+import { Calendar as CalendarIcon, Users, Clock, Loader2, AlertTriangle } from "lucide-react";
 import { submitBooking, type BookingFormState } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from "@/context/LanguageContext";
-import { es, enUS as en, ca } from 'date-fns/locale';
 
 // WhatsApp Icon SVG
 const WhatsAppIcon = () => (
@@ -33,6 +33,104 @@ const WhatsAppIcon = () => (
     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.487 5.235 3.487 8.413 0 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.712-1.002z" />
   </svg>
 );
+
+type OpeningHoursMap = typeof restaurantConfig.openingHours;
+
+// Helper function to get the day key ('mon', 'tue', etc.) from a Date object
+const getDayKey = (date: Date): string => {
+  const dayIndex = getDay(date); // 0 for Sunday, 1 for Monday, etc.
+  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  return dayNames[dayIndex];
+};
+
+// Helper function to parse opening hours string for a specific day
+const getOpeningHoursForDay = (
+  dayKey: string,
+  configHours: OpeningHoursMap
+): { start: string; end: string }[] | null => {
+  let hoursString: string | undefined;
+
+  // Direct mapping for simple day keys
+  if (dayKey === 'mon') hoursString = configHours.mon;
+  else if (dayKey === 'sun') hoursString = configHours.sun;
+  else if (dayKey === 'tue' || dayKey === 'wed') hoursString = configHours.tueWed;
+  else if (dayKey === 'thu' || dayKey === 'fri' || dayKey === 'sat') hoursString = configHours.thuSat;
+
+
+  if (!hoursString || hoursString.toUpperCase() === "CLOSED") {
+    return null; // Restaurant is closed
+  }
+
+  // Assuming format "HH:mm - HH:mm" for now
+  // TODO: Extend to handle multiple periods if config changes (e.g., "08:00-12:00, 13:00-17:00")
+  const parts = hoursString.split(/\s*-\s*/);
+  if (parts.length === 2) {
+    return [{ start: parts[0].trim(), end: parts[1].trim() }];
+  }
+  console.warn(`Invalid opening hours format for dayKey ${dayKey}: ${hoursString}`);
+  return null; // Invalid format
+};
+
+// Helper function to check if a time slot is within the opening hours
+const isTimeSlotAvailable = (
+  slot: string, // e.g., "1:00 PM" or "13:00"
+  openingHoursToday: { start: string; end: string }[] | null,
+  selectedDate: Date
+): boolean => {
+  if (!openingHoursToday) return false;
+
+  let slotDate: Date;
+  try {
+    // Try parsing "h:mm a" (e.g., 1:00 PM)
+    slotDate = parseTime(slot, 'h:mm a', selectedDate);
+    if (isNaN(slotDate.getTime())) {
+      // Try parsing "HH:mm" (e.g., 13:00) - useful if config.bookingTimeSlots uses 24h format
+      slotDate = parseTime(slot, 'HH:mm', selectedDate);
+    }
+     if (isNaN(slotDate.getTime())) {
+      // Fallback for slightly different AM/PM formats, e.g. "8:00 AM"
+      slotDate = parseTime(slot.replace(/\s/g, ''), 'h:mma', selectedDate);
+    }
+    if (isNaN(slotDate.getTime())) {
+      console.warn('Could not parse slot time after attempts:', slot);
+      return false;
+    }
+  } catch (e) {
+    console.warn('Error parsing slot time:', slot, e);
+    return false;
+  }
+  
+  for (const period of openingHoursToday) {
+    let periodStartDate: Date;
+    let periodEndDate: Date;
+
+    try {
+      const [startHour, startMinute] = period.start.split(':').map(Number);
+      periodStartDate = setMilliseconds(setSeconds(setMinutes(setHours(selectedDate, startHour), startMinute),0),0);
+
+
+      let [endHour, endMinute] = period.end.split(':').map(Number);
+      if (endHour === 24 && endMinute === 0) { // Handle "24:00" as end of day
+        periodEndDate = setMilliseconds(setSeconds(setMinutes(setHours(selectedDate, 23), 59),59),999);
+      } else {
+        periodEndDate = setMilliseconds(setSeconds(setMinutes(setHours(selectedDate, endHour), endMinute),0),0);
+      }
+      
+      if (isNaN(periodStartDate.getTime()) || isNaN(periodEndDate.getTime())) {
+        console.warn('Could not parse period times:', period);
+        continue;
+      }
+    } catch (e) {
+      console.warn('Error parsing period times:', period, e);
+      continue;
+    }
+
+    if (isWithinInterval(slotDate, { start: periodStartDate, end: periodEndDate })) {
+      return true;
+    }
+  }
+  return false;
+};
 
 
 function SubmitButton() {
@@ -64,7 +162,6 @@ export default function BookingSection() {
   const { t, language, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
   
-  // State for controlled inputs
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -72,18 +169,45 @@ export default function BookingSection() {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
-
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>(restaurantConfig.bookingTimeSlots);
+  const [showNoSlotsMessage, setShowNoSlotsMessage] = useState(false);
 
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const processedSuccessKeyRef = useRef<string | null>(null);
   const processedErrorKeyRef = useRef<string | null>(null);
 
-
-  // Set initial date on client mount to avoid hydration mismatch for Calendar
   useEffect(() => {
     setDate(new Date());
   }, []); 
+
+  // Effect to update available time slots when date changes
+  useEffect(() => {
+    if (date) {
+      const dayKey = getDayKey(date);
+      const openingHoursToday = getOpeningHoursForDay(dayKey, restaurantConfig.openingHours);
+      
+      const filteredSlots = restaurantConfig.bookingTimeSlots.filter(slot =>
+        isTimeSlotAvailable(slot, openingHoursToday, date)
+      );
+      setAvailableTimeSlots(filteredSlots);
+
+      if (filteredSlots.length === 0) {
+        setShowNoSlotsMessage(true);
+      } else {
+        setShowNoSlotsMessage(false);
+      }
+
+      // If previously selected time is no longer available, reset it
+      if (selectedTime && !filteredSlots.includes(selectedTime)) {
+        setSelectedTime(undefined);
+      }
+    } else {
+      // If no date is selected, show all slots by default (or could be empty)
+      setAvailableTimeSlots(restaurantConfig.bookingTimeSlots);
+      setShowNoSlotsMessage(false);
+    }
+  }, [date, selectedTime]);
 
 
   const initialState: BookingFormState = {
@@ -94,9 +218,7 @@ export default function BookingSection() {
     submittedData: null,
   };
   const [state, formAction, isPending] = useActionState(submitBooking, initialState);
-  // React's own isPending, not useFormStatus for this direct pattern
 
-  // Effect for displaying toasts based on form action state
   useEffect(() => {
     if (state?.messageKey) {
       if(state.success && state.messageKey !== processedSuccessKeyRef.current) {
@@ -106,7 +228,7 @@ export default function BookingSection() {
           variant: "default",
         });
         processedSuccessKeyRef.current = state.messageKey;
-        processedErrorKeyRef.current = null; // Clear error tracking
+        processedErrorKeyRef.current = null; 
       } else if (!state.success && state.messageKey !== processedErrorKeyRef.current) {
          toast({
           title: t('landing:booking.toast.errorTitle'),
@@ -114,20 +236,17 @@ export default function BookingSection() {
           variant: "destructive",
         });
         processedErrorKeyRef.current = state.messageKey;
-        processedSuccessKeyRef.current = null; // Clear success tracking
+        processedSuccessKeyRef.current = null; 
       }
     }
   }, [state, toast, t]);
 
-
-  // Effect for handling successful WhatsApp redirect and form reset
    useEffect(() => {
     if (state?.success && state.messageKey === processedSuccessKeyRef.current) { 
       if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
         const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
         window.open(whatsappUrl, '_blank');
       }
-      // Reset form fields on any success
       setName('');
       setEmail('');
       setPhone('');
@@ -135,12 +254,9 @@ export default function BookingSection() {
       setDate(new Date()); 
       setSelectedTime(undefined);
       setSelectedGuests(undefined);
-      
-      // Do not clear processedSuccessKeyRef.current here, let the toast logic handle it
     }
-  }, [state]); // Depend only on state
+  }, [state]); 
 
-  // If form submission failed, restore field values if they exist in state.submittedData
   useEffect(() => {
     if (!state?.success && state?.submittedData) {
         setName(state.submittedData.name || '');
@@ -148,24 +264,21 @@ export default function BookingSection() {
         setPhone(state.submittedData.phone || '');
         setNotes(state.submittedData.notes || '');
         if (state.submittedData.date) {
-            // Ensure date is parsed correctly if it's a string
-            const prevDate = typeof state.submittedData.date === 'string' ? new Date(state.submittedData.date) : state.submittedData.date;
+            const prevDate = typeof state.submittedData.date === 'string' ? parseTime(state.submittedData.date, 'yyyy-MM-dd', new Date()) : state.submittedData.date;
             if (prevDate && !isNaN(prevDate.getTime())) {
                  setDate(prevDate);
             } else {
-                setDate(new Date()); // Fallback if previous date was invalid or not set
+                setDate(new Date()); 
             }
         } else {
-             setDate(new Date()); // Fallback if no date was submitted
+             setDate(new Date()); 
         }
         setSelectedTime(state.submittedData.time || undefined);
         setSelectedGuests(state.submittedData.guests?.toString() || undefined);
     } else if (!state?.success && !state?.submittedData && date === undefined) {
-        // Ensures that if there's no submittedData on error and date is still undefined, 
-        // we set it to new Date() to avoid it being undefined on first error after mount.
         setDate(new Date());
     }
-  }, [state?.success, state?.submittedData]); // Removed 'date' from dependency array to avoid loop with setDate
+  }, [state?.success, state?.submittedData]); 
 
 
   let dateLocale;
@@ -174,7 +287,7 @@ export default function BookingSection() {
   else dateLocale = en;
 
   const maxConfigGuests = restaurantConfig.bookingMaxGuestsPerSlot || 8;
-  const manyGuestsNumericValue = 99; // Special value for "more than X"
+  const manyGuestsNumericValue = 99; 
 
   return (
     <section id="booking" className="py-12 sm:py-20 bg-secondary">
@@ -260,7 +373,7 @@ export default function BookingSection() {
                         selected={date}
                         onSelect={setDate}
                         initialFocus
-                        disabled={(d) => d < new Date(new Date().setDate(new Date().getDate() -1))} // Corrected to allow today
+                        disabled={(d) => d < new Date(new Date().setDate(new Date().getDate() -1))} 
                         locale={dateLocale}
                       />
                     </PopoverContent>
@@ -270,18 +383,35 @@ export default function BookingSection() {
                 </div>
                 <div>
                   <Label htmlFor="time">{t('landing:booking.label.time')}</Label>
-                  <Select name="time" value={selectedTime} onValueChange={setSelectedTime}>
+                  <Select 
+                    name="time" 
+                    value={selectedTime} 
+                    onValueChange={setSelectedTime}
+                    disabled={availableTimeSlots.length === 0 && !!date}
+                  >
                     <SelectTrigger id="time" className="w-full mt-1.5 bg-input text-sm">
                       <Clock className="mr-2 h-4 w-4 inline-block" />
                       <SelectValue placeholder={t('landing:booking.placeholder.time')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {restaurantConfig.bookingTimeSlots.map(slot => (
-                        <SelectItem key={slot} value={slot}>{slot}</SelectItem>
-                      ))}
+                      {availableTimeSlots.length > 0 ? (
+                        availableTimeSlots.map(slot => (
+                          <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                        ))
+                      ) : (
+                        date && <SelectItem value="no-slots" disabled>
+                                  {t('landing:booking.error.noSlotsForDay')}
+                                </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   {state?.errors?.time && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.time.map(errKey => t(errKey)).join(", ")}</p>}
+                   {showNoSlotsMessage && availableTimeSlots.length === 0 && date && (
+                    <p className="text-xs sm:text-sm text-destructive mt-1 flex items-center">
+                      <AlertTriangle className="h-4 w-4 mr-1 shrink-0" />
+                      {t('landing:booking.error.restaurantClosedOrNoSlots')}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="guests">{t('landing:booking.label.guests')}</Label>
@@ -332,4 +462,3 @@ export default function BookingSection() {
   );
 }
     
-
