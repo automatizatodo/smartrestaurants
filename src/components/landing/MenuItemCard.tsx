@@ -47,7 +47,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
         {shouldShowImage && (
           <div 
             className="relative w-full aspect-video overflow-hidden h-28 sm:h-32" 
-            suppressHydrationWarning 
+            suppressHydrationWarning={true}
           > 
             <Image
               suppressHydrationWarning
@@ -70,7 +70,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
           <div className="flex justify-between items-baseline">
             <CardTitle 
               suppressHydrationWarning
-              className="text-base lg:text-lg font-serif group-hover:text-primary transition-colors duration-300 leading-snug"
+              className="text-lg lg:text-xl font-serif group-hover:text-primary transition-colors duration-300 leading-snug"
             > 
               {displayName}
             </CardTitle>
@@ -90,23 +90,23 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
           
           {item.allergens && item.allergens.length > 0 && (
             <TooltipProvider delayDuration={300}>
-              <div className="mt-1.5 mb-0.5 flex items-center flex-wrap gap-1">
+              <div className="mt-auto pt-1.5 mb-0.5 flex items-center flex-wrap gap-2"> {/* Changed gap-1 to gap-2 for a bit more space */}
                 {item.allergens.map(allergen => {
-                  const iconName = allergen
+                  const allergenKeyForIcon = allergen
                     .toLowerCase()
                     .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
                     .replace(/\s+/g, '-') 
                     .replace(/[^a-z0-9-]/g, '');
                   
-                  const capitalizedAllergen = allergen.charAt(0).toUpperCase() + allergen.slice(1);
+                  const translatedAllergenName = t(`menu:allergen.${allergenKeyForIcon}`);
 
                   return (
-                    <Tooltip key={allergen}>
+                    <Tooltip key={allergenKeyForIcon}>
                       <TooltipTrigger asChild>
                         <div className="relative h-6 w-6 cursor-pointer">
                           <Image
-                            src={`/alergenos/${iconName}.svg`}
-                            alt={capitalizedAllergen}
+                            src={`/alergenos/${allergenKeyForIcon}.svg`}
+                            alt={translatedAllergenName}
                             fill
                             style={{ objectFit: 'contain' }}
                             suppressHydrationWarning
@@ -114,7 +114,7 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="bg-foreground text-background text-xs p-1 px-2 rounded">
-                        <p>{capitalizedAllergen}</p>
+                        <p>{translatedAllergenName}</p>
                       </TooltipContent>
                     </Tooltip>
                   );

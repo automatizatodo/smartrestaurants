@@ -18,5 +18,20 @@
   "allergensTitle": "Al·lèrgens:",
   "weekdaysPriceLabel": "Dilluns-Divendres",
   "tuesdayToFridayPriceLabel": "Dimarts-Divendres",
-  "weekendsPriceLabel": "Caps de Setmana i Festius"
+  "weekendsPriceLabel": "Caps de Setmana i Festius",
+
+  "allergen.gluten": "Gluten",
+  "allergen.crustaceos": "Crustacis",
+  "allergen.huevos": "Ous",
+  "allergen.pescado": "Peix",
+  "allergen.cacahuetes": "Cacauets",
+  "allergen.soja": "Soja",
+  "allergen.frutos-de-cascara": "Fruits de Closca",
+  "allergen.apio": "Api",
+  "allergen.mostaza": "Mostassa",
+  "allergen.granos-de-sesamo": "Grans de Sèsam",
+  "allergen.dioxido-de-azufre-y-sulfitos": "Diòxid de Sofre i Sulfits",
+  "allergen.altramuces": "Tramussos",
+  "allergen.moluscos": "Mol·luscs",
+  "allergen.lactosa": "Lactosa"
 }

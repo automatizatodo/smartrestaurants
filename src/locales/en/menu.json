@@ -18,5 +18,20 @@
   "allergensTitle": "Allergens:",
   "weekdaysPriceLabel": "Monday-Friday",
   "tuesdayToFridayPriceLabel": "Tuesday-Friday",
-  "weekendsPriceLabel": "Weekends & Holidays"
+  "weekendsPriceLabel": "Weekends & Holidays",
+
+  "allergen.gluten": "Gluten",
+  "allergen.crustaceos": "Crustaceans",
+  "allergen.huevos": "Eggs",
+  "allergen.pescado": "Fish",
+  "allergen.cacahuetes": "Peanuts",
+  "allergen.soja": "Soy",
+  "allergen.frutos-de-cascara": "Nuts",
+  "allergen.apio": "Celery",
+  "allergen.mostaza": "Mustard",
+  "allergen.granos-de-sesamo": "Sesame Seeds",
+  "allergen.dioxido-de-azufre-y-sulfitos": "Sulphur Dioxide and Sulphites",
+  "allergen.altramuces": "Lupin",
+  "allergen.moluscos": "Molluscs",
+  "allergen.lactosa": "Lactose"
 }

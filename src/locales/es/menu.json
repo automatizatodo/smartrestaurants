@@ -18,5 +18,20 @@
   "allergensTitle": "Alérgenos:",
   "weekdaysPriceLabel": "Lunes-Viernes",
   "tuesdayToFridayPriceLabel": "Martes-Viernes",
-  "weekendsPriceLabel": "Fines de Semana y Festivos"
+  "weekendsPriceLabel": "Fines de Semana y Festivos",
+
+  "allergen.gluten": "Gluten",
+  "allergen.crustaceos": "Crustáceos",
+  "allergen.huevos": "Huevos",
+  "allergen.pescado": "Pescado",
+  "allergen.cacahuetes": "Cacahuetes",
+  "allergen.soja": "Soja",
+  "allergen.frutos-de-cascara": "Frutos de Cáscara",
+  "allergen.apio": "Apio",
+  "allergen.mostaza": "Mostaza",
+  "allergen.granos-de-sesamo": "Granos de Sésamo",
+  "allergen.dioxido-de-azufre-y-sulfitos": "Dióxido de Azufre y Sulfitos",
+  "allergen.altramuces": "Altramuces",
+  "allergen.moluscos": "Moluscos",
+  "allergen.lactosa": "Lactosa"
 }
