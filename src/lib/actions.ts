@@ -1,8 +1,8 @@
 
 "use server";
 
-import { config } from 'dotenv'; // Import dotenv
-config(); // Load environment variables
+import { config } from 'dotenv'; 
+config(); 
 
 import { aiSommelier, type AISommelierInput, type AISommelierOutput } from "@/ai/flows/ai-sommelier";
 import { checkCalendarAvailability, type CheckCalendarAvailabilityInput, type CheckCalendarAvailabilityOutput } from "@/ai/flows/check-calendar-availability-flow";
@@ -32,7 +32,7 @@ const formatMenuForAI = (menuItems: MenuItemData[]): string => {
   }
   return menuItems.map(item =>
     "Dish: " + item.name.en +
-    "\nDescription: " + item.description.en +
+    "\nDescription: " + (item.description.en || 'N/A') + // Handle potentially empty description
     "\nPrice: " + (item.price || 'N/A') +
     "\nCategory: " + item.categoryKey
   ).join("\n\n");
@@ -61,7 +61,7 @@ export async function getAISommelierRecommendations(
   let menuInformationString = "Menu information is currently unavailable.";
   try {
     // console.log("ACTIONS_AISOMMELIER: Fetching menu for AI Sommelier...");
-    const { menuItems } = await fetchMenuDataWithPrice(); // Corrected function call
+    const { menuItems } = await fetchMenuDataWithPrice(); 
     if (menuItems && menuItems.length > 0) {
       menuInformationString = formatMenuForAI(menuItems);
       // console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted.");
@@ -122,6 +122,10 @@ const BookingSchema = z.object({
   notes: z.string().optional(),
 });
 
+// Define a type for the raw form data to be included in the state
+type BookingFormData = z.infer<typeof BookingSchema>;
+
+
 export interface BookingFormState {
   messageKey: string | null;
   messageParams?: Record<string, string | number> | null;
@@ -139,23 +143,24 @@ export interface BookingFormState {
   bookingMethod?: 'whatsapp' | 'calendar';
   whatsappNumber?: string;
   whatsappMessage?: string;
+  submittedData?: Partial<BookingFormData> | null; // To hold submitted data on error
 }
 
 export async function submitBooking(
-  prevState: BookingFormState | null,
+  prevState: BookingFormState, // prevState is now required by useActionState
   formData: FormData
 ): Promise<BookingFormState> {
   // console.log("ACTIONS_BOOKING: submitBooking action initiated.");
   // console.log("ACTIONS_BOOKING: Raw form data:", Object.fromEntries(formData.entries()));
 
   const rawFormData = {
-    name: formData.get("name"),
-    email: formData.get("email"),
-    phone: formData.get("phone"),
-    date: formData.get("date"),
-    time: formData.get("time"),
-    guests: formData.get("guests"),
-    notes: formData.get("notes") || undefined,
+    name: formData.get("name") as string || '',
+    email: formData.get("email") as string || '',
+    phone: formData.get("phone") as string || '',
+    date: formData.get("date") as string || '',
+    time: formData.get("time") as string || '',
+    guests: formData.get("guests") as string || '', // Will be coerced by Zod
+    notes: formData.get("notes") as string || undefined,
   };
 
   const validatedFields = BookingSchema.safeParse(rawFormData);
@@ -167,6 +172,7 @@ export async function submitBooking(
       success: false,
       errors: validatedFields.error.flatten().fieldErrors,
       messageParams: null,
+      submittedData: rawFormData, // Return raw form data on validation error
     };
   }
   // console.log("ACTIONS_BOOKING: Form data validated successfully:", validatedFields.data);
@@ -182,15 +188,16 @@ export async function submitBooking(
         success: false,
         errors: { general: ["landing:booking.error.whatsappConfigError"] },
         messageParams: null,
+        submittedData: validatedFields.data, // Return validated data
       };
     }
 
-    let formattedDate = date; // Default to YYYY-MM-DD
+    let formattedDate = date; 
     try {
         const parsedDateObj = parseISO(date);
-        formattedDate = format(parsedDateObj, "PPP"); // Use a locale-friendly format if parseISO succeeds
+        formattedDate = format(parsedDateObj, "PPP"); 
     } catch (e) {
-        // console.warn(\`ACTIONS_BOOKING_WHATSAPP: Could not parse date '\${date}' with parseISO. Using original string.\`);
+        // console.warn("ACTIONS_BOOKING_WHATSAPP: Could not parse date " + date + " with parseISO. Using original string.");
     }
 
     const restaurantNameForMsg = restaurantConfig.restaurantDisplayName || 'el restaurante';
@@ -219,6 +226,7 @@ export async function submitBooking(
       bookingMethod: 'whatsapp',
       whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''),
       whatsappMessage: whatsappMessage,
+      submittedData: null, // Clear submitted data on success
     };
 
   } else if (restaurantConfig.bookingMethod === 'calendar') {
@@ -231,12 +239,13 @@ export async function submitBooking(
       // console.log("ACTIONS_BOOKING: checkCalendarAvailability flow response:", availabilityResult);
 
       if (!availabilityResult || typeof availabilityResult.isAvailable === 'undefined') {
-          console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
+          // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
           return {
               messageKey: "landing:booking.error.calendarCheckFailed",
               success: false,
               errors: { general: ["landing:booking.error.calendarCheckFailed"] },
               messageParams: null,
+              submittedData: validatedFields.data,
           };
       }
 
@@ -250,15 +259,17 @@ export async function submitBooking(
           success: false,
           errors: { general: [availabilityResult.reasonKey || "landing:booking.error.slotUnavailable"] },
           messageParams: messageParams,
+          submittedData: validatedFields.data,
         };
       }
     } catch (error: any) {
-      console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
+      // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
       return {
         messageKey: "landing:booking.error.calendarCheckFailed",
         success: false,
         errors: { general: ["landing:booking.error.calendarCheckFailed"] },
         messageParams: null,
+        submittedData: validatedFields.data,
       };
     }
 
@@ -270,12 +281,13 @@ export async function submitBooking(
       // console.log("ACTIONS_BOOKING: createCalendarEvent flow response:", eventResult);
 
       if (!eventResult || typeof eventResult.success === 'undefined') {
-          console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
+          // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
           return {
               messageKey: "landing:booking.error.calendarError",
               success: false,
               errors: { general: ["landing:booking.error.calendarError"] },
               messageParams: null,
+              submittedData: validatedFields.data,
           };
       }
 
@@ -286,14 +298,15 @@ export async function submitBooking(
           success: false,
           errors: { general: [eventResult.errorKey || "landing:booking.error.calendarError"] },
           messageParams: null,
+          submittedData: validatedFields.data,
         };
       }
-      let formattedDate = date;
+      let formattedSuccessDate = date;
         try {
             const parsedDateObj = parseISO(date);
-            formattedDate = format(parsedDateObj, "PPP");
+            formattedSuccessDate = format(parsedDateObj, "PPP");
         } catch (e) {
-            // console.warn(\`ACTIONS_BOOKING_CALENDAR_SUCCESS: Could not parse date '\${date}' with parseISO for success message. Using original string.\`);
+            // console.warn("ACTIONS_BOOKING_CALENDAR_SUCCESS: Could not parse date " + date + " with parseISO for success message. Using original string.");
         }
 
       // console.log("ACTIONS_BOOKING: Booking successful. Event ID:", eventResult.eventId);
@@ -302,21 +315,23 @@ export async function submitBooking(
         messageParams: {
           name: validatedFields.data.name,
           guests: String(validatedFields.data.guests),
-          date: formattedDate, // Format for display
+          date: formattedSuccessDate, 
           time: validatedFields.data.time
         },
         success: true,
         errors: null,
         bookingMethod: 'calendar',
+        submittedData: null, // Clear submitted data on success
       };
 
     } catch (error: any) {
-      console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
+      // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
       return {
         messageKey: "landing:booking.error.calendarError",
         success: false,
         errors: { general: ["landing:booking.error.calendarError"] },
         messageParams: null,
+        submittedData: validatedFields.data,
       };
     }
   } else {
@@ -326,6 +341,8 @@ export async function submitBooking(
       success: false,
       errors: { general: ["landing:booking.error.unknownMethod"] },
       messageParams: null,
+      submittedData: validatedFields.data,
     };
   }
 }
+

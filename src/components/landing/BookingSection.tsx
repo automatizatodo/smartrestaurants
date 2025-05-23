@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useActionState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useActionState } from 'react'; // React's own useActionState
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,17 +63,21 @@ function SubmitButton() {
 export default function BookingSection() {
   const { t, language, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
-  const [date, setDate] = useState<Date | undefined>(undefined); // Initialize to undefined
+  
+  // State for controlled inputs
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [notes, setNotes] = useState('');
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
+
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const processedSuccessKeyRef = useRef<string | null>(null);
+  const processedErrorKeyRef = useRef<string | null>(null);
 
-  let dateLocale;
-  if (language === 'es') dateLocale = es;
-  else if (language === 'ca') dateLocale = ca;
-  else dateLocale = en;
 
   // Set initial date on client mount to avoid hydration mismatch
   useEffect(() => {
@@ -84,22 +89,30 @@ export default function BookingSection() {
     messageKey: null,
     success: false,
     errors: null,
-    messageParams: null
+    messageParams: null,
+    submittedData: null,
   };
   const [state, formAction] = useActionState(submitBooking, initialState);
 
   // Effect for displaying toasts based on form action state
   useEffect(() => {
-    if (state?.messageKey && state.messageKey !== processedSuccessKeyRef.current) {
-      toast({
-        title: state.success ? t('landing:booking.toast.successTitle') : t('landing:booking.toast.errorTitle'),
-        description: t(state.messageKey, state.messageParams || undefined),
-        variant: state.success ? "default" : "destructive",
-      });
-      if (state.success) {
-        processedSuccessKeyRef.current = state.messageKey; // Mark as processed for toast
-      } else {
-        processedSuccessKeyRef.current = null; // Clear if it's an error message
+    if (state?.messageKey) {
+      if(state.success && state.messageKey !== processedSuccessKeyRef.current) {
+        toast({
+          title: t('landing:booking.toast.successTitle'),
+          description: t(state.messageKey, state.messageParams || undefined),
+          variant: "default",
+        });
+        processedSuccessKeyRef.current = state.messageKey;
+        processedErrorKeyRef.current = null; // Clear error tracking
+      } else if (!state.success && state.messageKey !== processedErrorKeyRef.current) {
+         toast({
+          title: t('landing:booking.toast.errorTitle'),
+          description: t(state.messageKey, state.messageParams || undefined),
+          variant: "destructive",
+        });
+        processedErrorKeyRef.current = state.messageKey;
+        processedSuccessKeyRef.current = null; // Clear success tracking
       }
     }
   }, [state, toast, t]);
@@ -107,21 +120,30 @@ export default function BookingSection() {
 
   // Effect for handling successful WhatsApp redirect and form reset
    useEffect(() => {
-    if (state?.success && state.messageKey) { // Check if there's a success message
+    if (state?.success && state.messageKey) { 
       if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
-        console.log("CLIENT_BOOKING: Opening WhatsApp URL for submission:", state.messageKey);
         const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
         window.open(whatsappUrl, '_blank');
       }
       // Reset form fields on any success
-      formRef.current?.reset();
-      setDate(new Date()); // Reset date to today after successful submission
+      // formRef.current?.reset(); // No longer needed for controlled components
+      setName('');
+      setEmail('');
+      setPhone('');
+      setNotes('');
+      setDate(new Date()); 
       setSelectedTime(undefined);
       setSelectedGuests(undefined);
-      // Important: Do not re-set processedSuccessKeyRef here as it's for toast
+      
+      processedSuccessKeyRef.current = state.messageKey; 
     }
   }, [state?.success, state?.messageKey, state?.bookingMethod, state?.whatsappNumber, state?.whatsappMessage]);
 
+
+  let dateLocale;
+  if (language === 'es') dateLocale = es;
+  else if (language === 'ca') dateLocale = ca;
+  else dateLocale = en;
 
   return (
     <section id="booking" className="py-12 sm:py-20 bg-secondary">
@@ -136,7 +158,7 @@ export default function BookingSection() {
         </div>
 
         <Card className="max-w-xl sm:max-w-2xl mx-auto shadow-xl">
-          <form action={formAction} ref={formRef} className="space-y-4">
+          <form action={formAction} ref={formRef} className="space-y-4 sm:space-y-5">
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="font-serif text-xl sm:text-2xl">{t('landing:booking.cardTitle')}</CardTitle>
               <CardDescription className="text-sm sm:text-base">
@@ -147,18 +169,41 @@ export default function BookingSection() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                 <div>
                   <Label htmlFor="name">{t('landing:booking.label.name')}</Label>
-                  <Input id="name" name="name" placeholder={t('landing:booking.placeholder.name')} className="bg-input mt-1.5" />
+                  <Input 
+                    id="name" 
+                    name="name" 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={t('landing:booking.placeholder.name')} 
+                    className="bg-input mt-1.5" 
+                  />
                   {state?.errors?.name && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.name.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
                 <div>
                   <Label htmlFor="email">{t('landing:booking.label.email')}</Label>
-                  <Input id="email" name="email" type="email" placeholder={t('landing:booking.placeholder.email')} className="bg-input mt-1.5" />
+                  <Input 
+                    id="email" 
+                    name="email" 
+                    type="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t('landing:booking.placeholder.email')} 
+                    className="bg-input mt-1.5" 
+                  />
                   {state?.errors?.email && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.email.map(errKey => t(errKey)).join(", ")}</p>}
                 </div>
               </div>
               <div>
                 <Label htmlFor="phone">{t('landing:booking.label.phone')}</Label>
-                <Input id="phone" name="phone" type="tel" placeholder={t('landing:booking.placeholder.phone')} className="bg-input mt-1.5" />
+                <Input 
+                  id="phone" 
+                  name="phone" 
+                  type="tel" 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder={t('landing:booking.placeholder.phone')} 
+                  className="bg-input mt-1.5" 
+                />
                 {state?.errors?.phone && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.phone.map(errKey => t(errKey)).join(", ")}</p>}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
@@ -184,7 +229,7 @@ export default function BookingSection() {
                         selected={date}
                         onSelect={setDate}
                         initialFocus
-                        disabled={(d) => d < new Date(new Date().setDate(new Date().getDate() -1))}
+                        disabled={(d) => d < new Date(new Date().setDate(new Date().getDate() -1))} // Corrected to allow today
                         locale={dateLocale}
                       />
                     </PopoverContent>
@@ -225,7 +270,14 @@ export default function BookingSection() {
               </div>
               <div>
                 <Label htmlFor="notes">{t('landing:booking.label.notes', { restaurantName })}</Label>
-                <Input id="notes" name="notes" placeholder={t('landing:booking.placeholder.notes')} className="bg-input mt-1.5" />
+                <Input 
+                  id="notes" 
+                  name="notes" 
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={t('landing:booking.placeholder.notes')} 
+                  className="bg-input mt-1.5" 
+                />
                 {state?.errors?.notes && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.notes.map(errKey => t(errKey)).join(", ")}</p>}
               </div>
               {state?.errors?.general && (
@@ -244,3 +296,4 @@ export default function BookingSection() {
   );
 }
     
+
