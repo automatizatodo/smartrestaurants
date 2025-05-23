@@ -19,6 +19,26 @@ export default function HeroSection() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const fullTitle = t('landing:hero.seoTitle', { restaurantName });
+  let mainTitle = restaurantName; // Fallback to just restaurant name
+  let subTitlePart = "";
+
+  const separatorIndex = fullTitle.indexOf(': ');
+  if (separatorIndex !== -1) {
+    mainTitle = fullTitle.substring(0, separatorIndex);
+    subTitlePart = fullTitle.substring(separatorIndex + 2);
+  } else if (fullTitle.startsWith(restaurantName)) {
+    // If no colon, but starts with restaurantName, assume the rest is subtitle
+    mainTitle = restaurantName;
+    subTitlePart = fullTitle.substring(restaurantName.length).trim();
+    if (subTitlePart.startsWith(':')) { // Clean up leading colon if any
+        subTitlePart = subTitlePart.substring(1).trim();
+    } else if (subTitlePart.length > 0 && !subTitlePart.startsWith(',')) { // Add a visual separator if needed
+        // this case is less likely with current translations but good for robustness
+    }
+  }
+
+
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
       <div
@@ -43,14 +63,19 @@ export default function HeroSection() {
 
       <div className="relative z-10 p-4 sm:p-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 shadow-text uppercase"
+          className="font-bold text-white shadow-text uppercase"
           style={{ fontFamily: 'var(--font-cinzel), serif' }}
           suppressHydrationWarning
         >
-          {t('landing:hero.seoTitle', { restaurantName: restaurantName })}
+          <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-2">{mainTitle}</span>
+          {subTitlePart && (
+            <span className="block text-xl sm:text-2xl md:text-3xl text-gray-200 font-normal normal-case" style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+              {subTitlePart}
+            </span>
+          )}
         </h1>
         <p
-          className="text-xl sm:text-2xl md:text-3xl text-gray-200 mb-10 max-w-3xl mx-auto font-sans shadow-text"
+          className="text-xl sm:text-2xl md:text-3xl text-gray-200 mt-6 mb-10 max-w-3xl mx-auto font-sans shadow-text"
           style={{ fontFamily: 'var(--font-cinzel), serif' }}
           suppressHydrationWarning
         >
@@ -77,4 +102,3 @@ export default function HeroSection() {
     </section>
   );
 }
-
