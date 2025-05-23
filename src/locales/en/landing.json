@@ -52,6 +52,7 @@
   "booking.placeholder.time": "Select time",
   "booking.label.guests": "Guests",
   "booking.placeholder.guests": "Number of guests",
+  "booking.placeholder.moreThanXGuests": "More than {count} guests",
   "booking.label.notes": "Special Notes (optional)",
   "booking.placeholder.notes": "E.g., dietary restrictions, celebration...",
   "booking.buttonText": "Request Booking",
@@ -67,6 +68,8 @@
   "booking.error.timeRequired": "Time is required",
   "booking.error.guestsRequired": "At least one guest is required",
   "booking.error.guestsTooMany": "Maximum {count} guests allowed per booking for this slot.",
+  "booking.error.guestsTooManySystem": "Maximum {count} guests allowed per booking for this slot. For larger groups, please contact us.",
+  "booking.error.guestsTooManyForCalendar": "For more than {count} guests, please contact us directly for calendar bookings.",
   "booking.error.slotUnavailable": "The selected time slot {time} on {date} is not available. Please choose another time.",
   "booking.error.slotUnavailable.fullyBooked": "The selected time slot is fully booked. Please choose another time.",
   "booking.error.slotUnavailable.tooManyGuests": "This time slot cannot accommodate {guests} guests. Remaining capacity: {maxGuestsForSlot}. Please try a smaller party or different time.",
@@ -105,3 +108,5 @@
   "contactMap.hours.mon": "Monday",
   "contactMap.hours.closed": "Closed"
 }
+
+    

@@ -65,13 +65,14 @@ export default function BookingSection() {
   const restaurantName = translations.common.restaurantName;
   
   // State for controlled inputs
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [notes, setNotes] = useState('');
+  const [name, setName] = useState(prevState?.submittedData?.name || '');
+  const [email, setEmail] = useState(prevState?.submittedData?.email || '');
+  const [phone, setPhone] = useState(prevState?.submittedData?.phone || '');
+  const [notes, setNotes] = useState(prevState?.submittedData?.notes || '');
   const [date, setDate] = useState<Date | undefined>(undefined);
-  const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
-  const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
+  const [selectedTime, setSelectedTime] = useState<string | undefined>(prevState?.submittedData?.time);
+  const [selectedGuests, setSelectedGuests] = useState<string | undefined>(prevState?.submittedData?.guests?.toString());
+
 
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -79,10 +80,19 @@ export default function BookingSection() {
   const processedErrorKeyRef = useRef<string | null>(null);
 
 
-  // Set initial date on client mount to avoid hydration mismatch
+  // Set initial date on client mount to avoid hydration mismatch for Calendar
   useEffect(() => {
-    setDate(new Date());
-  }, []);
+    if(!prevState?.submittedData?.date) { // Only set initial if not restoring from error
+        setDate(new Date());
+    } else {
+        const prevDate = new Date(prevState.submittedData.date);
+        if (!isNaN(prevDate.getTime())) {
+            setDate(prevDate);
+        } else {
+            setDate(new Date()); // Fallback if previous date was invalid
+        }
+    }
+  }, []); // Run only once on mount if not restoring
 
 
   const initialState: BookingFormState = {
@@ -92,7 +102,8 @@ export default function BookingSection() {
     messageParams: null,
     submittedData: null,
   };
-  const [state, formAction] = useActionState(submitBooking, initialState);
+  const [state, formAction, isPending] = useActionState(submitBooking, initialState);
+  // React's own isPending, not useFormStatus for this direct pattern
 
   // Effect for displaying toasts based on form action state
   useEffect(() => {
@@ -120,13 +131,12 @@ export default function BookingSection() {
 
   // Effect for handling successful WhatsApp redirect and form reset
    useEffect(() => {
-    if (state?.success && state.messageKey) { 
+    if (state?.success && state.messageKey && state.messageKey === processedSuccessKeyRef.current) { 
       if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
         const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
         window.open(whatsappUrl, '_blank');
       }
       // Reset form fields on any success
-      // formRef.current?.reset(); // No longer needed for controlled components
       setName('');
       setEmail('');
       setPhone('');
@@ -135,15 +145,34 @@ export default function BookingSection() {
       setSelectedTime(undefined);
       setSelectedGuests(undefined);
       
-      processedSuccessKeyRef.current = state.messageKey; 
+      // Do not clear processedSuccessKeyRef.current here, let the toast logic handle it
     }
-  }, [state?.success, state?.messageKey, state?.bookingMethod, state?.whatsappNumber, state?.whatsappMessage]);
+  }, [state]); // Depend only on state
+
+  // If form submission failed, restore field values if they exist in state.submittedData
+  useEffect(() => {
+    if (!state?.success && state?.submittedData) {
+        setName(state.submittedData.name || '');
+        setEmail(state.submittedData.email || '');
+        setPhone(state.submittedData.phone || '');
+        setNotes(state.submittedData.notes || '');
+        if (state.submittedData.date) {
+            const prevDate = new Date(state.submittedData.date);
+            if (!isNaN(prevDate.getTime())) setDate(prevDate);
+        }
+        setSelectedTime(state.submittedData.time || undefined);
+        setSelectedGuests(state.submittedData.guests?.toString() || undefined);
+    }
+  }, [state?.success, state?.submittedData]);
 
 
   let dateLocale;
   if (language === 'es') dateLocale = es;
   else if (language === 'ca') dateLocale = ca;
   else dateLocale = en;
+
+  const maxConfigGuests = restaurantConfig.bookingMaxGuestsPerSlot || 8;
+  const manyGuestsNumericValue = 99; // Special value for "more than X"
 
   return (
     <section id="booking" className="py-12 sm:py-20 bg-secondary">
@@ -260,12 +289,17 @@ export default function BookingSection() {
                       <SelectValue placeholder={t('landing:booking.placeholder.guests')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {[...Array(restaurantConfig.bookingMaxGuestsPerSlot || 8)].map((_, i) => (
-                        <SelectItem key={i + 1} value={(i + 1).toString()}>{i + 1} {t(i === 0 ? 'common:guestSingular' : 'common:guestsPlural', {count: i+1})}</SelectItem>
+                      {[...Array(maxConfigGuests)].map((_, i) => (
+                        <SelectItem key={i + 1} value={(i + 1).toString()}>
+                          {i + 1} {t(i === 0 ? 'common:guestSingular' : 'common:guestsPlural', {count: i + 1})}
+                        </SelectItem>
                       ))}
+                       <SelectItem value={manyGuestsNumericValue.toString()}>
+                          {t('landing:booking.placeholder.moreThanXGuests', { count: maxConfigGuests })}
+                        </SelectItem>
                     </SelectContent>
                   </Select>
-                  {state?.errors?.guests && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.guests.map(errKey => t(errKey)).join(", ")}</p>}
+                  {state?.errors?.guests && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.guests.map(errKey => t(errKey, state.messageParams || undefined)).join(", ")}</p>}
                 </div>
               </div>
               <div>
@@ -297,3 +331,4 @@ export default function BookingSection() {
 }
     
 
+    

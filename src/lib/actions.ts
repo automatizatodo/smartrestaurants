@@ -27,12 +27,13 @@ export interface SommelierFormState {
 }
 
 const formatMenuForAI = (menuItems: MenuItemData[]): string => {
+  // console.log("ACTIONS_AISOMMELIER_FORMATMENU: Formatting menu for AI. Items count:", menuItems ? menuItems.length : 0);
   if (!menuItems || menuItems.length === 0) {
     return "No menu items available.";
   }
   return menuItems.map(item =>
-    "Dish: " + item.name.en +
-    "\nDescription: " + (item.description.en || 'N/A') + // Handle potentially empty description
+    "Dish: " + (item.name.en || item.name.es || item.name.ca) + // Use available name
+    "\nDescription: " + (item.description.en || item.description.es || item.description.ca || 'N/A') + 
     "\nPrice: " + (item.price || 'N/A') +
     "\nCategory: " + item.categoryKey
   ).join("\n\n");
@@ -61,10 +62,10 @@ export async function getAISommelierRecommendations(
   let menuInformationString = "Menu information is currently unavailable.";
   try {
     // console.log("ACTIONS_AISOMMELIER: Fetching menu for AI Sommelier...");
-    const { menuItems } = await fetchMenuDataWithPrice(); 
-    if (menuItems && menuItems.length > 0) {
-      menuInformationString = formatMenuForAI(menuItems);
-      // console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted.");
+    const menuData = await fetchMenuDataWithPrice(); 
+    if (menuData.menuItems && menuData.menuItems.length > 0) {
+      menuInformationString = formatMenuForAI(menuData.menuItems);
+      // console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted for AI.");
     } else {
       // console.warn("ACTIONS_AISOMMELIER: No menu items fetched for AI Sommelier.");
     }
@@ -112,18 +113,19 @@ export async function getAISommelierRecommendations(
   }
 }
 
+// Define a type for the raw form data to be included in the state
+type BookingFormData = z.infer<typeof BookingSchema>;
+
+// Allow guests to be a number up to 99 to handle the "many guests" special value
 const BookingSchema = z.object({
   name: z.string().min(1, "landing:booking.error.nameRequired"),
   email: z.string().email("landing:booking.error.emailInvalid"),
   phone: z.string().min(1, "landing:booking.error.phoneRequired"),
   date: z.string().min(1, "landing:booking.error.dateRequired"),
   time: z.string().min(1, "landing:booking.error.timeRequired"),
-  guests: z.coerce.number().int().min(1, "landing:booking.error.guestsRequired").max(restaurantConfig.bookingMaxGuestsPerSlot || 8, "landing:booking.error.guestsTooMany"),
+  guests: z.coerce.number().int().min(1, "landing:booking.error.guestsRequired").max(99, "landing:booking.error.guestsTooManySystem"), // Allow up to 99 for the special case
   notes: z.string().optional(),
 });
-
-// Define a type for the raw form data to be included in the state
-type BookingFormData = z.infer<typeof BookingSchema>;
 
 
 export interface BookingFormState {
@@ -143,25 +145,25 @@ export interface BookingFormState {
   bookingMethod?: 'whatsapp' | 'calendar';
   whatsappNumber?: string;
   whatsappMessage?: string;
-  submittedData?: Partial<BookingFormData> | null; // To hold submitted data on error
+  submittedData?: Partial<BookingFormData> | null; 
 }
 
 export async function submitBooking(
-  prevState: BookingFormState, // prevState is now required by useActionState
+  prevState: BookingFormState, 
   formData: FormData
 ): Promise<BookingFormState> {
   // console.log("ACTIONS_BOOKING: submitBooking action initiated.");
-  // console.log("ACTIONS_BOOKING: Raw form data:", Object.fromEntries(formData.entries()));
-
   const rawFormData = {
     name: formData.get("name") as string || '',
     email: formData.get("email") as string || '',
     phone: formData.get("phone") as string || '',
     date: formData.get("date") as string || '',
     time: formData.get("time") as string || '',
-    guests: formData.get("guests") as string || '', // Will be coerced by Zod
+    guests: formData.get("guests") as string || '', 
     notes: formData.get("notes") as string || undefined,
   };
+  // console.log("ACTIONS_BOOKING: Raw form data:", rawFormData);
+
 
   const validatedFields = BookingSchema.safeParse(rawFormData);
 
@@ -172,12 +174,14 @@ export async function submitBooking(
       success: false,
       errors: validatedFields.error.flatten().fieldErrors,
       messageParams: null,
-      submittedData: rawFormData, // Return raw form data on validation error
+      submittedData: rawFormData, 
     };
   }
   // console.log("ACTIONS_BOOKING: Form data validated successfully:", validatedFields.data);
 
   const { name, email, phone, date, time, guests, notes } = validatedFields.data;
+  const maxConfigGuests = restaurantConfig.bookingMaxGuestsPerSlot || 8;
+  const manyGuestsValue = 99; // Special value for "more than X"
 
   if (restaurantConfig.bookingMethod === 'whatsapp') {
     // console.log("ACTIONS_BOOKING: Processing booking via WhatsApp method.");
@@ -188,7 +192,7 @@ export async function submitBooking(
         success: false,
         errors: { general: ["landing:booking.error.whatsappConfigError"] },
         messageParams: null,
-        submittedData: validatedFields.data, // Return validated data
+        submittedData: validatedFields.data, 
       };
     }
 
@@ -201,6 +205,15 @@ export async function submitBooking(
     }
 
     const restaurantNameForMsg = restaurantConfig.restaurantDisplayName || 'el restaurante';
+    let guestText = guests.toString();
+    if (guests === manyGuestsValue) {
+        // Note: Cannot use 't' function here directly as this is a server action.
+        // Constructing the string manually or passing language to choose pre-translated string.
+        // For simplicity, hardcoding a generic representation.
+        guestText = `Més de ${maxConfigGuests}`; // This should be localized if possible, or use a generic term.
+    }
+
+
     const messageParts = [
       "Hola " + restaurantNameForMsg + ",",
       "Quisiera solicitar una reserva:",
@@ -209,7 +222,7 @@ export async function submitBooking(
       "- Teléfono: " + phone,
       "- Fecha: " + formattedDate,
       "- Hora: " + time,
-      "- Comensales: " + guests,
+      "- Comensales: " + guestText,
     ];
     if (notes) {
       messageParts.push("- Notas: " + notes);
@@ -226,11 +239,23 @@ export async function submitBooking(
       bookingMethod: 'whatsapp',
       whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''),
       whatsappMessage: whatsappMessage,
-      submittedData: null, // Clear submitted data on success
+      submittedData: null, 
     };
 
   } else if (restaurantConfig.bookingMethod === 'calendar') {
     // console.log("ACTIONS_BOOKING: Processing booking via Google Calendar method.");
+
+    if (guests === manyGuestsValue || guests > maxConfigGuests) {
+        // console.warn(`ACTIONS_BOOKING: Too many guests (${guests}) for calendar booking. Max allowed: ${maxConfigGuests}.`);
+        return {
+            messageKey: "landing:booking.error.guestsTooManyForCalendar",
+            success: false,
+            errors: { general: ["landing:booking.error.guestsTooManyForCalendar"], guests: ["landing:booking.error.guestsTooManyForCalendar"] },
+            messageParams: { count: maxConfigGuests },
+            submittedData: validatedFields.data,
+        };
+    }
+
     let availabilityResult: CheckCalendarAvailabilityOutput | undefined;
     try {
       // console.log("ACTIONS_BOOKING: Calling checkCalendarAvailability flow...");
@@ -250,9 +275,11 @@ export async function submitBooking(
       }
 
       if (!availabilityResult.isAvailable) {
-        const messageParams = availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests'
-          ? { time, date, guests: String(guests), maxGuestsForSlot: String(availabilityResult.maxGuestsForSlot || 0) }
-          : { time, date };
+        const messageParams: Record<string, string | number> = { time, date: format(parseISO(date), "PPP") };
+         if (availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests') {
+            messageParams.guests = String(guests);
+            messageParams.maxGuestsForSlot = String(availabilityResult.maxGuestsForSlot || 0);
+        }
         // console.warn("ACTIONS_BOOKING: Slot not available according to checkCalendarAvailability flow.", availabilityResult);
         return {
           messageKey: availabilityResult.reasonKey || "landing:booking.error.slotUnavailable",
@@ -264,6 +291,7 @@ export async function submitBooking(
       }
     } catch (error: any) {
       // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
+      // console.error("SUBMIT_BOOKING_ACTION_ERROR_CAUSE:", error.cause);
       return {
         messageKey: "landing:booking.error.calendarCheckFailed",
         success: false,
@@ -321,11 +349,12 @@ export async function submitBooking(
         success: true,
         errors: null,
         bookingMethod: 'calendar',
-        submittedData: null, // Clear submitted data on success
+        submittedData: null, 
       };
 
     } catch (error: any) {
       // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
+      // console.error("SUBMIT_BOOKING_ACTION_ERROR_CAUSE_CREATE:", error.cause);
       return {
         messageKey: "landing:booking.error.calendarError",
         success: false,
@@ -346,3 +375,4 @@ export async function submitBooking(
   }
 }
 
+    

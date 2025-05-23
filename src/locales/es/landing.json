@@ -54,6 +54,7 @@
   "booking.placeholder.time": "Selecciona hora",
   "booking.label.guests": "Comensales",
   "booking.placeholder.guests": "Número de comensales",
+  "booking.placeholder.moreThanXGuests": "Más de {count} comensales",
   "booking.label.notes": "Notas Especiales (opcional)",
   "booking.placeholder.notes": "Ej., restricciones alimentarias, celebración...",
   "booking.buttonText": "Solicitar Reserva",
@@ -69,6 +70,8 @@
   "booking.error.timeRequired": "La hora es obligatoria",
   "booking.error.guestsRequired": "Se requiere al menos un comensal",
   "booking.error.guestsTooMany": "Se permite un máximo de {count} comensales por reserva para esta franja horaria.",
+  "booking.error.guestsTooManySystem": "Se permite un máximo de {count} comensales por reserva para esta franja horaria. Para grupos más grandes, contáctanos.",
+  "booking.error.guestsTooManyForCalendar": "Para más de {count} comensales, por favor, contáctanos directamente para reservas en el calendario.",
   "booking.error.slotUnavailable": "La franja horaria seleccionada ({time} el {date}) no está disponible. Por favor, elige otra hora.",
   "booking.error.slotUnavailable.fullyBooked": "La franja horaria seleccionada está completamente reservada. Por favor, elige otra hora.",
   "booking.error.slotUnavailable.tooManyGuests": "Esta franja horaria no puede acomodar a {guests} comensales. Capacidad restante: {maxGuestsForSlot}. Intenta con menos personas o elige otra hora.",
@@ -107,3 +110,5 @@
   "contactMap.hours.mon": "Lunes",
   "contactMap.hours.closed": "Cerrado"
 }
+
+    

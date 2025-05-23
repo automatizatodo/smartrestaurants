@@ -54,6 +54,7 @@
   "booking.placeholder.time": "Selecciona hora",
   "booking.label.guests": "Comensals",
   "booking.placeholder.guests": "Nombre de comensals",
+  "booking.placeholder.moreThanXGuests": "Més de {count} comensals",
   "booking.label.notes": "Notes Especials (opcional)",
   "booking.placeholder.notes": "Ex., restriccions alimentàries, celebració...",
   "booking.buttonText": "Sol·licitar Reserva",
@@ -69,6 +70,8 @@
   "booking.error.timeRequired": "L'hora és obligatòria",
   "booking.error.guestsRequired": "Es requereix almenys un comensal",
   "booking.error.guestsTooMany": "Es permet un màxim de {count} comensals per reserva per a aquesta franja horària.",
+  "booking.error.guestsTooManySystem": "Es permet un màxim de {count} comensals per reserva per a aquesta franja horària. Per a grups més grans, contacta amb nosaltres.",
+  "booking.error.guestsTooManyForCalendar": "Per a més de {count} comensals, si us plau, contacta'ns directament per a reserves al calendari.",
   "booking.error.slotUnavailable": "La franja horària seleccionada {time} el {date} no està disponible. Si us plau, tria una altra hora.",
   "booking.error.slotUnavailable.fullyBooked": "La franja horària seleccionada està completament reservada. Si us plau, tria una altra hora.",
   "booking.error.slotUnavailable.tooManyGuests": "Aquesta franja horària no pot acomodar {guests} comensals. Capacitat restant: {maxGuestsForSlot}. Intenta amb menys persones o tria una altra hora.",
@@ -107,3 +110,5 @@
   "contactMap.hours.mon": "Dilluns",
   "contactMap.hours.closed": "Tancat"
 }
+
+    
