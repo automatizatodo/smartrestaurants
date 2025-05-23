@@ -23,13 +23,16 @@ export default function HeroSection() {
   let mainTitle = restaurantName; // Fallback to just restaurant name
   let subTitlePart = "";
 
+  // Try to split by the first colon to separate brand name from tagline
   const separatorIndex = fullSeoTitle.indexOf(': ');
   if (separatorIndex !== -1) {
     mainTitle = fullSeoTitle.substring(0, separatorIndex);
     subTitlePart = fullSeoTitle.substring(separatorIndex + 2);
   } else if (fullSeoTitle.startsWith(restaurantName)) {
+    // Fallback if no colon: assume restaurant name is at the start
     mainTitle = restaurantName;
     subTitlePart = fullSeoTitle.substring(restaurantName.length).trim();
+    // Remove leading colon if it was accidentally included in the seoTitle without a space
     if (subTitlePart.startsWith(':')) { 
         subTitlePart = subTitlePart.substring(1).trim();
     }
@@ -53,7 +56,7 @@ export default function HeroSection() {
           style={{ objectFit: 'cover' }}
           quality={80}
           priority
-          className="opacity-0 pointer-events-none"
+          className="opacity-0 pointer-events-none" // Hidden for assistive tech, bg is decorative
         />
          <div className="absolute inset-0 bg-black/50"></div>
       </div>
@@ -69,20 +72,14 @@ export default function HeroSection() {
           {subTitlePart && (
             <span 
               className="block text-xl sm:text-2xl md:text-3xl text-gray-200 font-normal normal-case mt-1 sm:mt-2" 
-              style={{ fontFamily: 'var(--font-cinzel), serif' }} // Changed font here
+              style={{ fontFamily: 'var(--font-cinzel), serif' }} // Using Cinzel for the SEO part as well
             >
               {subTitlePart}
             </span>
           )}
         </h1>
-        <p
-          className="text-xl sm:text-2xl md:text-3xl text-gray-200 mt-6 mb-10 max-w-3xl mx-auto shadow-text"
-          style={{ fontFamily: 'var(--font-cinzel), serif' }}
-          suppressHydrationWarning
-        >
-          {t('landing:hero.tagline')}
-        </p>
-        <div className="flex flex-col space-y-4 items-center sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
+        {/* Tagline <p> element removed */}
+        <div className="flex flex-col space-y-4 items-center sm:flex-row sm:space-y-0 sm:space-x-4 justify-center mt-10">
           <Link href="/menu" passHref>
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105 w-full sm:w-auto">
               {t('landing:hero.viewMenuButton')}
