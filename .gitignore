@@ -25,10 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Local environment variables
-.env*.local
-!/.env.example
-
 # Editor directories and files
 .vscode/*
 !.vscode/settings.json
@@ -53,15 +49,3 @@ firebase-debug.log
 *.firebase.*.log # Firebase CLI debug logs
 firebase.json # Often generated and can contain project-specific IDs
 database-debug.log
-
-# Google Cloud / Service Account Keys
-# IMPORTANT: Never commit service account keys or other sensitive credential files!
-*.json # Broad rule, be careful if you have other non-sensitive JSON
-gastronomic-canvas-credentials.json # If you named it this
-gastronomic-canvas-credentials.json.json # Your specific file
-*credentials*.json # Common naming pattern
-
-# Firebase App Hosting (sensitive if it contains secrets, though typically used for config)
-# apphosting.yaml # Better to keep this in repo if it only references secrets, not actual secrets.
-# Commenting out apphosting.yaml from .gitignore for now, as it's configuration.
-# If you ever put secrets directly in it (not recommended), then ignore it.
