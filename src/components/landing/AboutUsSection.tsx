@@ -9,35 +9,32 @@ import { useState, useCallback, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Definim les imatges aquí per a més claredat
+// Define images here for clarity
 const componentImages = [
   {
     src: "/façana.webp", // Façana
     altKey: "landing:aboutUs.imageAltExterior",
     hint: "restaurant exterior facade",
-    desktopClass: "absolute inset-0 w-10/12 md:w-9/12 mx-auto transform rotate-[-1deg] group-hover:rotate-[-2deg] transition-transform duration-300 rounded-lg shadow-xl z-10",
-    mobileClass: "w-full h-full object-cover",
+    mobileClass: "w-full h-full object-cover", // Used by carousel
     priority: true,
   },
   {
     src: "/interior2.webp", // Interior
     altKey: "landing:aboutUs.imageAltInterior",
     hint: "restaurant interior dining",
-    desktopClass: "absolute top-[-5%] right-[-5%] w-3/5 sm:w-7/12 transform rotate-[6deg] group-hover:rotate-[3deg] group-hover:scale-105 transition-transform duration-300 rounded-lg border-4 border-background dark:border-secondary shadow-2xl z-20",
-    mobileClass: "w-full h-full object-cover",
+    mobileClass: "w-full h-full object-cover", // Used by carousel
     priority: false,
   },
   {
-    src: "/terrassa1.webp", // Terrassa - Aquesta es mostrarà només al carrusel
+    src: "/terrassa1.webp", // Terrassa
     altKey: "landing:aboutUs.imageAltTerrace",
     hint: "restaurant terrace patio",
-    desktopClass: "hidden", // Oculta per defecte a l'escriptori
-    mobileClass: "w-full h-full object-cover",
+    mobileClass: "w-full h-full object-cover", // Used by carousel
     priority: false,
   },
 ];
 
-const carouselImages = componentImages; // Totes les imatges per al carrusel
+const carouselImages = componentImages; // All three images for the carousel
 
 export default function AboutUsSection() {
   const { t, translations } = useLanguage();
@@ -109,14 +106,13 @@ export default function AboutUsSection() {
             </div>
           </div>
 
-          {/* Columna Dreta: Carrusel d'Imatges (Mòbil) / Composició (Escriptori) */}
-          <div className="flex justify-center items-center md:h-full order-1 md:order-2">
-             {/* Carrusel per a mòbils */}
-            <div className="w-full max-w-md md:hidden">
+          {/* Columna Dreta: Carrusel d'Imatges (Visible a totes les mides) */}
+          <div className="flex justify-center items-center order-1 md:order-2">
+            <div className="w-full max-w-md"> {/* Sizing for carousel container */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-xl bg-secondary/20 border-2 border-primary/70 p-1.5 transform rotate-[-2deg] group-hover:rotate-[-3deg] transition-transform duration-300">
                 {carouselImages.map((image, index) => (
                   <div
-                    key={image.src + "-mobile"}
+                    key={image.src + "-carousel"}
                     className={cn(
                       "absolute inset-0 transition-opacity duration-700 ease-in-out",
                       index === currentIndex ? "opacity-100" : "opacity-0"
@@ -126,7 +122,7 @@ export default function AboutUsSection() {
                       src={image.src}
                       alt={t(image.altKey, { restaurantName })}
                       fill
-                      className={image.mobileClass}
+                      className={image.mobileClass} // Using mobileClass as it's for cover
                       data-ai-hint={image.hint}
                       priority={image.priority && index === 0}
                       sizes="(max-width: 768px) 100vw, 50vw"
@@ -172,44 +168,6 @@ export default function AboutUsSection() {
                     ))}
                   </div>
                 )}
-            </div>
-
-            {/* Composició per a escriptori */}
-            <div className="hidden md:block w-full max-w-sm lg:max-w-md relative group" style={{ minHeight: '380px' }}>
-              {/* Imatge Base (Façana) */}
-              <div className={cn(
-                "relative rounded-lg overflow-hidden shadow-xl aspect-[4/3]",
-                componentImages[0].desktopClass
-              )}>
-                <Image
-                  src={componentImages[0].src}
-                  alt={t(componentImages[0].altKey, { restaurantName })}
-                  fill
-                  className="object-cover"
-                  data-ai-hint={componentImages[0].hint}
-                  priority={componentImages[0].priority}
-                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 0vw"
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
-              {/* Imatge Superposada (Interior) */}
-              {componentImages[1] && ( // Check if the second image exists
-                <div className={cn(
-                    "absolute rounded-lg overflow-hidden aspect-[5/4]",
-                    componentImages[1].desktopClass
-                  )}>
-                  <Image
-                    src={componentImages[1].src}
-                    alt={t(componentImages[1].altKey, { restaurantName })}
-                    fill
-                    className="object-cover"
-                    data-ai-hint={componentImages[1].hint}
-                    priority={componentImages[1].priority}
-                    sizes="(min-width: 1024px) 15vw, (min-width: 768px) 20vw, 0vw"
-                    style={{ objectFit: 'cover' }}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>
