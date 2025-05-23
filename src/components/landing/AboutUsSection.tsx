@@ -31,7 +31,7 @@ const componentImages = [
     src: "/terrassa1.webp", // Terrassa - Aquesta es mostrarà només al carrusel
     altKey: "landing:aboutUs.imageAltTerrace",
     hint: "restaurant terrace patio",
-    desktopClass: "hidden", // Oculta per defecte a l'escriptori si no es vol a la composició
+    desktopClass: "hidden", // Oculta per defecte a l'escriptori
     mobileClass: "w-full h-full object-cover",
     priority: false,
   },
@@ -72,7 +72,6 @@ export default function AboutUsSection() {
         <div className="grid md:grid-cols-2 gap-x-10 lg:gap-x-16 gap-y-10 items-center">
           {/* Columna Esquerra: Textos */}
           <div className="space-y-8 md:space-y-10 order-2 md:order-1">
-            {/* Qui som */}
             <div className="relative">
               {restaurantConfig.logoUrl && (
                 <div className="absolute inset-0 flex items-center justify-center -z-10 pointer-events-none select-none">
@@ -83,6 +82,7 @@ export default function AboutUsSection() {
                     height={300}
                     className="object-contain opacity-5 md:opacity-[0.03]"
                     priority={false}
+                    style={{ objectFit: 'contain' }}
                   />
                 </div>
               )}
@@ -99,7 +99,6 @@ export default function AboutUsSection() {
               */}
             </div>
 
-            {/* El nostre espai */}
             <div>
               <h3 className="text-2xl lg:text-3xl font-cinzel font-semibold mb-3 text-primary">
                 {t('landing:aboutUs.ourSpaceTitle')}
@@ -110,11 +109,11 @@ export default function AboutUsSection() {
             </div>
           </div>
 
-          {/* Columna Dreta: Carrusel d'Imatges amb Marc inclinat */}
+          {/* Columna Dreta: Carrusel d'Imatges (Mòbil) / Composició (Escriptori) */}
           <div className="flex justify-center items-center md:h-full order-1 md:order-2">
              {/* Carrusel per a mòbils */}
             <div className="w-full max-w-md md:hidden">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-xl bg-secondary/20 border-2 border-primary/70 p-1.5">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-xl bg-secondary/20 border-2 border-primary/70 p-1.5 transform rotate-[-2deg] group-hover:rotate-[-3deg] transition-transform duration-300">
                 {carouselImages.map((image, index) => (
                   <div
                     key={image.src + "-mobile"}
@@ -131,6 +130,7 @@ export default function AboutUsSection() {
                       data-ai-hint={image.hint}
                       priority={image.priority && index === 0}
                       sizes="(max-width: 768px) 100vw, 50vw"
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                 ))}
@@ -189,24 +189,27 @@ export default function AboutUsSection() {
                   data-ai-hint={componentImages[0].hint}
                   priority={componentImages[0].priority}
                   sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 0vw"
+                  style={{ objectFit: 'cover' }}
                 />
               </div>
               {/* Imatge Superposada (Interior) */}
-              <div className={cn(
-                  "absolute rounded-lg overflow-hidden aspect-[5/4]", // Donem un aspect ratio per controlar alçada
-                  componentImages[1].desktopClass,
-                   "bottom-[-20%] transform translate-y-[-5%]" // Ajust per superposar a la secció següent
-                )}>
-                <Image
-                  src={componentImages[1].src}
-                  alt={t(componentImages[1].altKey, { restaurantName })}
-                  fill
-                  className="object-cover"
-                  data-ai-hint={componentImages[1].hint}
-                  priority={componentImages[1].priority}
-                  sizes="(min-width: 1024px) 15vw, (min-width: 768px) 20vw, 0vw"
-                />
-              </div>
+              {componentImages[1] && ( // Check if the second image exists
+                <div className={cn(
+                    "absolute rounded-lg overflow-hidden aspect-[5/4]",
+                    componentImages[1].desktopClass
+                  )}>
+                  <Image
+                    src={componentImages[1].src}
+                    alt={t(componentImages[1].altKey, { restaurantName })}
+                    fill
+                    className="object-cover"
+                    data-ai-hint={componentImages[1].hint}
+                    priority={componentImages[1].priority}
+                    sizes="(min-width: 1024px) 15vw, (min-width: 768px) 20vw, 0vw"
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
