@@ -46,6 +46,8 @@ interface RestaurantConfig {
   showMenuItemImages: boolean;
   showAISommelierSection: boolean;
   bookingMaxGuestsPerSlot?: number;
+  // IMPORTANT: Setting bookingMethod to 'calendar' will make live calls to Google Calendar API.
+  // Ensure credentials and API access are correctly configured.
   bookingMethod: 'calendar' | 'whatsapp';
   whatsappBookingNumber?: string;
   googleMapsEmbedUrl: string; // For the iframe embed

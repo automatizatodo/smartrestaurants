@@ -21,7 +21,7 @@ export async function fetchMenuDataWithPrice(): Promise<MenuServiceResponse> {
     const result: MenuServiceResponse = await fetchAndProcessMenuData();
     const itemCount = Array.isArray(result.menuItems) ? result.menuItems.length : 0;
 
-    // console.log("SERVICE_FETCH_MENU: Successfully processed " + itemCount + " menu items, price " + result.currentMenuPrice + " and price summary " + JSON.stringify(result.priceSummary) + " via direct call.");
+    // console.log("SERVICE_FETCH_MENU: Processed " + itemCount + " menu items, price " + result.currentMenuPrice + " and price summary " + JSON.stringify(result.priceSummary) + " via direct call.");
 
     if (itemCount === 0 && !result.currentMenuPrice && (!result.priceSummary || Object.keys(result.priceSummary).length === 0)) {
       // console.warn("SERVICE_FETCH_MENU: Direct call to fetchAndProcessMenuData resulted in 0 items, no current price, and no price summary. Check logs from 'API_ROUTE_LOGIC_MENU' in src/app/api/menu/route.ts for parsing details.");
@@ -32,7 +32,7 @@ export async function fetchMenuDataWithPrice(): Promise<MenuServiceResponse> {
     return result;
 
   } catch (error: any) {
-    // console.error("SERVICE_FETCH_MENU: Error during direct call to fetchAndProcessMenuData. Error Type: " + error.name + ", Message:", error.message);
+    console.error("SERVICE_FETCH_MENU: Error during direct call to fetchAndProcessMenuData. Error Type: " + error.name + ", Message:", error.message);
     // if (error.cause) {
       // console.error("SERVICE_FETCH_MENU: Error cause:", error.cause);
     // }

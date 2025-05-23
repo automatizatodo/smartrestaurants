@@ -81,8 +81,8 @@ const parseGuestsFromEvent = (event: any): number => {
     // console.log('CALENDAR_CHECK_AVAIL_HELPER_PGE: Found ' + count + ' guests via custom marker.');
     return count;
   }
-  console.warn('CALENDAR_CHECK_AVAIL_HELPER_PGE: Could not parse guest count from event: "' + summary + '". Description: "' + description + '". Defaulting to 0.');
-  return 0;
+  // console.warn('CALENDAR_CHECK_AVAIL_HELPER_PGE: Could not parse guest count from event: "' + summary + '". Description: "' + description + '". Defaulting to 0.');
+  return 0; // Default to 0 if no guest count found
 };
 
 
@@ -142,7 +142,7 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
         eventDateTime = getEventDateTimeRange(input.date, input.time, restaurantConfig.bookingSlotDurationMinutes);
         // console.log('CALENDAR_CHECK_AVAIL_FLOW: Successfully parsed event date/time range:', eventDateTime);
     } catch (error: any) {
-        console.error("CALENDAR_CHECK_AVAIL_FLOW: Error processing event date/time:", error.message, error.stack);
+        // console.error("CALENDAR_CHECK_AVAIL_FLOW: Error processing event date/time:", error.message, error.stack);
         return { isAvailable: false, reasonKey: "landing:booking.error.invalidDateTime" };
     }
     const { timeMin, timeMax } = eventDateTime;
@@ -205,14 +205,11 @@ const checkCalendarAvailabilityFlow = ai.defineFlow(
 
     } catch (error: any) {
       console.error('CALENDAR_CHECK_AVAIL_FLOW: ERROR during Google Calendar API interaction.');
-      // console.error('CALENDAR_CHECK_AVAIL_FLOW: Ensure GOOGLE_APPLICATION_CREDENTIALS points to a valid service account JSON file or GOOGLE_CREDENTIALS_JSON is set.');
-      // console.error('CALENDAR_CHECK_AVAIL_FLOW: Ensure the service account has permissions on the calendar and Calendar API is enabled.');
       console.error('CALENDAR_CHECK_AVAIL_FLOW: Detailed error:', error.response?.data || error.message, error.stack);
       return {
         isAvailable: false,
-        reasonKey: 'landing:booking.error.calendarCheckFailed',
+        reasonKey: 'landing:booking.error.calendarCheckFailed', // This is a generic fallback
       };
     }
   }
 );
-

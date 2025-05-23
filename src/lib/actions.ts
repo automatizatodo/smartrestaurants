@@ -32,7 +32,7 @@ const formatMenuForAI = (menuItems: MenuItemData[]): string => {
     return "No menu items available.";
   }
   return menuItems.map(item =>
-    "Dish: " + (item.name.en || item.name.es || item.name.ca) + // Use available name
+    "Dish: " + (item.name.en || item.name.es || item.name.ca) +
     "\nDescription: " + (item.description.en || item.description.es || item.description.ca || 'N/A') + 
     "\nPrice: " + (item.price || 'N/A') +
     "\nCategory: " + item.categoryKey
@@ -62,9 +62,9 @@ export async function getAISommelierRecommendations(
   let menuInformationString = "Menu information is currently unavailable.";
   try {
     // console.log("ACTIONS_AISOMMELIER: Fetching menu for AI Sommelier...");
-    const menuData = await fetchMenuDataWithPrice(); 
-    if (menuData.menuItems && menuData.menuItems.length > 0) {
-      menuInformationString = formatMenuForAI(menuData.menuItems);
+    const { menuItems } = await fetchMenuDataWithPrice(); 
+    if (menuItems && menuItems.length > 0) {
+      menuInformationString = formatMenuForAI(menuItems);
       // console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted for AI.");
     } else {
       // console.warn("ACTIONS_AISOMMELIER: No menu items fetched for AI Sommelier.");
@@ -207,10 +207,7 @@ export async function submitBooking(
     const restaurantNameForMsg = restaurantConfig.restaurantDisplayName || 'el restaurante';
     let guestText = guests.toString();
     if (guests === manyGuestsValue) {
-        // Note: Cannot use 't' function here directly as this is a server action.
-        // Constructing the string manually or passing language to choose pre-translated string.
-        // For simplicity, hardcoding a generic representation.
-        guestText = `Més de ${maxConfigGuests}`; // This should be localized if possible, or use a generic term.
+        guestText = "Més de " + maxConfigGuests; // This should be localized if possible
     }
 
 
@@ -246,7 +243,7 @@ export async function submitBooking(
     // console.log("ACTIONS_BOOKING: Processing booking via Google Calendar method.");
 
     if (guests === manyGuestsValue || guests > maxConfigGuests) {
-        // console.warn(`ACTIONS_BOOKING: Too many guests (${guests}) for calendar booking. Max allowed: ${maxConfigGuests}.`);
+        // console.warn("ACTIONS_BOOKING: Too many guests (" + guests + ") for calendar booking. Max allowed: " + maxConfigGuests + ".");
         return {
             messageKey: "landing:booking.error.guestsTooManyForCalendar",
             success: false,
@@ -264,11 +261,11 @@ export async function submitBooking(
       // console.log("ACTIONS_BOOKING: checkCalendarAvailability flow response:", availabilityResult);
 
       if (!availabilityResult || typeof availabilityResult.isAvailable === 'undefined') {
-          // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
+          console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
           return {
-              messageKey: "landing:booking.error.calendarCheckFailed",
+              messageKey: "landing:booking.error.calendarServiceUnavailable", // More generic error
               success: false,
-              errors: { general: ["landing:booking.error.calendarCheckFailed"] },
+              errors: { general: ["landing:booking.error.calendarServiceUnavailable"] },
               messageParams: null,
               submittedData: validatedFields.data,
           };
@@ -290,12 +287,12 @@ export async function submitBooking(
         };
       }
     } catch (error: any) {
-      // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
-      // console.error("SUBMIT_BOOKING_ACTION_ERROR_CAUSE:", error.cause);
+      console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
+      if (error.cause) console.error("SUBMIT_BOOKING_ACTION_ERROR_CAUSE_CHECK:", error.cause);
       return {
-        messageKey: "landing:booking.error.calendarCheckFailed",
+        messageKey: "landing:booking.error.calendarServiceUnavailable",
         success: false,
-        errors: { general: ["landing:booking.error.calendarCheckFailed"] },
+        errors: { general: ["landing:booking.error.calendarServiceUnavailable"] },
         messageParams: null,
         submittedData: validatedFields.data,
       };
@@ -309,11 +306,11 @@ export async function submitBooking(
       // console.log("ACTIONS_BOOKING: createCalendarEvent flow response:", eventResult);
 
       if (!eventResult || typeof eventResult.success === 'undefined') {
-          // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
+          console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
           return {
-              messageKey: "landing:booking.error.calendarError",
+              messageKey: "landing:booking.error.calendarServiceUnavailable", // More generic error
               success: false,
-              errors: { general: ["landing:booking.error.calendarError"] },
+              errors: { general: ["landing:booking.error.calendarServiceUnavailable"] },
               messageParams: null,
               submittedData: validatedFields.data,
           };
@@ -322,7 +319,7 @@ export async function submitBooking(
       if (!eventResult.success) {
         // console.warn("ACTIONS_BOOKING: Failed to create calendar event according to createCalendarEvent flow.", eventResult);
         return {
-          messageKey: eventResult.errorKey || "landing:booking.error.calendarError",
+          messageKey: eventResult.errorKey || "landing:booking.error.calendarError", // Keep specific error if provided by flow
           success: false,
           errors: { general: [eventResult.errorKey || "landing:booking.error.calendarError"] },
           messageParams: null,
@@ -353,12 +350,12 @@ export async function submitBooking(
       };
 
     } catch (error: any) {
-      // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
-      // console.error("SUBMIT_BOOKING_ACTION_ERROR_CAUSE_CREATE:", error.cause);
+      console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
+      if (error.cause) console.error("SUBMIT_BOOKING_ACTION_ERROR_CAUSE_CREATE:", error.cause);
       return {
-        messageKey: "landing:booking.error.calendarError",
+        messageKey: "landing:booking.error.calendarServiceUnavailable",
         success: false,
-        errors: { general: ["landing:booking.error.calendarError"] },
+        errors: { general: ["landing:booking.error.calendarServiceUnavailable"] },
         messageParams: null,
         submittedData: validatedFields.data,
       };
@@ -374,5 +371,3 @@ export async function submitBooking(
     };
   }
 }
-
-    

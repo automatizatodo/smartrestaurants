@@ -123,7 +123,7 @@ const createCalendarEventFlow = ai.defineFlow(
         eventTimes = getEventDateTime(input.date, input.time, restaurantConfig.bookingSlotDurationMinutes);
         // console.log('CALENDAR_CREATE_EVENT_FLOW: Successfully parsed event date/time range:', eventTimes);
     } catch (error: any) {
-        console.error("CALENDAR_CREATE_EVENT_FLOW: Error processing event date/time:", error.message, error.stack);
+        // console.error("CALENDAR_CREATE_EVENT_FLOW: Error processing event date/time:", error.message, error.stack);
         return { success: false, errorKey: "landing:booking.error.invalidDateTime" };
     }
 
@@ -169,7 +169,7 @@ const createCalendarEventFlow = ai.defineFlow(
           eventId: createdEvent.data.id,
         };
       } else {
-        console.error('CALENDAR_CREATE_EVENT_FLOW: Event created but no ID returned from API. This is unexpected.');
+        // console.error('CALENDAR_CREATE_EVENT_FLOW: Event created but no ID returned from API. This is unexpected.');
         return {
           success: false,
           errorKey: 'landing:booking.error.calendarError',
@@ -177,8 +177,6 @@ const createCalendarEventFlow = ai.defineFlow(
       }
     } catch (error: any) {
       console.error('CALENDAR_CREATE_EVENT_FLOW: ERROR during Google Calendar API interaction (event insert).');
-      // console.error('CALENDAR_CREATE_EVENT_FLOW: Ensure GOOGLE_APPLICATION_CREDENTIALS points to a valid service account JSON file or GOOGLE_CREDENTIALS_JSON is set.');
-      // console.error('CALENDAR_CREATE_EVENT_FLOW: Ensure the service account has "Make changes to events" permission on the calendar and Calendar API is enabled.');
       console.error('CALENDAR_CREATE_EVENT_FLOW: Detailed error:', error.response?.data || error.message, error.stack);
       return {
         success: false,
@@ -187,4 +185,3 @@ const createCalendarEventFlow = ai.defineFlow(
     }
   }
 );
-

@@ -2,11 +2,9 @@
 {
   "restaurantName": "Can Fanals",
   "tagline": "Grill, Tradition and Gluten-Free Flavor in Sabadell",
-  "nav.ourMenu": "Our Menu",
-  "nav.aiSommelier": "AI Sommelier",
-  "nav.bookTable": "Book a Table",
-  "nav.testimonials": "Testimonials",
   "nav.fullMenu": "Menu",
+  "nav.aiSommelier": "AI Sommelier",
+  "nav.testimonials": "Testimonials",
   "nav.aboutUs": "About Us",
   "nav.services": "Services",
   "nav.contact": "Contact & Map",
@@ -36,7 +34,6 @@
   "goToSlide": "Go to slide {number}",
   "guestSingular": "guest",
   "guestsPlural": "guests",
-  "page.menu.title": "Our Exquisite Menu",
   "page.menu.description": "",
   "allCategories": "All",
   "seo": {

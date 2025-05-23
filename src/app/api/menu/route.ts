@@ -9,7 +9,7 @@ import { parse as parseTime, isValid as isValidDate, format as formatDate, isMon
 // URL for the MAIN MENU sheet
 let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
 
-// !!! IMPORTANT: URL for the "preciosmenu" sheet !!!
+// URL for the "preciosmenu" sheet
 let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
 
 
@@ -68,14 +68,14 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses';
-    case 'second courses': return 'secondCourses';
-    case 'grilled garnish': return 'grilledGarnish';
-    case 'sauces': return 'sauces';
+    case 'main courses': return 'mainCourses'; // Primers Plats
+    case 'second courses': return 'secondCourses'; // Segon Plat
+    case 'grilled garnish': return 'grilledGarnish'; // Guarnició Brasa
+    case 'sauces': return 'sauces'; // Salses
     case 'desserts': return 'desserts';
-    case 'breads': return 'breads';
+    case 'breads': return 'breads'; // Pans
     case 'beverages': return 'beverages';
-    case 'wines': return 'wines';
+    case 'wines': return 'wines'; // Vins
     default:
       // console.warn("API_ROUTE_MAP_CATEGORY: Unmapped category EN: " + categoryEN + " - using direct key: " + lowerCategory.replace(/\s+/g, ''));
       return lowerCategory.replace(/\s+/g, '') || 'other';
@@ -142,7 +142,7 @@ function isValidHttpUrl(urlStr: string): boolean {
     const url = new URL(urlToParse);
     const isValid = url.protocol === "http:" || url.protocol === "https:";
     // if (!isValid) {
-      // console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' (parsed as '" + urlToParse + "') is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
+    //   console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' (parsed as '" + urlToParse + "') is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
     // }
     return isValid;
   } catch (e: any) {
@@ -232,7 +232,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     const dayNameLower = dayFormatter.format(nowUtc);
     currentDayNameInSpain = dayNameLower.charAt(0).toUpperCase() + dayNameLower.slice(1);
   } catch (e) {
-    console.warn("API_ROUTE_GET_PRICE: Error formatting day for timezone", timeZone, e);
+    // console.warn("API_ROUTE_GET_PRICE: Error formatting day for timezone", timeZone, e);
     currentDayNameInSpain = new Date().toLocaleDateString('es-ES', { weekday: 'long' }); // Fallback
     currentDayNameInSpain = currentDayNameInSpain.charAt(0).toUpperCase() + currentDayNameInSpain.slice(1);
   }
@@ -242,7 +242,7 @@ async function getCurrentMenuPrice(): Promise<string | null> {
     const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone });
     currentTimeFormattedInSpain = timeFormatter.format(nowUtc);
   } catch (e) {
-    console.warn("API_ROUTE_GET_PRICE: Error formatting time for timezone", timeZone, e);
+    // console.warn("API_ROUTE_GET_PRICE: Error formatting time for timezone", timeZone, e);
     const localNow = new Date(); // Fallback
     currentTimeFormattedInSpain = String(localNow.getHours()).padStart(2, '0') + ':' + String(localNow.getMinutes()).padStart(2, '0');
   }

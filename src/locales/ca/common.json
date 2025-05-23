@@ -2,11 +2,9 @@
 {
   "restaurantName": "Can Fanals",
   "tagline": "Brasa, Tradició i Sabor Sense Gluten a Sabadell",
-  "nav.ourMenu": "El Nostre Menú",
-  "nav.aiSommelier": "Sommelier IA",
-  "nav.bookTable": "Reservar Taula",
-  "nav.testimonials": "Testimonis",
   "nav.fullMenu": "Menú",
+  "nav.aiSommelier": "Sommelier IA",
+  "nav.testimonials": "Testimonis",
   "nav.aboutUs": "Sobre Nosaltres",
   "nav.services": "Serveis",
   "nav.contact": "Contacte i Mapa",
@@ -36,7 +34,6 @@
   "goToSlide": "Anar a la diapositiva {number}",
   "guestSingular": "comensal",
   "guestsPlural": "comensals",
-  "page.menu.title": "El Nostre Menú Exquisit",
   "page.menu.description": "",
   "allCategories": "Totes",
   "seo": {
