@@ -19,20 +19,19 @@ export default function HeroSection() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const fullSeoTitle = t('landing:hero.seoTitle'); // Example: "Can Fanals: Restaurant a Sabadell..."
-  let mainTitle = restaurantName; // Fallback to just restaurant name
+  const fullSeoTitle = t('landing:hero.seoTitle'); 
+  let mainTitle = restaurantName; 
   let subTitlePart = "";
 
-  // Try to split by the first colon to separate brand name from tagline
-  const separatorIndex = fullSeoTitle.indexOf(': ');
+  const separator = ": ";
+  const separatorIndex = fullSeoTitle.indexOf(separator);
+
   if (separatorIndex !== -1) {
     mainTitle = fullSeoTitle.substring(0, separatorIndex);
-    subTitlePart = fullSeoTitle.substring(separatorIndex + 2);
+    subTitlePart = fullSeoTitle.substring(separatorIndex + separator.length);
   } else if (fullSeoTitle.startsWith(restaurantName)) {
-    // Fallback if no colon: assume restaurant name is at the start
     mainTitle = restaurantName;
     subTitlePart = fullSeoTitle.substring(restaurantName.length).trim();
-    // Remove leading colon if it was accidentally included in the seoTitle without a space
     if (subTitlePart.startsWith(':')) { 
         subTitlePart = subTitlePart.substring(1).trim();
     }
@@ -56,7 +55,7 @@ export default function HeroSection() {
           style={{ objectFit: 'cover' }}
           quality={80}
           priority
-          className="opacity-0 pointer-events-none" // Hidden for assistive tech, bg is decorative
+          className="opacity-0 pointer-events-none" 
         />
          <div className="absolute inset-0 bg-black/50"></div>
       </div>
@@ -71,14 +70,14 @@ export default function HeroSection() {
           </span>
           {subTitlePart && (
             <span 
-              className="block text-xl sm:text-2xl md:text-3xl text-gray-200 font-normal normal-case mt-1 sm:mt-2" 
-              style={{ fontFamily: 'var(--font-cinzel), serif' }} // Using Cinzel for the SEO part as well
+              className="block text-xl sm:text-2xl md:text-3xl text-gray-200 font-normal normal-case mt-3 sm:mt-4 max-w-3xl mx-auto" 
+              style={{ fontFamily: 'var(--font-cinzel), serif' }}
             >
               {subTitlePart}
             </span>
           )}
         </h1>
-        {/* Tagline <p> element removed */}
+        
         <div className="flex flex-col space-y-4 items-center sm:flex-row sm:space-y-0 sm:space-x-4 justify-center mt-10">
           <Link href="/menu" passHref>
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-4 rounded-md shadow-lg transition-transform hover:scale-105 w-full sm:w-auto">
