@@ -65,13 +65,13 @@ export default function BookingSection() {
   const restaurantName = translations.common.restaurantName;
   
   // State for controlled inputs
-  const [name, setName] = useState(prevState?.submittedData?.name || '');
-  const [email, setEmail] = useState(prevState?.submittedData?.email || '');
-  const [phone, setPhone] = useState(prevState?.submittedData?.phone || '');
-  const [notes, setNotes] = useState(prevState?.submittedData?.notes || '');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [notes, setNotes] = useState('');
   const [date, setDate] = useState<Date | undefined>(undefined);
-  const [selectedTime, setSelectedTime] = useState<string | undefined>(prevState?.submittedData?.time);
-  const [selectedGuests, setSelectedGuests] = useState<string | undefined>(prevState?.submittedData?.guests?.toString());
+  const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
+  const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
 
 
   const { toast } = useToast();
@@ -82,17 +82,8 @@ export default function BookingSection() {
 
   // Set initial date on client mount to avoid hydration mismatch for Calendar
   useEffect(() => {
-    if(!prevState?.submittedData?.date) { // Only set initial if not restoring from error
-        setDate(new Date());
-    } else {
-        const prevDate = new Date(prevState.submittedData.date);
-        if (!isNaN(prevDate.getTime())) {
-            setDate(prevDate);
-        } else {
-            setDate(new Date()); // Fallback if previous date was invalid
-        }
-    }
-  }, []); // Run only once on mount if not restoring
+    setDate(new Date());
+  }, []); 
 
 
   const initialState: BookingFormState = {
@@ -131,7 +122,7 @@ export default function BookingSection() {
 
   // Effect for handling successful WhatsApp redirect and form reset
    useEffect(() => {
-    if (state?.success && state.messageKey && state.messageKey === processedSuccessKeyRef.current) { 
+    if (state?.success && state.messageKey === processedSuccessKeyRef.current) { 
       if (state.bookingMethod === 'whatsapp' && state.whatsappNumber && state.whatsappMessage) {
         const whatsappUrl = `https://wa.me/${state.whatsappNumber}?text=${encodeURIComponent(state.whatsappMessage)}`;
         window.open(whatsappUrl, '_blank');
@@ -157,13 +148,24 @@ export default function BookingSection() {
         setPhone(state.submittedData.phone || '');
         setNotes(state.submittedData.notes || '');
         if (state.submittedData.date) {
-            const prevDate = new Date(state.submittedData.date);
-            if (!isNaN(prevDate.getTime())) setDate(prevDate);
+            // Ensure date is parsed correctly if it's a string
+            const prevDate = typeof state.submittedData.date === 'string' ? new Date(state.submittedData.date) : state.submittedData.date;
+            if (prevDate && !isNaN(prevDate.getTime())) {
+                 setDate(prevDate);
+            } else {
+                setDate(new Date()); // Fallback if previous date was invalid or not set
+            }
+        } else {
+             setDate(new Date()); // Fallback if no date was submitted
         }
         setSelectedTime(state.submittedData.time || undefined);
         setSelectedGuests(state.submittedData.guests?.toString() || undefined);
+    } else if (!state?.success && !state?.submittedData && date === undefined) {
+        // Ensures that if there's no submittedData on error and date is still undefined, 
+        // we set it to new Date() to avoid it being undefined on first error after mount.
+        setDate(new Date());
     }
-  }, [state?.success, state?.submittedData]);
+  }, [state?.success, state?.submittedData]); // Removed 'date' from dependency array to avoid loop with setDate
 
 
   let dateLocale;
@@ -303,7 +305,7 @@ export default function BookingSection() {
                 </div>
               </div>
               <div>
-                <Label htmlFor="notes">{t('landing:booking.label.notes', { restaurantName })}</Label>
+                <Label htmlFor="notes">{t('landing:booking.label.notes')}</Label>
                 <Input 
                   id="notes" 
                   name="notes" 
@@ -331,4 +333,3 @@ export default function BookingSection() {
 }
     
 
-    
