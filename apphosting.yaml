@@ -19,12 +19,19 @@ runConfig:
     # Google Analytics Measurement ID
     NEXT_PUBLIC_GA_MEASUREMENT_ID: "G-ZEF2C45GJ7"
 
+    # Google Sheet CSV URLs
+    # IMPORTANT: Replace these with your actual published CSV URLs from Google Sheets
+    # (File > Share > Publish to web > Select sheet > CSV format)
+    GOOGLE_SHEET_MENU_CSV_URL: "YOUR_MAIN_MENU_SHEET_PUBLISHED_CSV_URL_HERE"
+    GOOGLE_SHEET_PRICES_CSV_URL: "YOUR_PRICES_MENU_SHEET_PUBLISHED_CSV_URL_HERE"
+
+
     # --- Method for GOOGLE_CREDENTIALS_JSON ---
     # Option 1: (RECOMMENDED SECURE METHOD) Use Google Secret Manager.
     # The key 'GOOGLE_CREDENTIALS_JSON' will be populated by the secret's value.
     # Make sure the App Hosting service agent has permissions to access this secret.
-    # GOOGLE_CREDENTIALS_JSON:
-    #   secret: GOOGLE_SERVICE_ACCOUNT_JSON_CONTENT # <-- !!! IMPORTANT: This MUST match the secret name you created in Secret Manager
+    GOOGLE_CREDENTIALS_JSON:
+      secret: GOOGLE_SERVICE_ACCOUNT_JSON_CONTENT # <-- !!! IMPORTANT: This MUST match the secret name you created in Secret Manager
 
     # Option 2: (UNSAFE METHOD - FOR TESTING/NON-CRITICAL ENVIRONMENTS ONLY)
     # Embed the JSON content directly.
@@ -35,20 +42,13 @@ runConfig:
     #
     # WARNING: This is NOT recommended for production. Use Google Secret Manager.
     # If you use this, COMMENT OUT or REMOVE the 'secret:' line above.
-    GOOGLE_CREDENTIALS_JSON: |
-      {
-        "type": "service_account",
-        "project_id": "test-restaurant-459912",
-        "private_key_id": "8f3e8b7d8f9c59240cb1bd3b8587ae46e5a5e5cc",
-        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCiPPQeyxxCo7nr\naDvcXXzbhozYVj9RiQqncE3ha6bnSblXyQ7DUdqrv6JqfWSXnzPVNooHzlJjNcUw\n9RFUBHosHtb0EsvA/wwayyW7EXyVRQzeb8lNWO1csteFG8W34CQE2QcfJiE12lpG\nzkQ3Q4nVJ/LUWjGWm5ZAZlzULgXgs2PwjIbb5yFPv2rfWPoougctsLmRXhGZ+vU7\ntehAXH17KPxr43X8vZm4+p5adrYPNFH5o9ipI/QlgCirR1CbbSweCHGksYWMP6rJ\nWjALI5STWvGCF5yLHDwqbjBH42b8J7q9hP61hjON4ZKvQckOFvavPeZO03gKQGQo\nxgkVvrB3AgMBAAECggEANWQI1J90B+w4saNmW8F6ZwYzELjlcpA+bNb1ElOqpB/r\nelvE23tzEqVorlHgylMOrEKcDzCThWm7IL7tunAUwrNNexo6aqOkmKa1HoiFLtx/\n/S3dmfJDfweuDHSUz0vYnq3LfbE/KalXn0ifQ26bDAZvD/o0qoM+YaguMXeJ4KWy\nOAISKJl2FEtdAKKYDHESlHjKdp64jZW98x8SV+JTG12SSZGIFz8j1X4WZ4+z8XUD\n5pVS5LJ6JFj1jlc+TddloMIgAKbxVOOLWQsL86qflbxMgoNlvTcVaa/8+g0N4gC4\nV0Ct6fR1oGofcItAGsnX2JY7Xx8Rdxhnv0mMiXn+VQKBgQDZlgCyT9XyqYl2yAp5\ngXXgR2gCAQ5jEepoHzdFnKcb7q9CW5EiMIrZtmoJ+ECZ8PmYECT2Fd79qvP5PORr\nyyWR0gOolZVkewmPv5bqR6MRWbnPbpQOzLjH+WWaTXHD1hIP6+MfgAUijCS+viMZ\n5otpYzmobI7+22wHFL9qQFydzQKBgQC+4XQznZXcF6Z4CObQAIHYMmfycERL8aj4\nQsSvUR34mzo416zwVol4HRUnVbebu780rGTFn/KhZhCxpnYRTmMWYAixgBMXMAzi\nns/fTULPlCYzl5top8vt9zMVWglHksGt1YgBfjm3dQ4JSEnsfaF901ql1agYRtNh\nWVpzzjajUwKBgQCfABmkM+kBOdjFHytgXTVZXnTnugPca5Qi4GTQjsgjBkm2MRme\npWBh9gYJIQt8MvcBoxKPba4VKp68jD3Tc5ERvSmFQUH5OlvjWrsampzUKgA5T/IL\n2phRMbOIjX1MAZwTXGoNc8zM0SJs7J7T54AK1EKnDCV2obuQdR3ns/66JQKBgCHS\n14Fx8iUu96ubgDLpdBi4Td0S8bc3Wkarpiieyh3Me9OovBdWbkOfe6kdskxhR29x\nAOZYAmmBKYIhShik+D/1wnSZikh4lj/t/k3GZglcaiyIN9yipytCu4WUD8LkCXfh\nN5l0IYwVrOgOLDNAy8X9Frn+EyxCGKDOcY3Fw77LAoGAaVccPMEE0VUMKZlYsTeg\nyVi0DkeSBvnjQIipjJFQtlGZvSfrknhF10EiCxk4SvMqnw5j4Sfkpvjeg/ixfIUy\n+2MTG2WmkDeR7kRJNsjUzKpwjkgwmVzq5byo+s2JsPkYC3kYQ9NIzp2lpVCJlgCs\niKJ7WOF5Yp+od2GXrEFSck0=\n-----END PRIVATE KEY-----\n",
-        "client_email": "editor@test-restaurant-459912.iam.gserviceaccount.com",
-        "client_id": "111516871261711309072",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/editor%40test-restaurant-459912.iam.gserviceaccount.com",
-        "universe_domain": "googleapis.com"
-      }
+    # GOOGLE_CREDENTIALS_JSON: |
+    #   {
+    #     "type": "service_account",
+    #     "project_id": "test-restaurant-459912",
+    #     # ... (rest of your JSON content) ...
+    #     "universe_domain": "googleapis.com"
+    #   }
 
 # Specifies that this is a Next.js backend.
 # An empty backend: {} block is often sufficient for Next.js apps.

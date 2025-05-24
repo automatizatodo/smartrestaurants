@@ -6,12 +6,9 @@ import type { MenuItemData } from '@/data/menu';
 import restaurantConfig from '@/config/restaurant.config';
 import { parse as parseTime, isValid as isValidDate, format as formatDate, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday, isSunday } from 'date-fns';
 
-// URL for the MAIN MENU sheet
-let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
-
-// URL for the "preciosmenu" sheet
-let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
-
+// URLs are now expected to be set as environment variables
+const GOOGLE_SHEET_MENU_CSV_URL = process.env.GOOGLE_SHEET_MENU_CSV_URL;
+const PRICES_SHEET_CSV_URL = process.env.GOOGLE_SHEET_PRICES_CSV_URL;
 
 // Column names from the Google Sheet structure
 const VISIBLE_COL = "Visible";
@@ -68,14 +65,14 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses'; // Primers Plats
-    case 'second courses': return 'secondCourses'; // Segon Plat
-    case 'grilled garnish': return 'grilledGarnish'; // Guarnició Brasa
-    case 'sauces': return 'sauces'; // Salses
+    case 'main courses': return 'mainCourses';
+    case 'second courses': return 'secondCourses';
+    case 'grilled garnish': return 'grilledGarnish';
+    case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
-    case 'breads': return 'breads'; // Pans
+    case 'breads': return 'breads';
     case 'beverages': return 'beverages';
-    case 'wines': return 'wines'; // Vins
+    case 'wines': return 'wines';
     default:
       // console.warn("API_ROUTE_MAP_CATEGORY: Unmapped category EN: " + categoryEN + " - using direct key: " + lowerCategory.replace(/\s+/g, ''));
       return lowerCategory.replace(/\s+/g, '') || 'other';
@@ -142,7 +139,7 @@ function isValidHttpUrl(urlStr: string): boolean {
     const url = new URL(urlToParse);
     const isValid = url.protocol === "http:" || url.protocol === "https:";
     // if (!isValid) {
-    //   console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' (parsed as '" + urlToParse + "') is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
+    //   // console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' (parsed as '" + urlToParse + "') is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
     // }
     return isValid;
   } catch (e: any) {
@@ -154,7 +151,7 @@ function isValidHttpUrl(urlStr: string): boolean {
 
 async function fetchRawCsvData(url: string, logPrefix: string): Promise<string | null> {
   if (!url || url.includes('YOUR_') || url.includes('REPLACE_WITH_')) {
-    console.error(logPrefix + ": CRITICAL - URL is not configured correctly: " + url + ". Please update it in src/app/api/menu/route.ts");
+    console.error(logPrefix + ": CRITICAL - URL is not configured correctly or placeholder value is being used: " + url + ". Please set this environment variable.");
     return null;
   }
 
@@ -191,6 +188,10 @@ async function fetchRawCsvData(url: string, logPrefix: string): Promise<string |
 }
 
 async function getCurrentMenuPrice(): Promise<string | null> {
+  if (!PRICES_SHEET_CSV_URL) {
+    console.warn("API_ROUTE_GET_PRICE: PRICES_SHEET_CSV_URL environment variable is not set. Using fallback price.");
+    return restaurantConfig.menuDelDia?.price || null;
+  }
   const csvText = await fetchRawCsvData(PRICES_SHEET_CSV_URL, "PRICE_SHEET_FETCH");
   if (!csvText) {
     // console.warn("API_ROUTE_GET_PRICE: Failed to fetch price sheet CSV. Using fallback price.");
@@ -274,6 +275,10 @@ async function getCurrentMenuPrice(): Promise<string | null> {
 }
 
 async function generatePriceSummary(): Promise<PriceSummary> {
+  if (!PRICES_SHEET_CSV_URL) {
+    console.warn("API_ROUTE_GENERATE_PRICE_SUMMARY: PRICES_SHEET_CSV_URL environment variable is not set. Returning empty summary.");
+    return {};
+  }
   const csvText = await fetchRawCsvData(PRICES_SHEET_CSV_URL, "PRICE_SUMMARY_FETCH");
   const priceSummary: PriceSummary = {};
 
@@ -347,31 +352,32 @@ async function generatePriceSummary(): Promise<PriceSummary> {
 
 export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemData[], currentMenuPrice: string | null, priceSummary: PriceSummary }> {
   // console.log("API_ROUTE_LOGIC_MENU: fetchAndProcessMenuData called.");
+  
+  if (!GOOGLE_SHEET_MENU_CSV_URL) {
+    console.error("API_ROUTE_LOGIC_MENU: CRITICAL - GOOGLE_SHEET_MENU_CSV_URL environment variable is not set. Cannot fetch menu items.");
+    // In this critical case, we might not even be able to get a fallback price if PRICES_SHEET_CSV_URL is also missing.
+    // However, getCurrentMenuPrice and generatePriceSummary have their own checks for PRICES_SHEET_CSV_URL.
+    const currentMenuPrice = await getCurrentMenuPrice(); // Attempt to get price, might use fallback
+    const priceSummaryData = await generatePriceSummary(); // Attempt to get summary, might be empty
+    return { menuItems: [], currentMenuPrice, priceSummary: priceSummaryData };
+  }
 
-  const menuCsvText = await fetchRawCsvData(GOOGLE_SHEET_CSV_URL, "MENU_SHEET_FETCH");
+  const menuCsvText = await fetchRawCsvData(GOOGLE_SHEET_MENU_CSV_URL, "MENU_SHEET_FETCH");
   let allMenuItems: MenuItemData[] = [];
 
   if (menuCsvText) {
     const parsedMenuData = parseCSV(menuCsvText, EXPECTED_MENU_HEADERS, "MENU_SHEET_PARSE");
-    // if (parsedMenuData.length === 0 && menuCsvText.trim().length > 0 && !menuCsvText.trim().startsWith(EXPECTED_MENU_HEADERS[0])) {
-        // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV parsing resulted in 0 items, but CSV text was not empty. This strongly suggests a header mismatch or structural issue with the CSV that parseCSV couldn't handle based on EXPECTED_MENU_HEADERS.");
-    // }
-
-    // let visibleItemsCount = 0;
     allMenuItems = parsedMenuData.map((item: Record<string, string>, index: number) => {
       // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Row " + (index + 2) + " RAW: " + JSON.stringify(item));
 
       const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); 
       const isVisible = ["TRUE", "VERDADERO", "SÍ", "SI", "1"].includes(visibleString.toUpperCase());
 
-
       if (!isVisible) {
         // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " is marked as NOT VISIBLE ('" + visibleString + "'). Skipping.");
         return null;
       }
-      // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " IS VISIBLE.");
-      // visibleItemsCount++;
-
+      
       const nameCA = item[NOM_CA_COL];
       const nameES = item[NOMBRE_ES_COL];
       const nameEN = item[NAME_EN_COL];
@@ -433,7 +439,6 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         .filter(a => a.length > 0 && a !== "false" && a !== "n/a");
 
       const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE', 'VERDADERO', 'SÍ', 'SI'].includes(sugerenciaChefString.toLowerCase().trim());
-      // if (isChefSuggestion) console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' IS a chef suggestion.");
 
       const menuItem: MenuItemData = {
         id: categoryKey + '-' + index + '-' + Date.now(),
@@ -457,19 +462,9 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item: " + JSON.stringify(menuItem));
       return menuItem;
     }).filter(item => item !== null) as MenuItemData[];
-
-    // console.log("API_ROUTE_LOGIC_MENU: Total items marked as visible: " + visibleItemsCount);
-    // console.log("API_ROUTE_LOGIC_MENU: Mapped to " + allMenuItems.length + " valid MenuItemData objects after filtering invisible and invalid items.");
-
   } else {
     // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV text was null. No menu items processed.");
   }
-
-  // if (allMenuItems.length === 0 && menuCsvText) {
-    // console.warn("API_ROUTE_LOGIC_MENU: All parsed items were filtered out or invalid during mapping. Check mapping logic and data consistency, especially the 'Visible' column and essential fields like names/categories.");
-  // } else if (allMenuItems.length === 0) {
-    // console.warn("API_ROUTE_LOGIC_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
-  // }
 
   const currentMenuPrice = await getCurrentMenuPrice();
   const priceSummaryData = await generatePriceSummary();
