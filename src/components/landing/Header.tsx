@@ -13,8 +13,8 @@ import LanguageSelector from '@/components/LanguageSelector';
 import restaurantConfig from '@/config/restaurant.config';
 
 const navItemKeysBase = [
-  // { labelKey: 'common:nav.ourMenu', href: '/#menu' }, // Removed
-  { labelKey: 'common:nav.fullMenu', href: '/menu' },
+  { labelKey: 'common:nav.menuDelDia', href: '/#menu' },
+  { labelKey: 'common:nav.carta', href: '/menu' },
   { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
 ];
@@ -22,7 +22,6 @@ const navItemKeysBase = [
 const aiSommelierNavItem = { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' };
 
 const navItemKeysEnd = [
-  // { labelKey: 'common:nav.bookTable', href: '/#booking' }, // Removed
   { labelKey: 'common:nav.contact', href: '/#contact-map' },
   { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
 ];
@@ -93,15 +92,15 @@ export default function Header() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 sm:h-28"> {/* Reduced height for mobile to h-20, kept h-28 for sm and up */}
+        <div className="flex items-center justify-between h-20 sm:h-24"> {/* Adjusted height for sm and up */}
           <Link href="/" className="flex items-center space-x-2">
             {restaurantConfig.logoUrl ? (
               <Image
                 src={restaurantConfig.logoUrl}
                 alt={`${restaurantName} Logo`}
-                width={288} 
-                height={96} 
-                className="h-16 sm:h-24 w-auto dark:filter dark:invert"  // Reduced logo height on mobile to h-16, sm and up is h-24
+                width={240} 
+                height={80} 
+                className="h-16 sm:h-20 w-auto dark:filter dark:invert"  // Adjusted logo height
                 priority
                 style={{ objectFit: 'contain' }}
               />
@@ -128,9 +127,9 @@ export default function Header() {
                           <Image
                             src={restaurantConfig.logoUrl}
                             alt={`${restaurantName} Logo`}
-                            width={192} // Adjusted width for h-16 (maintaining approx 3:1 aspect ratio)
-                            height={64}  // Adjusted height for h-16
-                            className="h-16 w-auto dark:filter dark:invert" // Reduced logo height in sheet to h-16
+                            width={150}
+                            height={50} 
+                            className="h-12 w-auto dark:filter dark:invert" // Adjusted logo height in sheet
                             style={{ objectFit: 'contain' }}
                           />
                         ) : (

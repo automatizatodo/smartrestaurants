@@ -8,7 +8,8 @@ import { useLanguage } from '@/context/LanguageContext';
 
 // Replicated nav item logic from Header.tsx
 const navItemKeysBase = [
-  { labelKey: 'common:nav.fullMenu', href: '/menu' },
+  { labelKey: 'common:nav.menuDelDia', href: '/#menu' },
+  { labelKey: 'common:nav.carta', href: '/menu' },
   { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
 ];
@@ -33,7 +34,7 @@ const getNavItems = () => {
 export default function Footer() {
   const { t, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
-  const tagline = translations.common.tagline;
+  const tagline = t('common:tagline'); // Use t() for tagline
   const currentYear = new Date().getFullYear();
   const footerNavItems = getNavItems();
 
@@ -47,9 +48,9 @@ export default function Footer() {
                   <Image
                     src={restaurantConfig.logoUrl}
                     alt={`${restaurantName} Logo - ${t('common:footer.seoText', { restaurantName })}`}
-                    width={432}
-                    height={144}
-                    className="h-36 w-auto dark:filter dark:invert"
+                    width={288} // Reduced from 432
+                    height={96}  // Reduced from 144
+                    className="h-24 w-auto dark:filter dark:invert" // Reduced from h-36
                     style={{ objectFit: 'contain' }}
                   />
                 ) : (

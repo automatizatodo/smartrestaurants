@@ -12,14 +12,14 @@ import { cn } from '@/lib/utils';
 // Define images here for clarity
 const componentImages = [
   {
-    src: "/façana.webp", // Façana
+    src: "/Comedor Restaurante.jpg", // Façana
     altKey: "landing:aboutUs.imageAltExterior",
     hint: "restaurant exterior facade",
     mobileClass: "w-full h-full object-cover", // Used by carousel
     priority: true,
   },
   {
-    src: "/interior2.webp", // Interior
+    src: "/Plato1.jpgbp", // Interior
     altKey: "landing:aboutUs.imageAltInterior",
     hint: "restaurant interior dining",
     mobileClass: "w-full h-full object-cover", // Used by carousel
