@@ -12,7 +12,7 @@ interface ThemeColors {
 }
 
 interface OpeningHours {
-  [key: string]: string; // Allows for keys like "tueWed", "thuSat", "sun", "mon"
+  [key: string]: string; // Allows for keys like "mon", "tue", "wed", etc.
 }
 
 interface MenuDelDiaConfig {
@@ -61,20 +61,20 @@ interface RestaurantConfig {
 
 // --- Configuration Object ---
 const restaurantConfig: RestaurantConfig = {
-  restaurantDisplayName: 'Can Fanals',
-  logoUrl: '/canfanals-logo.png',
-  address: 'Plaça Josep Barangé Bachs, 13, 08402 Granollers, Barcelona',
-  phone: '938 79 34 93',
-  phoneHref: 'tel:+34938793493',
-  email: 'reserves@canfanals.com', // TODO: User needs to update
-  emailHref: 'mailto:reserves@canfanals.com', // TODO: User needs to update
+  restaurantDisplayName: 'Restaurant Rossinyol', // Updated
+  logoUrl: '/canfanals-logo.png', // Placeholder - Update with Rossinyol's logo
+  address: 'Plaça Josep Barangé Bachs, 13, 08402 Granollers, Barcelona', // Updated
+  phone: '938 79 34 93', // Updated
+  phoneHref: 'tel:+34938793493', // Updated
+  email: 'reserves@restaurantrossinyol.com', // TODO: User needs to update for Rossinyol
+  emailHref: 'mailto:reserves@restaurantrossinyol.com', // TODO: User needs to update for Rossinyol
   socialMediaLinks: {
-    facebook: '#', // TODO: User needs to update
-    instagram: '#', // TODO: User needs to update
-    twitter: '#', // TODO: User needs to update
-    youtube: '#', // TODO: User needs to update
+    facebook: '#', // TODO: User needs to update for Rossinyol
+    instagram: '#', // TODO: User needs to update for Rossinyol
+    twitter: '#', // TODO: User needs to update for Rossinyol
+    youtube: '#', // TODO: User needs to update for Rossinyol
   },
-  heroImageUrl: '/background_rest.jpg',
+  heroImageUrl: '/background_rest.jpg', // Placeholder - Update with Rossinyol's hero image
   heroImageHint: 'restaurant interior modern',
   bookingTimeSlots: [
     "12:00 PM", "12:15 PM", "12:30 PM", "12:45 PM",
@@ -90,20 +90,17 @@ const restaurantConfig: RestaurantConfig = {
   bookingSlotDurationMinutes: 120,
   timeZone: 'Europe/Madrid',
   theme: {
-    primary: 'hsl(205 75% 58%)', // Mediterranean Coastal Primary Blue
+    primary: 'hsl(205 75% 58%)',
   },
   showMenuItemImages: true,
-  showAISommelierSection: false, // Set to false by default
+  showAISommelierSection: false,
   bookingMaxGuestsPerSlot: 8,
-  // IMPORTANT: Set bookingMethod to 'calendar' to make live calls to Google Calendar API.
-  // Ensure GOOGLE_APPLICATION_CREDENTIALS and GOOGLE_CALENDAR_ID environment variables are set.
-  // Defaulting to 'whatsapp' is safer if calendar integration is not fully configured.
-  bookingMethod: 'whatsapp', // or 'calendar'
-  whatsappBookingNumber: '+34608123872', // TODO: User needs to update with Can Fanals's WhatsApp
-  googleMapsEmbedUrl: 'YOUR_GOOGLE_MAPS_EMBED_URL_FOR_CAN_FANALS', // TODO: User needs to update
-  googleMapsLink: 'YOUR_GOOGLE_MAPS_DIRECT_LINK_FOR_CAN_FANALS', // TODO: User needs to update
-  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJrxjmUa-VpBIRenLu0Swg6cM',
-  tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_FOR_CAN_FANALS', // TODO: User needs to update
+  bookingMethod: 'whatsapp',
+  whatsappBookingNumber: '+34938793493', // Updated to Rossinyol's phone, ensure it's WhatsApp enabled
+  googleMapsEmbedUrl: 'YOUR_GOOGLE_MAPS_EMBED_URL_FOR_ROSSINYOL', // TODO: User needs to update
+  googleMapsLink: 'YOUR_GOOGLE_MAPS_DIRECT_LINK_FOR_ROSSINYOL', // TODO: User needs to update
+  googleReviewUrl: 'YOUR_GOOGLE_REVIEW_PLACE_ID_URL_FOR_ROSSINYOL', // TODO: User needs to update
+  tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_FOR_ROSSINYOL', // TODO: User needs to update
   openingHours: {
     mon: "13:00 – 16:00",
     tue: "13:00 – 16:00",
@@ -114,12 +111,12 @@ const restaurantConfig: RestaurantConfig = {
     sun: "12:00 – 17:00",
   },
   menuDelDia: {
-    price: "16,50€", // Example price for Menu del Dia
+    price: "16,50€", // Example price for Menu del Dia - Update if needed
     priceDescriptionKey: "menu:menuDelDia.priceIncludes", // Example: "IVA inclòs. Pa, beguda i postre o cafè."
     notesKey: "menu:menuDelDia.notes", // Example: "Disponible de dimarts a divendres al migdia, excepte festius."
   },
   allergenConfig: {
-    showAsText: false, // Set to false to attempt to show icons
+    showAsText: false,
   },
 };
 

@@ -7,34 +7,34 @@ import { Utensils, Fish, Cake } from 'lucide-react'; // Changed icons
 
 const servicesList = [
   {
-    icon: Utensils, // Changed from Coffee
-    titleKey: "landing:services.paellasAndTapas.title", // NEW KEY
-    descriptionKey: "landing:services.paellasAndTapas.description" // NEW KEY
+    icon: Utensils, 
+    titleKey: "landing:services.paellasAndTapas.title", 
+    descriptionKey: "landing:services.paellasAndTapas.description" 
   },
   {
-    icon: Fish, // Changed from ChefHat
-    titleKey: "landing:services.fishAndGrilledMeats.title", // NEW KEY
-    descriptionKey: "landing:services.fishAndGrilledMeats.description" // NEW KEY
+    icon: Fish, 
+    titleKey: "landing:services.fishAndGrilledMeats.title", 
+    descriptionKey: "landing:services.fishAndGrilledMeats.description" 
   },
   {
-    icon: Cake, // Changed from ClipboardList
-    titleKey: "landing:services.dessertsAndWines.title", // NEW KEY
-    descriptionKey: "landing:services.dessertsAndWines.description" // NEW KEY
+    icon: Cake, 
+    titleKey: "landing:services.dessertsAndWines.title", 
+    descriptionKey: "landing:services.dessertsAndWines.description" 
   }
 ];
 
 export default function ServicesSection() {
   const { t } = useLanguage();
-  const restaurantName = t('common:restaurantName'); // Get restaurant name for alt text
+  const restaurantName = t('common:restaurantName'); 
 
   return (
-    <section id="services" className="py-16 sm:py-24 bg-background">
+    <section id="services" className="py-12 sm:py-20 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4" suppressHydrationWarning>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4" suppressHydrationWarning>
             {t('landing:services.sectionTitle')}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto" suppressHydrationWarning>
+          <p className="text-md sm:text-lg text-muted-foreground max-w-xl sm:max-w-2xl mx-auto" suppressHydrationWarning>
             {t('landing:services.sectionDescription')}
           </p>
         </div>
