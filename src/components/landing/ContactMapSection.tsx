@@ -13,6 +13,11 @@ export default function ContactMapSection() {
   // Order of days for display, matching individual keys in openingHours and locale files
   const openingHoursOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
+  // Log the embed URL for diagnostics
+  if (typeof window !== 'undefined') { // Ensure this log only runs on the client
+    console.log("CONTACT_MAP_SECTION: Google Maps Embed URL from config:", restaurantConfig.googleMapsEmbedUrl);
+  }
+
   return (
     <section id="contact-map" className="py-16 sm:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,7 +71,7 @@ export default function ContactMapSection() {
               <ul className="text-foreground/90 space-y-1.5">
                 {openingHoursOrder.map(dayKey => {
                   // @ts-ignore 
-                  const hours = restaurantConfig.openingHours[dayKey] || "CLOSED"; // Default to CLOSED if key not found
+                  const hours = restaurantConfig.openingHours[dayKey as keyof typeof restaurantConfig.openingHours] || "CLOSED";
                   const dayLabelKey = `landing:contactMap.hours.${dayKey}`;
                   
                   return (
@@ -96,8 +101,8 @@ export default function ContactMapSection() {
                 title={t('landing:contactMap.mapTitle', { restaurantName })}
               ></iframe>
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
-                {t('landing:contactMap.mapUnavailable')}
+              <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground p-4 text-center">
+                <p suppressHydrationWarning>{t('landing:contactMap.mapUnavailable')}</p>
               </div>
             )}
           </div>
