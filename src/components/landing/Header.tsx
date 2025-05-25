@@ -11,15 +11,13 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import restaurantConfig from '@/config/restaurant.config';
+import { cn } from '@/lib/utils';
 
 const navItemKeysBase = [
-  { labelKey: 'common:nav.menuDelDia', href: '/#menu' },
   { labelKey: 'common:nav.carta', href: '/menu' },
   { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
 ];
-
-const aiSommelierNavItem = { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' };
 
 const navItemKeysEnd = [
   { labelKey: 'common:nav.contact', href: '/#contact-map' },
@@ -28,9 +26,11 @@ const navItemKeysEnd = [
 
 const getNavItems = () => {
   let items = [...navItemKeysBase];
-  if (restaurantConfig.showAISommelierSection) {
-    items.push(aiSommelierNavItem);
-  }
+  // AISommelier link is conditionally shown based on restaurantConfig.showAISommelierSection
+  // It was removed based on previous requests. If needed again, this logic should be:
+  // if (restaurantConfig.showAISommelierSection) {
+  //   items.push({ labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' });
+  // }
   items.push(...navItemKeysEnd);
   return items;
 };
@@ -50,11 +50,21 @@ export default function Header() {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
+    // Set initial state
+    handleScroll(); 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const NavLinks = ({ inSheet = false }: { inSheet?: boolean }) => (
     <nav className={`flex ${inSheet ? 'flex-col space-y-3 items-start' : 'space-x-4 lg:space-x-6 items-center'}`}>
+      {/* "Menú del Dia" link was removed as per previous request, keeping "Carta" */}
+      <Link
+        href="/#menu" // This should point to the menu section on the homepage
+        className="text-sm font-medium transition-colors hover:text-primary"
+        onClick={() => inSheet && setIsSheetOpen(false)}
+      >
+        {t('common:nav.menuDelDia')}
+      </Link>
       {navItems.map((item) => (
         <Link
           key={item.labelKey}
@@ -100,12 +110,21 @@ export default function Header() {
                 alt={`${restaurantName} Logo`}
                 width={240} 
                 height={80} 
-                className="h-16 sm:h-20 w-auto dark:filter dark:invert"  // Adjusted logo height
+                className={cn(
+                  "h-16 sm:h-20 w-auto", // Base size
+                  "dark:filter dark:invert", // Dark mode: always white
+                  !isScrolled && "filter invert" // Light mode, transparent header: invert to white
+                )}
                 priority
                 style={{ objectFit: 'contain' }}
               />
             ) : (
-              <span className="text-xl sm:text-2xl font-serif font-bold text-foreground">{restaurantName}</span>
+              <span className={cn(
+                "text-xl sm:text-2xl font-serif font-bold",
+                isScrolled ? "text-foreground" : "text-white" // Text color change for fallback
+              )}>
+                {restaurantName}
+              </span>
             )}
 
           </Link>
@@ -114,7 +133,7 @@ export default function Header() {
             <div className="flex items-center">
               <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className={cn(!isScrolled && !isSheetOpen && "text-white hover:bg-white/10 hover:text-white", isScrolled && "text-foreground")}>
                     <MenuIcon className="h-6 w-6" />
                     <span className="sr-only">Open menu</span>
                   </Button>
@@ -127,9 +146,9 @@ export default function Header() {
                           <Image
                             src={restaurantConfig.logoUrl}
                             alt={`${restaurantName} Logo`}
-                            width={150}
-                            height={50} 
-                            className="h-12 w-auto dark:filter dark:invert" // Adjusted logo height in sheet
+                            width={150} // Adjusted size for sheet
+                            height={50}  // Adjusted size for sheet
+                            className="h-12 w-auto dark:filter dark:invert" // Dark mode handled
                             style={{ objectFit: 'contain' }}
                           />
                         ) : (
@@ -148,7 +167,7 @@ export default function Header() {
               </Sheet>
             </div>
           ) : (
-            <div className="flex items-center space-x-3 lg:space-x-4">
+            <div className={cn("flex items-center space-x-3 lg:space-x-4", !isScrolled && "text-white")}>
               <NavLinks />
               <LanguageSelector />
             </div>
