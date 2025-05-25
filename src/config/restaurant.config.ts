@@ -102,13 +102,13 @@ const restaurantConfig: RestaurantConfig = {
   googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJxxAul8XHpBIRNdCnYnfRj3s', // TODO: User needs to update
   tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_FOR_ROSSINYOL', // TODO: User needs to update
   openingHours: {
-    mon: "13:00 – 16:00",
-    tue: "13:00 – 16:00",
-    wed: "13:00 – 16:00",
-    thu: "13:00 – 16:00",
-    fri: "13:00 – 16:00 / 20:00 – 23:00",
-    sat: "13:00 – 16:00 / 20:00 – 23:30",
-    sun: "12:00 – 17:00",
+    mon: "13:00 - 16:00",
+    tue: "13:00 - 16:00",
+    wed: "13:00 - 16:00",
+    thu: "13:00 - 16:00",
+    fri: "13:00 - 16:00 / 20:00 - 23:00",
+    sat: "13:00 - 16:00 / 20:00 - 23:30",
+    sun: "12:00 - 17:00",
   },
   menuDelDia: {
     price: "16,50€", // Example price for Menu del Dia - Update if needed
