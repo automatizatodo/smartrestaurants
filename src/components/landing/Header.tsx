@@ -124,7 +124,7 @@ export default function Header() {
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 sm:h-24"> {/* Adjusted base height, sm retains larger for logo */}
+        <div className="flex items-center justify-between h-18 sm:h-20"> {/* Adjusted base height, sm retains larger for logo */}
           <Link href="/" className="flex items-center space-x-2">
             {restaurantConfig.logoUrl ? (
               <Image
@@ -133,9 +133,8 @@ export default function Header() {
                 width={240} 
                 height={80} 
                 className={cn(
-                  "h-16 sm:h-20 w-auto", // Adjusted mobile height, sm keeps larger
-                  "dark:filter dark:invert", // Dark mode: always white
-                  !isScrolled && "filter invert" // Light mode, transparent header: invert to white (if logo is black on transparent)
+                  "h-10 sm:h-14 w-auto", // Adjusted mobile height, sm keeps larger
+                  isScrolled && "dark:filter dark:invert" // Light mode, transparent header: invert to white (if logo is black on transparent)
                 )}
                 priority
                 style={{ objectFit: 'contain' }}
