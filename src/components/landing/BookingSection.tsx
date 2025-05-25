@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { format, getDay, parse as parseTime, setHours, setMinutes, setSeconds, setMilliseconds, isWithinInterval } from "date-fns";
+import { format, getDay, parse as parseTime, setHours, setMinutes, setSeconds, setMilliseconds, isWithinInterval, addMinutes } from "date-fns";
 import { es, enUS as en, ca } from 'date-fns/locale';
 import { Calendar as CalendarIcon, Users, Clock, Loader2, AlertTriangle } from "lucide-react";
 import { submitBooking, type BookingFormState } from "@/lib/actions";
@@ -44,61 +44,62 @@ const getDayKey = (date: Date): string => {
 };
 
 // Helper function to parse opening hours string for a specific day
+// Handles single periods like "13:00 - 16:00" and multiple like "13:00 - 16:00 / 20:00 - 23:00"
 const getOpeningHoursForDay = (
   dayKey: string,
   configHours: OpeningHoursMap
 ): { start: string; end: string }[] | null => {
-  let hoursString: string | undefined;
-
-  // Direct mapping for simple day keys
-  if (dayKey === 'mon') hoursString = configHours.mon;
-  else if (dayKey === 'sun') hoursString = configHours.sun;
-  else if (dayKey === 'tue' || dayKey === 'wed') hoursString = configHours.tueWed;
-  else if (dayKey === 'thu' || dayKey === 'fri' || dayKey === 'sat') hoursString = configHours.thuSat;
-
+  let hoursString: string | undefined = configHours[dayKey as keyof OpeningHoursMap];
 
   if (!hoursString || hoursString.toUpperCase() === "CLOSED") {
     return null; // Restaurant is closed
   }
 
-  // Assuming format "HH:mm - HH:mm" for now
-  // TODO: Extend to handle multiple periods if config changes (e.g., "08:00-12:00, 13:00-17:00")
-  const parts = hoursString.split(/\s*-\s*/);
-  if (parts.length === 2) {
-    return [{ start: parts[0].trim(), end: parts[1].trim() }];
+  const periods = hoursString.split(/\s*\/\s*/); // Split by " / " for multiple periods
+  const parsedPeriods: { start: string; end: string }[] = [];
+
+  for (const period of periods) {
+    const parts = period.split(/\s*-\s*/);
+    if (parts.length === 2) {
+      parsedPeriods.push({ start: parts[0].trim(), end: parts[1].trim() });
+    } else {
+      // console.warn(String.raw`Invalid time period format: "${period}" in hours string "${hoursString}" for dayKey ${dayKey}`);
+    }
   }
-  console.warn(`Invalid opening hours format for dayKey ${dayKey}: ${hoursString}`);
-  return null; // Invalid format
+  return parsedPeriods.length > 0 ? parsedPeriods : null;
 };
 
-// Helper function to check if a time slot is within the opening hours
+// Helper function to check if a time slot is within the opening hours, considering booking duration
 const isTimeSlotAvailable = (
   slot: string, // e.g., "1:00 PM" or "13:00"
   openingHoursToday: { start: string; end: string }[] | null,
-  selectedDate: Date
+  selectedDate: Date,
+  bookingDurationMinutes: number
 ): boolean => {
   if (!openingHoursToday) return false;
 
-  let slotDate: Date;
+  let slotStartDate: Date;
   try {
     // Try parsing "h:mm a" (e.g., 1:00 PM)
-    slotDate = parseTime(slot, 'h:mm a', selectedDate);
-    if (isNaN(slotDate.getTime())) {
-      // Try parsing "HH:mm" (e.g., 13:00) - useful if config.bookingTimeSlots uses 24h format
-      slotDate = parseTime(slot, 'HH:mm', selectedDate);
+    slotStartDate = parseTime(slot, 'h:mm a', selectedDate);
+    if (isNaN(slotStartDate.getTime())) {
+      // Try parsing "HH:mm" (e.g., 13:00)
+      slotStartDate = parseTime(slot, 'HH:mm', selectedDate);
     }
-     if (isNaN(slotDate.getTime())) {
-      // Fallback for slightly different AM/PM formats, e.g. "8:00 AM"
-      slotDate = parseTime(slot.replace(/\s/g, ''), 'h:mma', selectedDate);
+     if (isNaN(slotStartDate.getTime())) {
+      // Fallback for slightly different AM/PM formats, e.g. "8:00AM"
+      slotStartDate = parseTime(slot.replace(/\s/g, ''), 'h:mma', selectedDate);
     }
-    if (isNaN(slotDate.getTime())) {
-      console.warn('Could not parse slot time after attempts:', slot);
+    if (isNaN(slotStartDate.getTime())) {
+      // console.warn('BOOKING_SECTION: Could not parse slot time after attempts:', slot);
       return false;
     }
   } catch (e) {
-    console.warn('Error parsing slot time:', slot, e);
+    // console.warn('BOOKING_SECTION: Error parsing slot time:', slot, e);
     return false;
   }
+
+  const slotEndDate = addMinutes(slotStartDate, bookingDurationMinutes);
   
   for (const period of openingHoursToday) {
     let periodStartDate: Date;
@@ -108,24 +109,28 @@ const isTimeSlotAvailable = (
       const [startHour, startMinute] = period.start.split(':').map(Number);
       periodStartDate = setMilliseconds(setSeconds(setMinutes(setHours(selectedDate, startHour), startMinute),0),0);
 
-
       let [endHour, endMinute] = period.end.split(':').map(Number);
-      if (endHour === 24 && endMinute === 0) { // Handle "24:00" as end of day
+       // Handle "24:00" as the very end of the day (exclusive for start, inclusive for end)
+      if (endHour === 24 && endMinute === 0) {
+        // This represents the midnight that *starts* the next day,
+        // so for comparison, it's effectively the very end of the current day.
         periodEndDate = setMilliseconds(setSeconds(setMinutes(setHours(selectedDate, 23), 59),59),999);
       } else {
         periodEndDate = setMilliseconds(setSeconds(setMinutes(setHours(selectedDate, endHour), endMinute),0),0);
       }
       
       if (isNaN(periodStartDate.getTime()) || isNaN(periodEndDate.getTime())) {
-        console.warn('Could not parse period times:', period);
+        // console.warn('BOOKING_SECTION: Could not parse period times:', period);
         continue;
       }
     } catch (e) {
-      console.warn('Error parsing period times:', period, e);
+      // console.warn('BOOKING_SECTION: Error parsing period times:', period, e);
       continue;
     }
-
-    if (isWithinInterval(slotDate, { start: periodStartDate, end: periodEndDate })) {
+    
+    // Check if the slot start time is at or after the period start time
+    // AND the slot end time is at or before the period end time.
+    if (slotStartDate.getTime() >= periodStartDate.getTime() && slotEndDate.getTime() <= periodEndDate.getTime()) {
       return true;
     }
   }
@@ -162,6 +167,16 @@ export default function BookingSection() {
   const { t, language, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
   
+  const initialState: BookingFormState = {
+    messageKey: null,
+    success: false,
+    errors: null,
+    messageParams: null,
+    submittedData: null,
+  };
+  const [state, formAction, isPending] = useActionState(submitBooking, initialState);
+  
+  // State for controlled inputs
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -169,6 +184,7 @@ export default function BookingSection() {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedGuests, setSelectedGuests] = useState<string | undefined>(undefined);
+  
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>(restaurantConfig.bookingTimeSlots);
   const [showNoSlotsMessage, setShowNoSlotsMessage] = useState(false);
 
@@ -178,6 +194,7 @@ export default function BookingSection() {
   const processedErrorKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Initialize date to today on client mount to avoid hydration mismatch
     setDate(new Date());
   }, []); 
 
@@ -188,13 +205,16 @@ export default function BookingSection() {
       const openingHoursToday = getOpeningHoursForDay(dayKey, restaurantConfig.openingHours);
       
       const filteredSlots = restaurantConfig.bookingTimeSlots.filter(slot =>
-        isTimeSlotAvailable(slot, openingHoursToday, date)
+        isTimeSlotAvailable(slot, openingHoursToday, date, restaurantConfig.bookingSlotDurationMinutes)
       );
       setAvailableTimeSlots(filteredSlots);
 
-      if (filteredSlots.length === 0) {
+      if (filteredSlots.length === 0 && openingHoursToday) { // Show only if day has opening hours but no slots fit
         setShowNoSlotsMessage(true);
-      } else {
+      } else if (!openingHoursToday) { // Restaurant is explicitly CLOSED
+         setShowNoSlotsMessage(true); // Also show message if closed
+      }
+      else {
         setShowNoSlotsMessage(false);
       }
 
@@ -203,21 +223,11 @@ export default function BookingSection() {
         setSelectedTime(undefined);
       }
     } else {
-      // If no date is selected, show all slots by default (or could be empty)
       setAvailableTimeSlots(restaurantConfig.bookingTimeSlots);
       setShowNoSlotsMessage(false);
     }
-  }, [date, selectedTime]);
+  }, [date, selectedTime]); // Removed restaurantConfig.bookingTimeSlots from deps as it's static
 
-
-  const initialState: BookingFormState = {
-    messageKey: null,
-    success: false,
-    errors: null,
-    messageParams: null,
-    submittedData: null,
-  };
-  const [state, formAction, isPending] = useActionState(submitBooking, initialState);
 
   useEffect(() => {
     if (state?.messageKey) {
@@ -254,18 +264,22 @@ export default function BookingSection() {
       setDate(new Date()); 
       setSelectedTime(undefined);
       setSelectedGuests(undefined);
+      formRef.current?.reset(); // Explicitly reset form fields
     }
   }, [state]); 
 
   useEffect(() => {
+    // Re-populate fields if there was an error and submittedData exists
     if (!state?.success && state?.submittedData) {
         setName(state.submittedData.name || '');
         setEmail(state.submittedData.email || '');
         setPhone(state.submittedData.phone || '');
         setNotes(state.submittedData.notes || '');
         if (state.submittedData.date) {
-            const prevDate = typeof state.submittedData.date === 'string' ? parseTime(state.submittedData.date, 'yyyy-MM-dd', new Date()) : state.submittedData.date;
-            if (prevDate && !isNaN(prevDate.getTime())) {
+            // Date from submittedData is yyyy-MM-dd string
+            const [year, month, day] = (state.submittedData.date as string).split('-').map(Number);
+            const prevDate = new Date(year, month - 1, day); // Month is 0-indexed
+            if (!isNaN(prevDate.getTime())) {
                  setDate(prevDate);
             } else {
                 setDate(new Date()); 
@@ -275,10 +289,10 @@ export default function BookingSection() {
         }
         setSelectedTime(state.submittedData.time || undefined);
         setSelectedGuests(state.submittedData.guests?.toString() || undefined);
-    } else if (!state?.success && !state?.submittedData && date === undefined) {
+    } else if (!state?.success && !state?.submittedData && !date) { // Only set date if not already set
         setDate(new Date());
     }
-  }, [state?.success, state?.submittedData]); 
+  }, [state?.success, state?.submittedData]); // `date` removed from deps to avoid loop
 
 
   let dateLocale;
@@ -406,7 +420,7 @@ export default function BookingSection() {
                     </SelectContent>
                   </Select>
                   {state?.errors?.time && <p className="text-xs sm:text-sm text-destructive mt-1">{state.errors.time.map(errKey => t(errKey)).join(", ")}</p>}
-                   {showNoSlotsMessage && availableTimeSlots.length === 0 && date && (
+                   {showNoSlotsMessage && date && ( // Only show message if a date is selected
                     <p className="text-xs sm:text-sm text-destructive mt-1 flex items-center">
                       <AlertTriangle className="h-4 w-4 mr-1 shrink-0" />
                       {t('landing:booking.error.restaurantClosedOrNoSlots')}
@@ -462,3 +476,4 @@ export default function BookingSection() {
   );
 }
     
+
