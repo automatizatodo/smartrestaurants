@@ -14,7 +14,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    /* Mediterranean Coastal - Light Theme */
+    /* Mediterranean Coastal - Light Theme (Current Light Theme) */
     --background: 200 50% 98%; /* Very light, almost white with a hint of cool grey/blue */
     --foreground: 210 30% 25%; /* Dark desaturated blue/grey for text */
 
@@ -62,50 +62,50 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .dark {
-    /* Mediterranean Coastal - Dark Theme */
-    --background: 210 30% 12%; /* Dark, deep blue-grey */
-    --foreground: 200 30% 88%; /* Light, cool grey/off-white text */
+    /* "Dark" Theme - Light Version */
+    --background: 210 20% 96%; /* Very light cool grey */
+    --foreground: 210 25% 35%; /* Darker cool grey for text */
 
-    --card: 210 30% 15%; /* Slightly lighter dark blue-grey for cards */
-    --card-foreground: 200 30% 88%;
+    --card: 210 20% 99%; /* Almost white, slightly cooler than background */
+    --card-foreground: 210 25% 35%;
 
-    --popover: 210 30% 15%;
-    --popover-foreground: 200 30% 88%;
+    --popover: 210 20% 99%;
+    --popover-foreground: 210 25% 35%;
 
-    --primary: 205 70% 65%; /* Light blue, needs to be vibrant enough for dark mode */
-    --primary-foreground: 210 30% 10%; /* Very dark blue/black for text on primary in dark mode */
+    --primary: 200 70% 55%; /* A slightly deeper, distinct blue */
+    --primary-foreground: 210 40% 98%; /* Light text on primary */
 
-    --secondary: 210 25% 25%; /* Darker muted blue-grey */
-    --secondary-foreground: 200 30% 80%;
+    --secondary: 210 20% 92%; /* Lighter cool grey, for secondary elements */
+    --secondary-foreground: 200 50% 40%; /* Medium cool grey text on secondary */
 
-    --muted: 210 20% 22%; /* Darker muted blue-grey */
-    --muted-foreground: 200 25% 65%; /* Lighter muted text */
+    --muted: 210 20% 88%; /* Muted cool grey */
+    --muted-foreground: 210 25% 55%; /* Muted grey text */
 
-    --accent: 195 70% 75%; /* A slightly brighter light blue for dark theme accents */
-    --accent-foreground: 200 30% 90%;
+    --accent: 190 75% 65%; /* A brighter, slightly greener blue for accents */
+    --accent-foreground: 210 30% 20%; /* Darker text on accent */
 
-    --destructive: 0 65% 55%; /* Red for destructive, slightly brighter on dark */
+    --destructive: 0 65% 55%; /* Red for destructive, needs to be visible on light background */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 20% 30%; /* Darker blue-grey border */
-    --input: 210 25% 20%; /* Dark blue-grey input background */
-    --ring: 205 70% 65%; /* Matches primary blue for focus rings in dark mode */
+    --border: 210 20% 85%; /* Light cool grey border */
+    --input: 210 20% 94%; /* Very light grey input background, distinct from main bg */
+    --ring: 200 70% 50%; /* Matches the new primary blue for focus rings */
     
-    --chart-1: 205 65% 60%;
-    --chart-2: 190 55% 55%;
-    --chart-3: 220 50% 70%;
-    --chart-4: 45 60% 60%; 
-    --chart-5: 30 55% 65%;
+    --chart-1: 200 65% 60%;
+    --chart-2: 185 55% 55%;
+    --chart-3: 215 50% 70%;
+    --chart-4: 40 60% 60%; 
+    --chart-5: 25 55% 65%;
     
-    /* Sidebar variables - Dark Theme */
-    --sidebar-background: 210 28% 10%; /* Slightly different from main dark background */
-    --sidebar-foreground: 200 30% 85%;
-    --sidebar-primary: 205 70% 65%;
-    --sidebar-primary-foreground: 210 30% 10%;
-    --sidebar-accent: 210 25% 22%;
-    --sidebar-accent-foreground: 200 30% 85%;
-    --sidebar-border: 210 20% 30%;
-    --sidebar-ring: 205 70% 65%;
+    /* Sidebar variables - "Dark" (Light) Theme */
+    --sidebar-background: 210 22% 95%; /* Slightly different light grey */
+    --sidebar-foreground: 210 25% 30%;
+    --sidebar-primary: 200 70% 55%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 20% 90%;
+    --sidebar-accent-foreground: 200 50% 40%;
+    --sidebar-border: 210 20% 85%;
+    --sidebar-ring: 200 70% 50%;
   }
 }
 
