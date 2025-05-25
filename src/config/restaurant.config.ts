@@ -61,53 +61,65 @@ interface RestaurantConfig {
 
 // --- Configuration Object ---
 const restaurantConfig: RestaurantConfig = {
-  restaurantDisplayName: 'Restaurant Rossinyol', // UPDATED
-  logoUrl: '/nou-logo-rossinyol.png', // TODO: User needs to provide this new logo
-  address: 'Granollers, Barcelona (Especificar carrer i número)', // UPDATED - User needs to provide full address
-  phone: '930 000 000', // TODO: User needs to update
-  phoneHref: 'tel:+34930000000', // TODO: User needs to update
-  email: 'reserves@restaurantrossinyol.com', // TODO: User needs to update
-  emailHref: 'mailto:reserves@restaurantrossinyol.com', // TODO: User needs to update
+  restaurantDisplayName: 'Can Fanals',
+  logoUrl: '/canfanals-logo.png',
+  address: 'Plaça Josep Barangé Bachs, 13, 08402 Granollers, Barcelona',
+  phone: '938 79 34 93',
+  phoneHref: 'tel:+34938793493',
+  email: 'reserves@canfanals.com', // TODO: User needs to update
+  emailHref: 'mailto:reserves@canfanals.com', // TODO: User needs to update
   socialMediaLinks: {
     facebook: '#', // TODO: User needs to update
     instagram: '#', // TODO: User needs to update
     twitter: '#', // TODO: User needs to update
     youtube: '#', // TODO: User needs to update
   },
-  heroImageUrl: '/hero-rossinyol.jpg', // TODO: User needs to provide this new image
-  heroImageHint: 'ambiente restaurant rossinyol', // UPDATED
-  bookingTimeSlots: [ 
-    "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-    "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM",
-    "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM", "10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM"
+  heroImageUrl: '/background_rest.jpg',
+  heroImageHint: 'restaurant interior modern',
+  bookingTimeSlots: [
+    "12:00 PM", "12:15 PM", "12:30 PM", "12:45 PM",
+    "1:00 PM", "1:15 PM", "1:30 PM", "1:45 PM",
+    "2:00 PM", "2:15 PM", "2:30 PM", "2:45 PM",
+    "3:00 PM", "3:15 PM", "3:30 PM", "3:45 PM",
+    "4:00 PM", "4:15 PM", "4:30 PM", "4:45 PM",
+    "8:00 PM", "8:15 PM", "8:30 PM", "8:45 PM",
+    "9:00 PM", "9:15 PM", "9:30 PM", "9:45 PM",
+    "10:00 PM", "10:15 PM", "10:30 PM", "10:45 PM",
+    "11:00 PM"
   ],
   bookingSlotDurationMinutes: 120,
-  timeZone: 'Europe/Madrid', 
+  timeZone: 'Europe/Madrid',
   theme: {
-    primary: 'hsl(205 75% 58%)', // Current blue, user might want to change this for Rossinyol
+    primary: 'hsl(205 75% 58%)', // Mediterranean Coastal Primary Blue
   },
   showMenuItemImages: true,
-  showAISommelierSection: false,
+  showAISommelierSection: false, // Set to false by default
   bookingMaxGuestsPerSlot: 8,
-  bookingMethod: 'whatsapp', // Or 'calendar' if preferred and configured for Rossinyol
-  whatsappBookingNumber: '+34600000001', // TODO: User needs to update with Rossinyol's WhatsApp
-  googleMapsEmbedUrl: 'YOUR_GOOGLE_MAPS_EMBED_URL_FOR_ROSSINYOL', // TODO: User needs to update
-  googleMapsLink: 'YOUR_GOOGLE_MAPS_DIRECT_LINK_FOR_ROSSINYOL', // TODO: User needs to update
-  googleReviewUrl: 'YOUR_GOOGLE_REVIEW_LINK_FOR_ROSSINYOL', // TODO: User needs to update (using Place ID)
-  tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_FOR_ROSSINYOL', // TODO: User needs to update
-  openingHours: { 
-    tueWed: "08:00 - 17:00", // Example, user needs to confirm Rossinyol's hours
-    thuSat: "08:00 - 24:00", 
-    sun: "08:00 - 19:00",
-    mon: "CLOSED", 
+  // IMPORTANT: Set bookingMethod to 'calendar' to make live calls to Google Calendar API.
+  // Ensure GOOGLE_APPLICATION_CREDENTIALS and GOOGLE_CALENDAR_ID environment variables are set.
+  // Defaulting to 'whatsapp' is safer if calendar integration is not fully configured.
+  bookingMethod: 'whatsapp', // or 'calendar'
+  whatsappBookingNumber: '+34608123872', // TODO: User needs to update with Can Fanals's WhatsApp
+  googleMapsEmbedUrl: 'YOUR_GOOGLE_MAPS_EMBED_URL_FOR_CAN_FANALS', // TODO: User needs to update
+  googleMapsLink: 'YOUR_GOOGLE_MAPS_DIRECT_LINK_FOR_CAN_FANALS', // TODO: User needs to update
+  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJrxjmUa-VpBIRenLu0Swg6cM',
+  tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_FOR_CAN_FANALS', // TODO: User needs to update
+  openingHours: {
+    mon: "13:00 – 16:00",
+    tue: "13:00 – 16:00",
+    wed: "13:00 – 16:00",
+    thu: "13:00 – 16:00",
+    fri: "13:00 – 16:00 / 20:00 – 23:00",
+    sat: "13:00 – 16:00 / 20:00 – 23:30",
+    sun: "12:00 – 17:00",
   },
   menuDelDia: {
-    price: "15,00€", // Fallback price for Rossinyol, adjust as needed
-    priceDescriptionKey: "menu:menuDelDia.priceIncludes",
-    notesKey: "menu:menuDelDia.notes",
+    price: "16,50€", // Example price for Menu del Dia
+    priceDescriptionKey: "menu:menuDelDia.priceIncludes", // Example: "IVA inclòs. Pa, beguda i postre o cafè."
+    notesKey: "menu:menuDelDia.notes", // Example: "Disponible de dimarts a divendres al migdia, excepte festius."
   },
   allergenConfig: {
-    showAsText: false, 
+    showAsText: false, // Set to false to attempt to show icons
   },
 };
 

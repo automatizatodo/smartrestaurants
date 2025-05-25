@@ -10,8 +10,8 @@ export default function ContactMapSection() {
   const { t } = useLanguage();
   const restaurantName = t('common:restaurantName');
 
-  // Order of days for display
-  const openingHoursOrder = ['mon', 'tueWed', 'thuSat', 'sun'];
+  // Order of days for display, matching individual keys in openingHours and locale files
+  const openingHoursOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
   return (
     <section id="contact-map" className="py-16 sm:py-24 bg-background">
@@ -65,8 +65,8 @@ export default function ContactMapSection() {
               </h3>
               <ul className="text-foreground/90 space-y-1.5">
                 {openingHoursOrder.map(dayKey => {
-                  // @ts-ignore // TODO: Fix type for configHours index
-                  const hours = restaurantConfig.openingHours[dayKey];
+                  // @ts-ignore 
+                  const hours = restaurantConfig.openingHours[dayKey] || "CLOSED"; // Default to CLOSED if key not found
                   const dayLabelKey = `landing:contactMap.hours.${dayKey}`;
                   
                   return (
@@ -84,7 +84,7 @@ export default function ContactMapSection() {
 
           {/* Google Maps Embed Column */}
           <div className="h-[400px] md:h-full w-full rounded-lg overflow-hidden shadow-xl border border-border">
-            {restaurantConfig.googleMapsEmbedUrl ? (
+            {restaurantConfig.googleMapsEmbedUrl && !restaurantConfig.googleMapsEmbedUrl.includes("YOUR_GOOGLE_MAPS_EMBED_URL") ? (
               <iframe
                 src={restaurantConfig.googleMapsEmbedUrl}
                 width="100%"
