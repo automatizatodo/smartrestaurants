@@ -97,8 +97,8 @@ const restaurantConfig: RestaurantConfig = {
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp',
   whatsappBookingNumber: '+34938793493', // Updated to Rossinyol's phone, ensure it's WhatsApp enabled
-  googleMapsEmbedUrl: 'YOUR_GOOGLE_MAPS_EMBED_URL_FOR_ROSSINYOL', // TODO: User needs to update
-  googleMapsLink: 'YOUR_GOOGLE_MAPS_DIRECT_LINK_FOR_ROSSINYOL', // TODO: User needs to update
+  googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d763705.7819750104!2d1.0699324781249946!3d41.607630600000014!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12a4c7c5972e10c7%3A0x7b8fd17762a7d035!2sRestaurant%20Rossinyol!5e0!3m2!1sen!2ses!4v1748189156124!5m2!1sen!2ses', // TODO: User needs to update
+  googleMapsLink: 'https://maps.app.goo.gl/MXHMvTsqnPhpANcV9', // TODO: User needs to update
   googleReviewUrl: 'YOUR_GOOGLE_REVIEW_PLACE_ID_URL_FOR_ROSSINYOL', // TODO: User needs to update
   tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_FOR_ROSSINYOL', // TODO: User needs to update
   openingHours: {
