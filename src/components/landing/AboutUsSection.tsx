@@ -12,21 +12,21 @@ import { cn } from '@/lib/utils';
 // Define images here for clarity
 const componentImages = [
   {
-    src: "/Comedor Restaurante.jpg", // Façana
+    src: "/restaurante.jpg", // Façana
     altKey: "landing:aboutUs.imageAltExterior",
     hint: "restaurant exterior facade",
     mobileClass: "w-full h-full object-cover", // Used by carousel
     priority: true,
   },
   {
-    src: "/Plato1.jpgbp", // Interior
+    src: "/Plato1.jpg", // Interior
     altKey: "landing:aboutUs.imageAltInterior",
     hint: "restaurant interior dining",
     mobileClass: "w-full h-full object-cover", // Used by carousel
     priority: false,
   },
   {
-    src: "/terrassa1.webp", // Terrassa
+    src: "/Plato2.jpg", // Terrassa
     altKey: "landing:aboutUs.imageAltTerrace",
     hint: "restaurant terrace patio",
     mobileClass: "w-full h-full object-cover", // Used by carousel

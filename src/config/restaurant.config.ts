@@ -74,7 +74,7 @@ const restaurantConfig: RestaurantConfig = {
     twitter: '#', // TODO: User needs to update for Rossinyol
     youtube: '#', // TODO: User needs to update for Rossinyol
   },
-  heroImageUrl: '/Comedor Restaurante.jpg', // Placeholder - Update with Rossinyol's hero image
+  heroImageUrl: '/restaurante.jpg', // Placeholder - Update with Rossinyol's hero image
   heroImageHint: 'restaurant interior modern',
   bookingTimeSlots: [
     "12:00 PM", "12:15 PM", "12:30 PM", "12:45 PM",
