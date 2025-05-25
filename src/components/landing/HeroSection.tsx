@@ -29,15 +29,14 @@ export default function HeroSection() {
   if (separatorIndex !== -1) {
     mainTitlePart = fullSeoTitle.substring(0, separatorIndex);
     subTitlePart = fullSeoTitle.substring(separatorIndex + separator.length);
-  } else if (fullSeoTitle.startsWith(restaurantName)) { // Fallback if colon is missing but starts with restaurant name
+  } else if (fullSeoTitle.startsWith(restaurantName)) {
     mainTitlePart = restaurantName;
     subTitlePart = fullSeoTitle.substring(restaurantName.length).trim();
-    // Further cleanup if the remaining part starts with a common separator character
     if (subTitlePart.startsWith(':') || subTitlePart.startsWith('-') || subTitlePart.startsWith('|')) {
         subTitlePart = subTitlePart.substring(1).trim();
     }
-  } else { // If no separator and doesn't start with restaurant name, use the whole string as subtitle (or handle as error)
-    subTitlePart = fullSeoTitle; // Or consider mainTitlePart = fullSeoTitle and subTitlePart = ""
+  } else { 
+    mainTitlePart = fullSeoTitle; // If no separator, use the whole string as main title
   }
 
 
@@ -68,13 +67,13 @@ export default function HeroSection() {
           className="font-bold text-white shadow-text uppercase"
           suppressHydrationWarning
         >
-          <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl" style={{ fontFamily: 'var(--font-cinzel), serif' }}>
+          <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl" style={{ fontFamily: 'var(--font-anton), sans-serif' }}>
             {mainTitlePart}
           </span>
           {subTitlePart && (
             <span 
               className="block text-xl sm:text-2xl md:text-3xl text-gray-200 font-normal normal-case mt-4 sm:mt-5 max-w-3xl mx-auto"
-              style={{ fontFamily: 'var(--font-cinzel), serif' }}
+              style={{ fontFamily: 'var(--font-anton), sans-serif' }}
             >
               {subTitlePart}
             </span>
@@ -102,4 +101,3 @@ export default function HeroSection() {
     </section>
   );
 }
-

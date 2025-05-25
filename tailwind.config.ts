@@ -12,7 +12,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['var(--font-geist-sans)'],
-        serif: ['var(--font-cinzel)'], // Changed from Playfair Display to Cinzel
+        serif: ['var(--font-anton)', 'sans-serif'], // Changed to Anton
       },
   		colors: {
   			background: 'hsl(var(--background))',

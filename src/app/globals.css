@@ -9,7 +9,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-cinzel), serif; /* Cinzel for headings */
+  font-family: var(--font-anton), sans-serif; /* Changed to Anton */
 }
 
 @layer base {

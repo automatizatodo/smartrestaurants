@@ -1,6 +1,6 @@
 
 import type { Metadata, Viewport } from 'next';
-import { Geist, Cinzel as CinzelFont } from 'next/font/google';
+import { Geist, Anton as AntonFont } from 'next/font/google'; // Changed Geist_Sans to Geist
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -13,10 +13,10 @@ const geist = Geist({
   subsets: ['latin'],
 });
 
-const cinzel = CinzelFont({ 
-  variable: '--font-cinzel',
+const anton = AntonFont({
+  variable: '--font-anton',
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400'], 
 });
 
 const restaurantName = caCommon.restaurantName || 'Can Fanals';
@@ -30,8 +30,8 @@ export const metadata: Metadata = {
     template: `%s | ${restaurantName}`,
   },
   description: defaultDescription,
-  keywords: ['restaurant a Sabadell', 'cuina catalana', 'brasa', 'sense gluten', 'Can Fanals Sabadell', 'menjar a Sabadell'],
   authors: [{ name: restaurantName, url: appUrl }],
+  keywords: ['restaurant a Sabadell', 'cuina catalana', 'brasa', 'sense gluten', 'Can Fanals Sabadell', 'menjar a Sabadell'],
   openGraph: {
     title: `${restaurantName} | ${mainKeywords}`,
     description: defaultDescription,
@@ -88,16 +88,16 @@ export default function RootLayout({
   return (
     <html lang="ca" className="dark">
       <head>
-        {gaId && gaId !== "YOUR_GA_MEASUREMENT_ID_HERE" && (
+        {gaId === "G-ZEF2C45GJ7" && ( // Corrected condition: load if gaId IS "G-ZEF2C45GJ7"
           <>
-            <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=G-ZEF2C45GJ7`}></script>
             <script
               dangerouslySetInnerHTML={{
                 __html: `
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
-                  gtag('config', '${gaId}');
+                  gtag('config', 'G-ZEF2C45GJ7');
                 `,
               }}
             />
@@ -105,7 +105,7 @@ export default function RootLayout({
         )}
       </head>
       <body
-        className={`${geist.variable} ${cinzel.variable} antialiased`}
+        className={`${geist.variable} ${anton.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <LanguageProvider>
