@@ -2,7 +2,8 @@
 "use client";
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+// Changed to default import for React and explicit hook usage
+import React from 'react';
 
 // Import locale data
 import enCommon from '@/locales/en/common.json';
@@ -78,31 +79,29 @@ interface LanguageContextType {
   translations: Translations;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = React.createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  // Set Catalan as the initial default language
-  const [language, setLanguage] = useState<Locale>('ca');
-  const [currentTranslations, setCurrentTranslations] = useState<Translations>(translationsData.ca);
+  const [language, setLanguage] = React.useState<Locale>('ca');
+  const [currentTranslations, setCurrentTranslations] = React.useState<Translations>(translationsData.ca);
 
-  // Removed useEffect for browser language detection to enforce Catalan as default
-  // useEffect(() => {
-  //   if (typeof navigator !== 'undefined') {
-  //     const browserLang = navigator.language.split('-')[0] as Locale;
-  //     if (browserLang === 'es' && translationsData.es) {
-  //       setLanguage('es');
-  //     } else if (browserLang === 'en' && translationsData.en) {
-  //       setLanguage('en');
-  //     }
+  // useEffect to set initial language based on browser, but default to 'ca'
+  // This was previously commented out to force 'ca' as default.
+  // React.useEffect(() => {
+  //   const browserLang = navigator.language.split('-')[0] as Locale;
+  //   if (browserLang === 'es' && translationsData.es) {
+  //     setLanguage('es');
+  //   } else if (browserLang === 'en' && translationsData.en) {
+  //     setLanguage('en');
   //   }
+  //   // If not 'es' or 'en', it remains 'ca' due to useState initial value
   // }, []);
 
-  useEffect(() => {
-    // This effect updates translations whenever the language state changes
-    setCurrentTranslations(translationsData[language] || translationsData.ca); // Fallback to Catalan translations
+  React.useEffect(() => {
+    setCurrentTranslations(translationsData[language] || translationsData.ca);
   }, [language]);
 
-  const t = useCallback(
+  const t = React.useCallback(
     (keyWithNamespace: string, params?: Record<string, string | number>) => {
       const parts = keyWithNamespace.split(':');
       let namespace: string;
@@ -110,18 +109,18 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       let subKey: string | undefined;
 
       if (parts.length === 3 && parts[0] === 'page-specific') {
-        // Handles keys like "page-specific:menu:title"
         namespace = parts[0];
-        subKey = parts[1]; // e.g., "menu"
-        key = parts[2];     // e.g., "title"
+        subKey = parts[1]; 
+        key = parts[2];     
       } else if (parts.length === 2) {
         [namespace, key] = parts;
       } else {
+        // Fallback if no namespace is provided, assume 'common' or the key itself if not found
         namespace = 'common';
         key = keyWithNamespace;
       }
       
-      let translation = keyWithNamespace; 
+      let translation = keyWithNamespace; // Default to the key itself if not found
 
       if (namespace === 'page-specific' && subKey) {
         const pageSpecificNamespace = currentTranslations[namespace] as PageSpecificTranslations | undefined;
@@ -131,6 +130,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       } else if (currentTranslations[namespace] && typeof (currentTranslations[namespace] as Record<string,string>)[key] === 'string') {
         translation = (currentTranslations[namespace] as Record<string,string>)[key];
       } else if (currentTranslations.common && typeof currentTranslations.common[keyWithNamespace] === 'string') {
+         // Fallback to check the full key in 'common' if not found in specified namespace
          translation = currentTranslations.common[keyWithNamespace];
       }
 
@@ -154,7 +154,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
+  const context = React.useContext(LanguageContext); // Explicitly use React.useContext
   if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
