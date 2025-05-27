@@ -3,21 +3,22 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import restaurantConfig from '@/config/restaurant.config';
+import type { OpeningHours } from '@/config/restaurant.config'; // Import type
 import { MapPin, Phone, Mail, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ContactMapSection() {
-  const { t } = useLanguage();
-  const restaurantName = t('common:restaurantName');
+  const { t, translations } = useLanguage();
+  const restaurantName = translations.common.restaurantName;
 
-  // Order of days for display
-  const openingHoursOrder = ['mon', 'tueWed', 'thuSat', 'sun'];
+  // Order of days for display matching the individual keys in restaurantConfig.openingHours
+  const openingHoursOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
   return (
     <section id="contact-map" className="py-16 sm:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
+          <h2 className="text-4xl sm:text-5xl font-anton font-bold text-foreground mb-4">
             {t('landing:contactMap.sectionTitle')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -29,44 +30,49 @@ export default function ContactMapSection() {
           {/* Contact Information & Opening Hours Column */}
           <div className="space-y-8 bg-card p-6 sm:p-8 rounded-lg shadow-lg">
             <div>
-              <h3 className="text-2xl font-serif font-semibold text-primary mb-4">{t('landing:contactMap.contactDetailsTitle')}</h3>
+              <h3 className="text-2xl font-anton font-semibold text-primary mb-4">{t('landing:contactMap.contactDetailsTitle')}</h3>
               <div className="space-y-4 text-foreground/90">
                 <div className="flex items-start">
                   <MapPin className="h-6 w-6 mr-3 mt-1 text-primary shrink-0" />
                   <div>
                     <p className="font-medium">{t('landing:contactMap.addressLabel')}</p>
                     <p>{restaurantConfig.address}</p>
-                    <Link href={restaurantConfig.googleMapsLink} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline inline-flex items-center mt-1">
-                      {t('landing:contactMap.getDirections')} <ExternalLink className="h-4 w-4 ml-1" />
-                    </Link>
+                    {restaurantConfig.googleMapsLink && (
+                        <Link href={restaurantConfig.googleMapsLink} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline inline-flex items-center mt-1">
+                        {t('landing:contactMap.getDirections')} <ExternalLink className="h-4 w-4 ml-1" />
+                        </Link>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center">
-                  <Phone className="h-6 w-6 mr-3 text-primary shrink-0" />
-                  <div>
-                    <p className="font-medium">{t('landing:contactMap.phoneLabel')}</p>
-                    <a href={restaurantConfig.phoneHref} className="hover:text-primary transition-colors">{restaurantConfig.phone}</a>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <Mail className="h-6 w-6 mr-3 text-primary shrink-0" />
-                  <div>
-                    <p className="font-medium">{t('landing:contactMap.emailLabel')}</p>
-                    <a href={restaurantConfig.emailHref} className="hover:text-primary transition-colors">{restaurantConfig.email}</a>
-                  </div>
-                </div>
+                {restaurantConfig.phone && (
+                    <div className="flex items-center">
+                    <Phone className="h-6 w-6 mr-3 text-primary shrink-0" />
+                    <div>
+                        <p className="font-medium">{t('landing:contactMap.phoneLabel')}</p>
+                        <a href={restaurantConfig.phoneHref} className="hover:text-primary transition-colors">{restaurantConfig.phone}</a>
+                    </div>
+                    </div>
+                )}
+                {restaurantConfig.email && (
+                    <div className="flex items-center">
+                    <Mail className="h-6 w-6 mr-3 text-primary shrink-0" />
+                    <div>
+                        <p className="font-medium">{t('landing:contactMap.emailLabel')}</p>
+                        <a href={restaurantConfig.emailHref} className="hover:text-primary transition-colors">{restaurantConfig.email}</a>
+                    </div>
+                    </div>
+                )}
               </div>
             </div>
             
             <div>
-              <h3 className="text-2xl font-serif font-semibold text-primary mb-4 mt-6 flex items-center">
+              <h3 className="text-2xl font-anton font-semibold text-primary mb-4 mt-6 flex items-center">
                 <Clock className="h-6 w-6 mr-3 text-primary shrink-0" />
                 {t('landing:contactMap.openingHoursTitle')}
               </h3>
               <ul className="text-foreground/90 space-y-1.5">
                 {openingHoursOrder.map(dayKey => {
-                  // @ts-ignore // TODO: Fix type for configHours index
-                  const hours = restaurantConfig.openingHours[dayKey];
+                  const hours = restaurantConfig.openingHours[dayKey as keyof OpeningHours];
                   const dayLabelKey = `landing:contactMap.hours.${dayKey}`;
                   
                   return (
@@ -84,7 +90,7 @@ export default function ContactMapSection() {
 
           {/* Google Maps Embed Column */}
           <div className="h-[400px] md:h-full w-full rounded-lg overflow-hidden shadow-xl border border-border">
-            {restaurantConfig.googleMapsEmbedUrl ? (
+            {restaurantConfig.googleMapsEmbedUrl && !restaurantConfig.googleMapsEmbedUrl.includes("YOUR_") ? (
               <iframe
                 src={restaurantConfig.googleMapsEmbedUrl}
                 width="100%"
