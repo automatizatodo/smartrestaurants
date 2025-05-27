@@ -1,14 +1,12 @@
 
 {
-  "restaurantName": "La Ferradura",
-  "tagline": "Cuina mediterrània amb encant al cor d'Alp",
-  "nav.menuDelDia": "Suggeriments",
+  "restaurantName": "La Bodega de la Ferradura",
+  "tagline": "Cuina de muntanya i brasa al cor d'Alp",
   "nav.carta": "Carta",
-  "nav.aiSommelier": "Sommelier IA",
-  "nav.testimonials": "Opinions",
-  "nav.aboutUs": "Nosaltres",
   "nav.services": "La Nostra Cuina",
+  "nav.aboutUs": "Nosaltres",
   "nav.contact": "Contacte i Ubicació",
+  "nav.testimonials": "Opinions",
   "nav.mobileMenuTitle": "Menú de Navegació",
   "button.bookNow": "Reservar Taula",
   "button.viewFullMenu": "Veure la Carta Completa",
@@ -20,7 +18,7 @@
   "footer.copyright": "© {year} {restaurantName}. Tots els drets reservats.",
   "footer.managedByText": "Lloc web gestionat per",
   "footer.managedByBrand": "automatizatodo.com",
-  "footer.seoText": "{restaurantName} - El teu restaurant de cuina mediterrània a Alp.",
+  "footer.seoText": "{restaurantName} - Restaurant de cuina de muntanya i brasa a Alp.",
   "form.error.generic": "S'ha produït un error inesperat. Si us plau, torna-ho a provar més tard.",
   "form.error.invalidInput": "Entrada invàlida. Si us plau, revisa les teves dades.",
   "languageSelector.label": "Selecciona idioma",
@@ -33,15 +31,15 @@
   "guestsPlural": "comensals",
   "allCategories": "Totes",
   "seo": {
-    "mainKeywords": "Restaurant a Alp, La Ferradura, cuina mediterrània, pasta fresca, pizza, Alp",
+    "mainKeywords": "restaurant a Alp, La Bodega de la Ferradura, cuina de muntanya, brasa, Alp",
     "pageContext": "Restaurant a Alp",
-    "defaultDescription": "Descobreix La Ferradura a Alp, especialista en cuina mediterrània, pasta fresca, pizzes artesanes i productes ecològics. Reserva la teva taula!",
-    "defaultTitleSuffix": "La Ferradura | Restaurant Mediterrani a Alp"
+    "defaultDescription": "Descobreix La Bodega de la Ferradura a Alp, especialista en cuina de muntanya, brasa i productes de proximitat. Reserva la teva taula!",
+    "defaultTitleSuffix": "La Bodega de la Ferradura | Restaurant de Muntanya a Alp"
   },
+  "cookieConsent.ariaLabel": "Avís de galetes",
   "cookieConsent.text": "Aquest lloc web utilitza galetes per proporcionar la funcionalitat necessària del lloc i per millorar la teva experiència. En utilitzar aquest lloc web, acceptes el nostre ús de galetes.",
   "cookieConsent.acceptButton": "Acceptar",
   "cookieConsent.rejectButton": "Rebutjar",
   "cookieConsent.privacyPolicyLink": "Política de Privacitat",
-  "cookieConsent.ariaLabel": "Avís de galetes",
   "calendar.serviceUnavailable": "El servei de reserves no està disponible temporalment. Si us plau, intenta-ho més tard o contacta amb nosaltres."
 }

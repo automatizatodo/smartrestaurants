@@ -1,14 +1,12 @@
 
 {
-  "restaurantName": "La Ferradura",
-  "tagline": "Charming Mediterranean cuisine in the heart of Alp",
-  "nav.menuDelDia": "Suggestions",
+  "restaurantName": "La Bodega de la Ferradura",
+  "tagline": "Mountain cuisine and grill in the heart of Alp",
   "nav.carta": "À la Carte",
-  "nav.aiSommelier": "AI Sommelier",
-  "nav.testimonials": "Reviews",
-  "nav.aboutUs": "About Us",
   "nav.services": "Our Cuisine",
+  "nav.aboutUs": "About Us",
   "nav.contact": "Contact & Location",
+  "nav.testimonials": "Reviews",
   "nav.mobileMenuTitle": "Navigation Menu",
   "button.bookNow": "Book a Table",
   "button.viewFullMenu": "View Full Menu",
@@ -20,7 +18,7 @@
   "footer.copyright": "© {year} {restaurantName}. All rights reserved.",
   "footer.managedByText": "Website managed by",
   "footer.managedByBrand": "automatizatodo.com",
-  "footer.seoText": "{restaurantName} - Your Mediterranean restaurant in Alp.",
+  "footer.seoText": "{restaurantName} - Your mountain cuisine and grill restaurant in Alp.",
   "form.error.generic": "An unexpected error occurred. Please try again later.",
   "form.error.invalidInput": "Invalid input. Please check your details.",
   "languageSelector.label": "Select language",
@@ -33,15 +31,15 @@
   "guestsPlural": "guests",
   "allCategories": "All",
   "seo": {
-    "mainKeywords": "Restaurant in Alp, La Ferradura, Mediterranean cuisine, fresh pasta, pizza, Alp",
+    "mainKeywords": "restaurant in Alp, La Bodega de la Ferradura, mountain cuisine, grill, Alp",
     "pageContext": "Restaurant in Alp",
-    "defaultDescription": "Discover La Ferradura in Alp, specializing in Mediterranean cuisine, fresh pasta, artisan pizzas, and organic products. Book your table!",
-    "defaultTitleSuffix": "La Ferradura | Mediterranean Restaurant in Alp"
+    "defaultDescription": "Discover La Bodega de la Ferradura in Alp, specializing in mountain cuisine, grill, and local products. Book your table!",
+    "defaultTitleSuffix": "La Bodega de la Ferradura | Mountain Cuisine Restaurant in Alp"
   },
+  "cookieConsent.ariaLabel": "Cookie Notice",
   "cookieConsent.text": "This website uses cookies to provide necessary site functionality and to improve your experience. By using this website, you agree to our use of cookies.",
   "cookieConsent.acceptButton": "Accept",
   "cookieConsent.rejectButton": "Reject",
   "cookieConsent.privacyPolicyLink": "Privacy Policy",
-  "cookieConsent.ariaLabel": "Cookie Notice",
   "calendar.serviceUnavailable": "The booking service is temporarily unavailable. Please try again later or contact us."
 }

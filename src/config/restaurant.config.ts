@@ -11,7 +11,7 @@ interface ThemeColors {
   primary: string;
 }
 
-interface OpeningHours {
+export interface OpeningHours {
   [key: string]: string; // Allows for keys like "mon", "tue", "wed", etc.
 }
 
@@ -47,27 +47,27 @@ interface RestaurantConfig {
   tripAdvisorReviewUrl?: string;
   openingHours: OpeningHours;
   allergenConfig: AllergenDisplayConfig;
-  // menuDelDia object removed as per new requirements
+  defaultLocale?: 'ca' | 'es' | 'en'; // Optional: Define a default locale for date formatting if needed
 }
 
 // --- Configuration Object ---
 const restaurantConfig: RestaurantConfig = {
-  restaurantDisplayName: 'La Ferradura',
-  logoUrl: '/logo.webp', // USER ACTION: Replace with actual logo for La Ferradura (e.g., /la-ferradura-logo.webp)
-  address: 'Plaça Nova, 2, 17538 Alp, Girona, España',
-  phone: '+34 972 89 07 35',
+  restaurantDisplayName: 'La Bodega de la Ferradura',
+  logoUrl: '/logo.webp', // USER ACTION: Replace with actual logo for La Bodega de la Ferradura (e.g., /la-bodega-ferradura-logo.webp)
+  address: 'Plaça Nova, 2, 17538 Alp, Girona, España', // Maintained from "La Ferradura"
+  phone: '+34 972 89 07 35', // Maintained from "La Ferradura"
   phoneHref: 'tel:+34972890735',
-  phone2: '+34 617 12 38 70', // Added second phone
-  phoneHref2: 'tel:+34617123870', // Added second phone href
-  email: 'alpferradura@gmail.com',
+  phone2: '+34 617 12 38 70', // Maintained from "La Ferradura"
+  phoneHref2: 'tel:+34617123870',
+  email: 'alpferradura@gmail.com', // Maintained from "La Ferradura", USER ACTION: Update if different for La Bodega de la Ferradura
   emailHref: 'mailto:alpferradura@gmail.com',
   socialMediaLinks: {
-    facebook: '#', // TODO: Replace with La Ferradura's Facebook
-    instagram: '#', // TODO: Replace with La Ferradura's Instagram
-    twitter: '#', // TODO: Replace
-    youtube: '#', // TODO: Replace
+    facebook: 'TODO_YOUR_LA_BODEGA_FERRADURA_FACEBOOK_URL',
+    instagram: 'TODO_YOUR_LA_BODEGA_FERRADURA_INSTAGRAM_URL',
+    twitter: 'TODO_YOUR_LA_BODEGA_FERRADURA_TWITTER_URL',
+    youtube: 'TODO_YOUR_LA_BODEGA_FERRADURA_YOUTUBE_URL',
   },
-  heroImageUrl: '/background_rest.jpg', // USER ACTION: Replace with a suitable hero image for La Ferradura
+  heroImageUrl: '/background_rest.jpg', // USER ACTION: Replace with a suitable hero image for La Bodega de la Ferradura
   heroImageHint: 'restaurant alp la cerdanya',
   bookingTimeSlots: [
     "13:00", "13:15", "13:30", "13:45",
@@ -80,18 +80,18 @@ const restaurantConfig: RestaurantConfig = {
   bookingSlotDurationMinutes: 90,
   timeZone: 'Europe/Madrid',
   theme: {
-    primary: 'hsl(205 55% 48%)', // Blue from #5096CB
+    primary: 'hsl(205 55% 48%)', // Maintained from previous "La Ferradura" rustic blue theme
   },
   showMenuItemImages: true,
-  showAISommelierSection: false, // Kept as false as per previous instruction
+  showAISommelierSection: false,
   bookingMaxGuestsPerSlot: 8,
-  bookingMethod: 'whatsapp', // Defaulting to whatsapp, can be changed
-  whatsappBookingNumber: '+34617123870', // Example, USER ACTION: Update with actual WhatsApp number if method is 'whatsapp'
-  googleMapsEmbedUrl: 'TODO_YOUR_LA_FERRADURA_GOOGLE_MAPS_EMBED_URL', // USER ACTION: Replace with actual embed URL for La Ferradura in Alp
-  googleMapsLink: 'TODO_YOUR_LA_FERRADURA_GOOGLE_MAPS_LINK', // USER ACTION: Replace with actual Google Maps link
-  googleReviewUrl: 'TODO_YOUR_LA_FERRADURA_GOOGLE_REVIEW_URL', // USER ACTION: Replace with actual Google Review link
-  tripAdvisorReviewUrl: 'TODO_YOUR_LA_FERRADURA_TRIPADVISOR_REVIEW_URL_HERE',
-  openingHours: {
+  bookingMethod: 'whatsapp',
+  whatsappBookingNumber: '+34617123870', // Maintained from "La Ferradura", USER ACTION: Update if different
+  googleMapsEmbedUrl: 'TODO_YOUR_LA_BODEGA_FERRADURA_GOOGLE_MAPS_EMBED_URL_ALP',
+  googleMapsLink: 'TODO_YOUR_LA_BODEGA_FERRADURA_GOOGLE_MAPS_LINK_ALP',
+  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID_FOR_LA_BODEGA_FERRADURA_ALP', // USER ACTION: Update with new Place ID
+  tripAdvisorReviewUrl: 'TODO_YOUR_LA_BODEGA_FERRADURA_TRIPADVISOR_REVIEW_URL_ALP',
+  openingHours: { // Maintained from "La Ferradura"
     mon: "13:00 – 16:00 / 20:00 – 23:00",
     tue: "13:00 – 16:00 / 20:00 – 23:00",
     wed: "13:00 – 16:00 / 20:00 – 23:00",
@@ -103,6 +103,7 @@ const restaurantConfig: RestaurantConfig = {
   allergenConfig: {
     showAsText: false,
   },
+  defaultLocale: 'ca',
 };
 
 export default restaurantConfig;
