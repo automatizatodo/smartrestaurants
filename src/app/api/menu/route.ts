@@ -7,7 +7,7 @@ import type { MenuItemData } from '@/data/menu';
 // import { parse as parseTime, isValid as isValidDate, format as formatDate, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday, isSunday } from 'date-fns'; // No longer needed for prices
 
 // URL for the MAIN MENU sheet
-let GOOGLE_SHEET_CSV_URL = process.env.GOOGLE_SHEET_MENU_CSV_URL || 'REPLACE_WITH_YOUR_MAIN_MENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
+let GOOGLE_SHEET_CSV_URL = process.env.GOOGLE_SHEET_MENU_CSV_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
 
 // URL for the "preciosmenu" sheet - This logic will be removed/commented out
 // let PRICES_SHEET_CSV_URL = process.env.GOOGLE_SHEET_PRICES_CSV_URL || 'REPLACE_WITH_YOUR_PRICES_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';

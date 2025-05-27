@@ -53,7 +53,7 @@ interface RestaurantConfig {
 // --- Configuration Object ---
 const restaurantConfig: RestaurantConfig = {
   restaurantDisplayName: 'La Bodega de la Ferradura',
-  logoUrl: '/logo.webp', // USER ACTION: Replace with actual logo for La Bodega de la Ferradura (e.g., /la-bodega-ferradura-logo.webp)
+  logoUrl: '/Logo_La_ferradura.webp', // USER ACTION: Replace with actual logo for La Bodega de la Ferradura (e.g., /la-bodega-ferradura-logo.webp)
   address: 'Plaça Nova, 2, 17538 Alp, Girona, España', // Maintained from "La Ferradura"
   phone: '+34 972 89 07 35', // Maintained from "La Ferradura"
   phoneHref: 'tel:+34972890735',
@@ -67,7 +67,7 @@ const restaurantConfig: RestaurantConfig = {
     twitter: 'TODO_YOUR_LA_BODEGA_FERRADURA_TWITTER_URL',
     youtube: 'TODO_YOUR_LA_BODEGA_FERRADURA_YOUTUBE_URL',
   },
-  heroImageUrl: '/background_rest.jpg', // USER ACTION: Replace with a suitable hero image for La Bodega de la Ferradura
+  heroImageUrl: '/backgroundhero.webp', // USER ACTION: Replace with a suitable hero image for La Bodega de la Ferradura
   heroImageHint: 'restaurant alp la cerdanya',
   bookingTimeSlots: [
     "13:00", "13:15", "13:30", "13:45",
@@ -87,9 +87,9 @@ const restaurantConfig: RestaurantConfig = {
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp',
   whatsappBookingNumber: '+34617123870', // Maintained from "La Ferradura", USER ACTION: Update if different
-  googleMapsEmbedUrl: 'TODO_YOUR_LA_BODEGA_FERRADURA_GOOGLE_MAPS_EMBED_URL_ALP',
+  googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5895.21149778973!2d1.8858153!3d42.3722407!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12a577669f5ca1ad%3A0xf61123edd270bbdb!2sLa%20Bodega%20de%20la%20Ferradura!5e0!3m2!1sen!2ses!4v1748386556902!5m2!1sen!2ses',
   googleMapsLink: 'TODO_YOUR_LA_BODEGA_FERRADURA_GOOGLE_MAPS_LINK_ALP',
-  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID_FOR_LA_BODEGA_FERRADURA_ALP', // USER ACTION: Update with new Place ID
+  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJraFcn2Z3pRIR27tw0u0jEfY', // USER ACTION: Update with new Place ID
   tripAdvisorReviewUrl: 'TODO_YOUR_LA_BODEGA_FERRADURA_TRIPADVISOR_REVIEW_URL_ALP',
   openingHours: { // Maintained from "La Ferradura"
     mon: "13:00 – 16:00 / 20:00 – 23:00",
