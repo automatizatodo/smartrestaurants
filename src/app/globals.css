@@ -15,25 +15,25 @@ h1, h2, h3, h4, h5, h6 {
 @layer base {
   :root {
     /* Light Theme: Rustic Blue, Wood, Cream */
-    --background: 35 100% 97%; /* Very light warm cream */
-    --foreground: 30 40% 20%;  /* Dark warm brown for text */
+    --background: 35 100% 97%; /* Very light warm cream hsl(35, 100%, 97%) */
+    --foreground: 30 40% 20%;  /* Dark warm brown hsl(30, 40%, 20%) */
 
-    --card: 35 60% 92%;       /* Light cream/beige for cards */
+    --card: 35 60% 92%;       /* Light cream/beige hsl(35, 60%, 92%) */
     --card-foreground: var(--foreground);
 
-    --popover: 35 80% 98%;    /* Lighter cream for popovers */
+    --popover: 35 80% 98%;    /* Lighter cream hsl(35, 80%, 98%) */
     --popover-foreground: var(--foreground);
 
-    --primary: 205 55% 55%;   /* The specified blue: #5096CB */
+    --primary: 205 55% 55%;   /* The specified blue: #5096CB hsl(205, 55%, 55%) */
     --primary-foreground: 210 40% 98%; /* Very light, almost white, for text on primary blue */
 
-    --secondary: 30 35% 82%;  /* Softer, lighter wood tone for secondary elements */
+    --secondary: 30 35% 82%;  /* Softer, lighter wood tone hsl(30, 35%, 82%) */
     --secondary-foreground: 30 30% 25%; /* Dark brown for text on secondary */
 
-    --muted: 35 40% 88%;      /* Light beige/gray for muted text or subtle backgrounds */
+    --muted: 35 40% 88%;      /* Light beige/gray hsl(35, 40%, 88%) for muted text or subtle backgrounds */
     --muted-foreground: 30 30% 45%; /* Muted brown for text */
 
-    --accent: 30 40% 68%;     /* Light wood brown for accents */
+    --accent: 30 40% 68%;     /* Light wood brown hsl(30, 40%, 68%) for accents */
     --accent-foreground: 30 35% 15%; /* Darker brown for text on wood accent */
 
     --destructive: 0 70% 55%; /* Warm red for destructive actions */
@@ -50,10 +50,10 @@ h1, h2, h3, h4, h5, h6 {
     --chart-5: 35 45% 80%;    /* Light Beige */
     --radius: 0.5rem;
 
-    /* Sidebar Variables (can be adjusted if a sidebar is used) */
+    /* Sidebar Variables */
     --sidebar-background: 30 30% 20%; /* Dark wood brown for sidebar */
     --sidebar-foreground: 35 30% 90%; /* Light text for sidebar */
-    --sidebar-primary: var(--primary); 
+    --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
     --sidebar-accent: 30 30% 30%;    /* Slightly lighter brown for sidebar accents */
     --sidebar-accent-foreground: 35 30% 85%;
@@ -63,25 +63,25 @@ h1, h2, h3, h4, h5, h6 {
 
   .dark {
     /* "Dark" Theme (Alternative Light): Light Cool Blue/Gray, Wood, Cream */
-    --background: 205 40% 96%; /* Very light cool off-white, tending to blue */
-    --foreground: 205 30% 25%;  /* Dark desaturated blue for text */
+    --background: 205 40% 96%; /* Very light cool off-white, tending to blue hsl(205, 40%, 96%) */
+    --foreground: 205 30% 25%;  /* Dark desaturated blue for text hsl(205, 30%, 25%) */
 
-    --card: 205 35% 90%;       /* Slightly darker light cool gray/blue for cards */
+    --card: 205 35% 90%;       /* Slightly darker light cool gray/blue for cards hsl(205, 35%, 90%) */
     --card-foreground: var(--foreground);
 
-    --popover: 205 45% 98%;    /* Very light, almost white cool popover */
+    --popover: 205 45% 98%;    /* Very light, almost white cool popover hsl(205, 45%, 98%) */
     --popover-foreground: var(--foreground);
 
     --primary: 205 55% 50%;   /* The blue, slightly darker for contrast on lighter "dark" bg */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 30 30% 88%;  /* Light warm gray/beige, contrasting with cool background */
+    --secondary: 30 30% 88%;  /* Light warm gray/beige, contrasting with cool background hsl(30, 30%, 88%) */
     --secondary-foreground: 30 30% 30%;
 
-    --muted: 205 25% 85%;      /* Muted cool light gray */
+    --muted: 205 25% 85%;      /* Muted cool light gray hsl(205, 25%, 85%) */
     --muted-foreground: 205 25% 50%; /* Muted desaturated blue text */
 
-    --accent: 30 40% 70%;     /* Wood tone, a bit lighter for this "dark" theme */
+    --accent: 30 40% 70%;     /* Wood tone, a bit lighter for this "dark" theme hsl(30, 40%, 70%) */
     --accent-foreground: 30 35% 20%;
 
     --destructive: 0 60% 50%;
@@ -90,7 +90,7 @@ h1, h2, h3, h4, h5, h6 {
     --border: 205 25% 80%;     /* Cool light gray border */
     --input: 205 30% 92%;      /* Light cool input background */
     --ring: 205 50% 55%;      /* Blue for focus rings */
-    
+
     /* Sidebar Dark Variables */
     --sidebar-background: 205 20% 22%; /* Dark desaturated blue for sidebar */
     --sidebar-foreground: 205 30% 88%;
