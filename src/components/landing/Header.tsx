@@ -130,7 +130,7 @@ export default function Header() {
                 width={240}
                 height={80}
                 className={cn(
-                  "w-auto filter invert", 
+                  "w-auto", 
                   isMobile ? "h-16" : "sm:h-20" 
                 )}
                 priority
