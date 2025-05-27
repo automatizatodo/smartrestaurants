@@ -57,7 +57,7 @@ interface RestaurantConfig {
 // --- Configuration Object ---
 const restaurantConfig: RestaurantConfig = {
   restaurantDisplayName: 'La Bodega de la Ferradura', // NOU NOM
-  logoUrl: '/logo-ferradura-placeholder.webp', // TODO: Replace with actual logo for La Ferradura (e.g., /la-ferradura-logo.webp)
+  logoUrl: '/Logo_La_ferradura.webp', // TODO: Replace with actual logo for La Ferradura (e.g., /la-ferradura-logo.webp)
   address: 'Plaça Major, 5, 17538 Alp, Girona', // NOU - Adreça real
   phone: '972 89 00 18', // NOU - Telèfon real
   phoneHref: 'tel:+34972890018', // NOU - Corregit
@@ -69,7 +69,7 @@ const restaurantConfig: RestaurantConfig = {
     twitter: '#', // TODO: Replace
     youtube: '#', // TODO: Replace
   },
-  heroImageUrl: '/background-ferradura-placeholder.jpg', // TODO: Replace with a suitable hero image for La Ferradura
+  heroImageUrl: '/backgroundhero.webp', // TODO: Replace with a suitable hero image for La Ferradura
   heroImageHint: 'muntanyes Alp restaurant rústic', // NOU
   bookingTimeSlots: [ 
     "12:00", "12:15", "12:30", "12:45",
