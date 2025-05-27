@@ -7,25 +7,31 @@ import restaurantConfig from '@/config/restaurant.config';
 import { useLanguage } from '@/context/LanguageContext';
 
 // Replicated nav item logic from Header.tsx
-const navItemKeysBase = [
-  { labelKey: 'common:nav.fullMenu', href: '/menu' },
+const navItemKeysBaseFooter = [
+  // { labelKey: 'common:nav.menuDelDia', href: '/#menu' }, // Eliminat
+  { labelKey: 'common:nav.carta', href: '/menu' },
   { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
 ];
 
-const aiSommelierNavItem = { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' };
+const aiSommelierNavItemFooter = { labelKey: 'common:nav.aiSommelier', href: '/#ai-sommelier' };
 
-const navItemKeysEnd = [
+const navItemKeysEndFooter = [
   { labelKey: 'common:nav.contact', href: '/#contact-map' },
   { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
 ];
 
-const getNavItems = () => {
-  let items = [...navItemKeysBase];
+const getNavItemsFooter = () => {
+  let items = [...navItemKeysBaseFooter];
   if (restaurantConfig.showAISommelierSection) {
-    items.push(aiSommelierNavItem);
+    const aboutUsIndex = items.findIndex(item => item.href === '/#about-us');
+    if (aboutUsIndex !== -1) {
+      items.splice(aboutUsIndex + 1, 0, aiSommelierNavItemFooter);
+    } else {
+      items.push(aiSommelierNavItemFooter);
+    }
   }
-  items.push(...navItemKeysEnd);
+  items.push(...navItemKeysEndFooter);
   return items;
 };
 
@@ -35,7 +41,7 @@ export default function Footer() {
   const restaurantName = translations.common.restaurantName;
   const tagline = translations.common.tagline;
   const currentYear = new Date().getFullYear();
-  const footerNavItems = getNavItems();
+  const footerNavItems = getNavItemsFooter();
 
   return (
     <footer className="bg-secondary text-muted-foreground border-t border-border/50">
@@ -47,9 +53,9 @@ export default function Footer() {
                   <Image
                     src={restaurantConfig.logoUrl}
                     alt={`${restaurantName} Logo - ${t('common:footer.seoText', { restaurantName })}`}
-                    width={432}
-                    height={144}
-                    className="h-36 w-auto dark:filter dark:invert"
+                    width={288} // Mantinc mida ajustada
+                    height={96} // Mantinc mida ajustada
+                    className="h-24 w-auto filter invert" // Mantinc mida ajustada
                     style={{ objectFit: 'contain' }}
                   />
                 ) : (
@@ -122,7 +128,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-border/50 pt-8 text-center text-sm">
-          <p className="mb-2">{t('common:footer.seoText', { restaurantName })}</p>
+          <p className="mb-2">{t('common:footer.seoText', { restaurantName: restaurantName })}</p>
           <p>{t('common:footer.copyright', { year: currentYear, restaurantName: restaurantName })}</p>
           <p className="mt-2 text-xs">
             {t('common:footer.managedByText')}{' '}

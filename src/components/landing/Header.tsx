@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 
 // Navigation items definition
 const navItemKeysBase = [
-  { labelKey: 'common:nav.menuDelDia', href: '/#menu' },
+  // { labelKey: 'common:nav.menuDelDia', href: '/#menu' }, // Eliminat
   { labelKey: 'common:nav.carta', href: '/menu' },
   { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
@@ -57,7 +57,7 @@ export default function Header() {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check scroll position on initial load
+    handleScroll(); 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -74,7 +74,7 @@ export default function Header() {
           className={cn(
             "text-sm font-medium transition-colors",
             !isScrolled && !inSheet && !isMobile ? "text-primary-foreground hover:text-primary-foreground/80" : "text-sidebar-foreground hover:text-primary",
-            inSheet && "text-sidebar-foreground hover:text-primary" 
+            inSheet && "text-sidebar-foreground hover:text-primary"
           )}
           onClick={() => inSheet && setIsSheetOpen(false)}
         >
@@ -105,7 +105,7 @@ export default function Header() {
            </Link>
          </div>
          <div className="pt-3 w-full border-t border-sidebar-border mt-2">
-            <LanguageSelector variant="default" />
+            <LanguageSelector />
          </div>
         </>
       )}
@@ -120,18 +120,18 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className={cn(
             "flex items-center justify-between",
-             isMobile ? "h-20" : "h-24 sm:h-24" // Adjusted height
+            isMobile ? "h-20" : "sm:h-24" 
           )}>
           <Link href="/" className="flex items-center space-x-2">
             {restaurantConfig.logoUrl ? (
               <Image
                 src={restaurantConfig.logoUrl}
                 alt={t('common:restaurantName') + ' Logo'}
-                width={150} 
-                height={50} 
+                width={240}
+                height={80}
                 className={cn(
                   "w-auto filter invert", 
-                  isMobile ? "h-12" : "sm:h-16" 
+                  isMobile ? "h-16" : "sm:h-20" 
                 )}
                 priority
                 style={{ objectFit: 'contain' }}
@@ -164,7 +164,7 @@ export default function Header() {
                             alt={t('common:restaurantName') + ' Logo'}
                             width={150} 
                             height={50} 
-                            className="h-12 w-auto filter invert" 
+                            className="h-16 w-auto filter invert" 
                             style={{ objectFit: 'contain' }}
                           />
                         ) : (
