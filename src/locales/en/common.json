@@ -14,10 +14,6 @@
   "button.viewFullMenu": "View Full À la Carte",
   "footer.quickLinks": "Quick Links",
   "footer.home": "Home",
-  "footer.menu": "Menu",
-  "footer.aiSommelierLink": "AI Sommelier",
-  "footer.bookTableLink": "Book a Table",
-  "footer.testimonialsLink": "Reviews",
   "footer.contactUs": "Contact Us",
   "footer.followUs": "Follow Us",
   "footer.followUsDescription": "Stay updated with our latest news and events.",
@@ -35,17 +31,19 @@
   "goToSlide": "Go to slide {number}",
   "guestSingular": "guest",
   "guestsPlural": "guests",
-  "page.menu.description": "",
   "allCategories": "All",
   "seo": {
     "mainKeywords": "Restaurant in Alp, La Bodega de la Ferradura, mountain cuisine, grill",
     "pageContext": "Restaurant in Alp",
-    "defaultDescription": "Discover La Bodega de la Ferradura in Alp, specializing in traditional mountain cuisine, grilled meats, and local products. Book your table!"
+    "defaultDescription": "Discover La Bodega de la Ferradura in Alp, specializing in traditional mountain cuisine, grilled meats, and local products. Book your table!",
+    "defaultTitleSuffix": "Restaurant in Alp for Mountain Cuisine and Grill"
   },
+  "cookieConsent.ariaLabel": "Cookie Notice",
   "cookieConsent.text": "This website uses cookies to provide necessary site functionality and to improve your experience. By using this website, you agree to our use of cookies.",
   "cookieConsent.acceptButton": "Accept",
   "cookieConsent.rejectButton": "Reject",
-  "cookieConsent.ariaLabel": "Cookie Notice",
   "cookieConsent.privacyPolicyLink": "Privacy Policy",
   "calendar.serviceUnavailable": "The booking service is temporarily unavailable. Please try again later or contact us."
 }
+
+    

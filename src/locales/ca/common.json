@@ -14,10 +14,6 @@
   "button.viewFullMenu": "Veure la Carta Completa",
   "footer.quickLinks": "Enllaços Ràpids",
   "footer.home": "Inici",
-  "footer.menu": "Menú",
-  "footer.aiSommelierLink": "Sommelier IA",
-  "footer.bookTableLink": "Reservar Taula",
-  "footer.testimonialsLink": "Opinions",
   "footer.contactUs": "Contacta'ns",
   "footer.followUs": "Segueix-nos",
   "footer.followUsDescription": "Estigues al dia de les nostres novetats i esdeveniments.",
@@ -35,17 +31,19 @@
   "goToSlide": "Anar a la imatge {number}",
   "guestSingular": "comensal",
   "guestsPlural": "comensals",
-  "page.menu.description": "",
   "allCategories": "Totes",
   "seo": {
     "mainKeywords": "Restaurant a Alp, La Bodega de la Ferradura, cuina de muntanya, brasa",
     "pageContext": "Restaurant a Alp",
-    "defaultDescription": "Descobreix La Bodega de la Ferradura a Alp, especialitzat en cuina tradicional de muntanya, carns a la brasa i productes de proximitat. Reserva la teva taula!"
+    "defaultDescription": "Descobreix La Bodega de la Ferradura a Alp, especialitzat en cuina tradicional de muntanya, carns a la brasa i productes de proximitat. Reserva la teva taula!",
+    "defaultTitleSuffix": "Restaurant a Alp de Cuina de Muntanya i Brasa"
   },
+  "cookieConsent.ariaLabel": "Avís de galetes",
   "cookieConsent.text": "Aquest lloc web utilitza galetes per proporcionar la funcionalitat necessària del lloc i per millorar la teva experiència. En utilitzar aquest lloc web, acceptes el nostre ús de galetes.",
   "cookieConsent.acceptButton": "Acceptar",
   "cookieConsent.rejectButton": "Rebutjar",
-  "cookieConsent.ariaLabel": "Avís de galetes",
   "cookieConsent.privacyPolicyLink": "Política de Privacitat",
   "calendar.serviceUnavailable": "El servei de reserves no està disponible temporalment. Si us plau, intenta-ho més tard o contacta amb nosaltres."
 }
+
+    
