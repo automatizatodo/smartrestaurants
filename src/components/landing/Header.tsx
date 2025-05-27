@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 
 // Navigation items definition
 const navItemKeysBase = [
-  // { labelKey: 'common:nav.menuDelDia', href: '/#menu' }, // Hidden as per previous request
+  { labelKey: 'common:nav.menuDelDia', href: '/#menu' },
   { labelKey: 'common:nav.carta', href: '/menu' },
   { labelKey: 'common:nav.services', href: '/#services' },
   { labelKey: 'common:nav.aboutUs', href: '/#about-us' },
@@ -27,7 +27,6 @@ const aiSommelierNavItem = { labelKey: 'common:nav.aiSommelier', href: '/#ai-som
 const navItemKeysEnd = [
   { labelKey: 'common:nav.contact', href: '/#contact-map' },
   { labelKey: 'common:nav.testimonials', href: '/#testimonials' },
-  // { labelKey: 'common:nav.booking', href: '/#booking' }, // Hidden as per previous request
 ];
 
 const getNavItems = () => {
@@ -74,8 +73,8 @@ export default function Header() {
           href={item.href}
           className={cn(
             "text-sm font-medium transition-colors",
-            !isScrolled && !inSheet ? "text-primary-foreground hover:text-primary-foreground/80" : "text-sidebar-foreground hover:text-primary",
-            inSheet && "text-sidebar-foreground hover:text-primary" // For mobile sheet, always use sidebar colors
+            !isScrolled && !inSheet && !isMobile ? "text-primary-foreground hover:text-primary-foreground/80" : "text-sidebar-foreground hover:text-primary",
+            inSheet && "text-sidebar-foreground hover:text-primary" 
           )}
           onClick={() => inSheet && setIsSheetOpen(false)}
         >
@@ -85,11 +84,11 @@ export default function Header() {
       {!inSheet && (
          <Link href="/#booking" passHref>
             <Button
-              variant={!isScrolled ? "outline" : "default"}
+              variant={!isScrolled && !isMobile ? "outline" : "default"}
               size="sm"
               className={cn(
                 "ml-2",
-                !isScrolled ? "border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" : "bg-primary text-primary-foreground hover:bg-primary/90"
+                !isScrolled && !isMobile ? "border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" : "bg-primary text-primary-foreground hover:bg-primary/90"
               )}
             >
                 {t('common:button.bookNow')}
@@ -106,7 +105,7 @@ export default function Header() {
            </Link>
          </div>
          <div className="pt-3 w-full border-t border-sidebar-border mt-2">
-            <LanguageSelector variant="default" /> {/* Always default variant in sheet */}
+            <LanguageSelector variant="default" />
          </div>
         </>
       )}
@@ -116,23 +115,23 @@ export default function Header() {
   return (
     <header className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-      isScrolled ? "bg-sidebar-background/90 backdrop-blur-md shadow-lg" : "bg-transparent shadow-none"
+      !isScrolled ? "bg-transparent shadow-none" : "bg-sidebar-background/90 backdrop-blur-md shadow-lg"
     )}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className={cn(
             "flex items-center justify-between",
-            isMobile ? "h-20" : "h-24 sm:h-28" // Adjusted height for desktop
+             isMobile ? "h-20" : "h-24 sm:h-24" // Adjusted height
           )}>
           <Link href="/" className="flex items-center space-x-2">
             {restaurantConfig.logoUrl ? (
               <Image
                 src={restaurantConfig.logoUrl}
-                alt={`${restaurantName} Logo`}
-                width={isMobile ? 150 : 240}
-                height={isMobile ? 50 : 80}
+                alt={t('common:restaurantName') + ' Logo'}
+                width={150} 
+                height={50} 
                 className={cn(
-                  "w-auto filter invert", // Always invert for white logo
-                  isMobile ? "h-12" : "h-16 sm:h-20" // Adjusted height
+                  "w-auto filter invert", 
+                  isMobile ? "h-12" : "sm:h-16" 
                 )}
                 priority
                 style={{ objectFit: 'contain' }}
@@ -141,7 +140,7 @@ export default function Header() {
               <span className={cn(
                 "font-anton font-bold",
                 isMobile ? "text-xl" : "text-xl sm:text-2xl",
-                !isScrolled ? "text-primary-foreground" : "text-sidebar-foreground"
+                !isScrolled && !isMobile ? "text-primary-foreground" : "text-sidebar-foreground"
               )}>{restaurantName}</span>
             )}
           </Link>
@@ -162,10 +161,10 @@ export default function Header() {
                         {restaurantConfig.logoUrl ? (
                           <Image
                             src={restaurantConfig.logoUrl}
-                            alt={`${restaurantName} Logo`}
-                            width={150}
-                            height={50}
-                            className="h-12 w-auto filter invert"
+                            alt={t('common:restaurantName') + ' Logo'}
+                            width={150} 
+                            height={50} 
+                            className="h-12 w-auto filter invert" 
                             style={{ objectFit: 'contain' }}
                           />
                         ) : (
