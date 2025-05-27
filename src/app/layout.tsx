@@ -1,6 +1,6 @@
 
 import type { Metadata, Viewport } from 'next';
-import { Geist, Cinzel as CinzelFont } from 'next/font/google';
+import { Geist_Sans as Geist, Anton } from 'next/font/google'; // Changed Cinzel to Anton
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -8,20 +8,21 @@ import AppInitializer from '@/components/AppInitializer';
 import caCommon from '@/locales/ca/common.json';
 import CookieConsentBanner from '@/components/common/CookieConsentBanner';
 
-const geist = Geist({ 
+const geistSans = Geist({ 
   variable: '--font-geist-sans',
   subsets: ['latin'],
 });
 
-const cinzel = CinzelFont({ 
-  variable: '--font-cinzel',
+// Changed Cinzel to Anton
+const antonFont = Anton({
+  variable: '--font-anton',
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400'], // Anton typically only has one weight
 });
 
-const restaurantName = caCommon.restaurantName || 'Can Fanals';
-const mainKeywords = caCommon.seo.mainKeywords || 'Restaurant a Sabadell - Brasa i Cuina Tradicional';
-const defaultDescription = caCommon.seo.defaultDescription || 'Descobreix Can Fanals, el teu restaurant a Sabadell especialitzat en carns a la brasa, cuina tradicional catalana i opcions sense gluten. Reserva la teva taula!';
+const restaurantName = caCommon.restaurantName; // Default to Catalan for metadata
+const mainKeywords = caCommon.seo.mainKeywords;
+const defaultDescription = caCommon.seo.defaultDescription;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
 
 export const metadata: Metadata = {
@@ -30,8 +31,8 @@ export const metadata: Metadata = {
     template: `%s | ${restaurantName}`,
   },
   description: defaultDescription,
-  keywords: ['restaurant a Sabadell', 'cuina catalana', 'brasa', 'sense gluten', 'Can Fanals Sabadell', 'menjar a Sabadell'],
   authors: [{ name: restaurantName, url: appUrl }],
+  keywords: (caCommon.seo.pageContext ? [caCommon.seo.pageContext] : []).concat(mainKeywords.split(',').map(k => k.trim())),
   openGraph: {
     title: `${restaurantName} | ${mainKeywords}`,
     description: defaultDescription,
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
         alt: `Logo de ${restaurantName}`,
       },
     ],
-    locale: 'ca_ES',
+    locale: 'ca_ES', // Default locale
     type: 'website',
   },
   twitter: {
@@ -72,8 +73,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'hsl(var(--background))' },
-    { media: '(prefers-color-scheme: dark)', color: 'hsl(var(--background))' },
+    { media: '(prefers-color-scheme: light)', color: 'hsl(var(--background))' }, 
+    { media: '(prefers-color-scheme: dark)', color: 'hsl(var(--background))' },  
   ],
 };
 
@@ -86,9 +87,9 @@ export default function RootLayout({
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   return (
-    <html lang="ca" className="dark">
+    <html lang="ca"> 
       <head>
-        {gaId && gaId !== "YOUR_GA_MEASUREMENT_ID_HERE" && (
+        {gaId && gaId === "G-ZEF2C45GJ7" && (
           <>
             <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
             <script
@@ -105,7 +106,7 @@ export default function RootLayout({
         )}
       </head>
       <body
-        className={`${geist.variable} ${cinzel.variable} antialiased`}
+        className={`${geistSans.variable} ${antonFont.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <LanguageProvider>

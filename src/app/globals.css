@@ -14,7 +14,55 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    /* Light Theme: Warm Ocher, Light Brown, Blue Accent */
+    /* Dark Theme: Deep Wood, Rustic Blue, Warm Cream */
+    --background: 25 30% 15%;        /* Deep dark brown hsl(25, 30%, 15%) */
+    --foreground: 35 40% 85%;        /* Light warm cream/beige hsl(35, 40%, 85%) */
+
+    --card: 25 25% 22%;             /* Darker wood brown hsl(25, 25%, 22%) */
+    --card-foreground: var(--foreground);
+
+    --popover: 25 25% 25%;          /* Slightly darker popover hsl(25, 25%, 25%) */
+    --popover-foreground: var(--foreground);
+
+    --primary: 205 55% 55%;         /* The specified blue: #5096CB hsl(205, 55%, 55%) */
+    --primary-foreground: 205 100% 97%;/* Very light, almost white, for text on primary blue */
+
+    --secondary: 25 20% 30%;        /* Dark, desaturated wood/charcoal hsl(25, 20%, 30%) */
+    --secondary-foreground: 35 35% 75%; /* Muted cream for text on secondary */
+
+    --muted: 25 15% 40%;            /* Dark muted brown/gray hsl(25, 15%, 40%) */
+    --muted-foreground: 35 30% 65%;   /* Muted lighter cream/gray for text */
+
+    --accent: 205 45% 45%;          /* Darker, slightly desaturated blue for accents hsl(205, 45%, 45%) */
+    --accent-foreground: 35 100% 97%; /* Light cream text on dark blue accent */
+
+    --destructive: 0 60% 50%;       /* A warm red for destructive actions */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 25 20% 35%;           /* Dark wood/charcoal border hsl(25, 20%, 35%) */
+    --input: 25 20% 28%;            /* Input background, dark wood hsl(25, 20%, 28%) */
+    --ring: 205 50% 60%;            /* Lighter blue for focus rings */
+
+    --chart-1: 205 55% 55%;         /* Primary Blue */
+    --chart-2: 25 30% 40%;          /* Dark Wood Brown Accent */
+    --chart-3: 205 45% 65%;         /* Medium Blue */
+    --chart-4: 35 40% 70%;          /* Light Ocher/Cream (for contrast) */
+    --chart-5: 25 20% 50%;          /* Medium-Dark Wood Brown */
+    --radius: 0.5rem;
+
+    /* Sidebar Variables - Dark theme for sidebar by default */
+    --sidebar-background: 25 25% 18%; /* Slightly darker than card */
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+  }
+
+  .dark {
+    /* Light Theme (acting as the ".dark" mode if toggled): Warm Ocher, Light Brown, Blue Accent */
     --background: 35 50% 88%;      /* Light warm ocher/beige hsl(35, 50%, 88%) */
     --foreground: 25 50% 25%;      /* Dark warm brown hsl(25, 50%, 25%) */
 
@@ -43,63 +91,15 @@ h1, h2, h3, h4, h5, h6 {
     --input: 35 55% 90%;          /* Input background, light ocher/beige hsl(35, 55%, 90%) */
     --ring: 205 50% 60%;          /* Lighter blue for focus rings */
 
-    --chart-1: 205 55% 55%;       /* Primary Blue */
-    --chart-2: 25 40% 40%;        /* Dark Wood Brown Accent */
-    --chart-3: 30 30% 55%;        /* Medium Wood Brown */
-    --chart-4: 205 40% 70%;       /* Lighter Blue */
-    --chart-5: 35 50% 80%;        /* Light Ocher */
-    --radius: 0.5rem;
-
-    /* Sidebar Variables - kept darker for contrast if a sidebar is ever added */
-    --sidebar-background: 30 30% 20%; 
-    --sidebar-foreground: 35 30% 90%; 
+    /* Sidebar Variables - Light theme for sidebar when .dark is active */
+    --sidebar-background: 30 40% 85%; /* Light wood tone for light theme sidebar */
+    --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
-    --sidebar-accent: 30 30% 30%;    
-    --sidebar-accent-foreground: 35 30% 85%;
-    --sidebar-border: 30 30% 25%;
-    --sidebar-ring: var(--primary);
-  }
-
-  .dark {
-    /* "Dark" Theme (Alternative Light - Cooler Tones, Stone/Gray with Wood & Blue) */
-    --background: 210 20% 96%;     /* Very light cool gray/off-white hsl(210, 20%, 96%) */
-    --foreground: 210 25% 25%;     /* Dark slate gray/blue hsl(210, 25%, 25%) */
-
-    --card: 210 20% 90%;           /* Light stone gray hsl(210, 20%, 90%) */
-    --card-foreground: var(--foreground);
-
-    --popover: 210 30% 98%;        /* Very light, almost white cool popover hsl(210, 30%, 98%) */
-    --popover-foreground: var(--foreground);
-
-    --primary: 205 55% 55%;       /* The Blue #5096CB */
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 30 30% 75%;      /* Light warm wood brown, for contrast hsl(30, 30%, 75%) */
-    --secondary-foreground: 25 35% 30%; /* Dark brown for text on secondary */
-
-    --muted: 210 15% 85%;          /* Muted light gray hsl(210, 15%, 85%) */
-    --muted-foreground: 210 20% 50%; /* Muted slate gray text */
-
-    --accent: 30 35% 60%;         /* Medium wood brown accent hsl(30, 35%, 60%) */
-    --accent-foreground: 35 80% 95%; /* Light cream text on wood accent */
-
-    --destructive: 0 60% 50%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 210 15% 75%;         /* Mid cool gray border hsl(210, 15%, 75%) */
-    --input: 210 25% 93%;          /* Light cool input background hsl(210, 25%, 93%) */
-    --ring: 205 50% 60%;          /* Blue for focus rings */
-
-    /* Sidebar Dark Variables */
-    --sidebar-background: 205 20% 22%; 
-    --sidebar-foreground: 205 30% 88%;
-    --sidebar-primary: var(--primary);
-    --sidebar-primary-foreground: var(--primary-foreground);
-    --sidebar-accent: 205 20% 30%;
-    --sidebar-accent-foreground: 205 30% 80%;
-    --sidebar-border: 205 20% 25%;
-    --sidebar-ring: var(--primary);
+    --sidebar-accent: 30 30% 75%;
+    --sidebar-accent-foreground: 25 40% 20%;
+    --sidebar-border: 30 30% 70%;
+    --sidebar-ring: var(--ring);
   }
 }
 
@@ -152,5 +152,3 @@ h1, h2, h3, h4, h5, h6 {
     scrollbar-width: none;  /* Firefox */
   }
 }
-
-    
