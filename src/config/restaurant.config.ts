@@ -8,34 +8,31 @@ interface SocialMediaLinks {
 }
 
 interface ThemeColors {
-  primary: string; // Example: '#FFD700' (Gold) - Corresponds to HSL var in globals.css
+  primary: string; 
 }
 
 interface OpeningHours {
-  [key: string]: string; // Allows for keys like "tueWed", "thuSat", "sun", "mon"
+  [key: string]: string; // Allows for keys like "mon", "tue", "wed", etc.
 }
 
 interface MenuDelDiaConfig {
-  price: string; // This will now serve as a FALLBACK price if dynamic pricing fails
-  priceDescriptionKey: string; // e.g., "menu:menuDelDia.priceIncludes" (like "IVA inclòs")
-  notesKey?: string; // Optional notes for the menu, e.g., "Pa, aigua i vi inclosos"
+  price: string; 
+  priceDescriptionKey: string; 
+  notesKey?: string; 
 }
 
 interface AllergenDisplayConfig {
-  // For now, we'll just display text. Later, this could map keys to icon components or image paths.
-  // Example: gluten: { icon: <GlutenFreeIcon/>, textKey: 'allergens:gluten' }
-  showAsText: boolean; // If true, display allergen strings directly. If false, icons (future)
+  showAsText: boolean;
 }
 
 interface RestaurantConfig {
-  // Non-translatable details
-  restaurantDisplayName: string; // Name used for internal messages like WhatsApp
-  logoUrl: string; // Path to the logo image in /public folder e.g., /logo.png
+  restaurantDisplayName: string;
+  logoUrl: string; 
   address: string;
   phone: string;
-  phoneHref: string; // Tel link format
+  phoneHref: string; 
   email: string;
-  emailHref: string; // Mailto link format
+  emailHref: string; 
   socialMediaLinks: SocialMediaLinks;
   heroImageUrl: string;
   heroImageHint: string;
@@ -46,68 +43,78 @@ interface RestaurantConfig {
   showMenuItemImages: boolean;
   showAISommelierSection: boolean;
   bookingMaxGuestsPerSlot?: number;
-  // IMPORTANT: Setting bookingMethod to 'calendar' will make live calls to Google Calendar API.
-  // Ensure credentials and API access are correctly configured.
   bookingMethod: 'calendar' | 'whatsapp';
   whatsappBookingNumber?: string;
-  googleMapsEmbedUrl: string; // For the iframe embed
-  googleMapsLink: string; // For a direct link to Google Maps
-  googleReviewUrl?: string; // Link to leave a Google Review
-  tripAdvisorReviewUrl?: string; // Link to leave a TripAdvisor Review
+  googleMapsEmbedUrl: string;
+  googleMapsLink: string; 
+  googleReviewUrl?: string; 
+  tripAdvisorReviewUrl?: string; 
   openingHours: OpeningHours;
-  menuDelDia?: MenuDelDiaConfig; // Optional, if the restaurant has a Menu del Dia
+  menuDelDia?: MenuDelDiaConfig; 
   allergenConfig: AllergenDisplayConfig;
 }
 
 // --- Configuration Object ---
 const restaurantConfig: RestaurantConfig = {
-  restaurantDisplayName: 'Can Fanals',
-  logoUrl: '/can-fanals-logo.png',
-  address: 'Carrer Font Nova, 29, 08202 Sabadell, Barcelona',
-  phone: '930 256 434',
-  phoneHref: 'tel:+34930256434', // Corrected phone href
-  email: 'reservations@canfanals.com',
-  emailHref: 'mailto:reservations@canfanals.com',
+  restaurantDisplayName: 'La Bodega de la Ferradura', // NOU NOM
+  logoUrl: '/logo-ferradura-placeholder.webp', // TODO: Replace with actual logo for La Ferradura (e.g., /la-ferradura-logo.webp)
+  address: 'Plaça Major, 5, 17538 Alp, Girona', // NOU - Adreça real
+  phone: '972 89 00 18', // NOU - Telèfon real
+  phoneHref: 'tel:+34972890018', // NOU - Corregit
+  email: 'reservas@labodegadelaferradura.com', // TODO: Replace with actual email for La Ferradura
+  emailHref: 'mailto:reservas@labodegadelaferradura.com', // TODO: Replace
   socialMediaLinks: {
-    facebook: '#',
-    instagram: '#',
-    twitter: '#',
-    youtube: '#',
+    facebook: '#', // TODO: Replace
+    instagram: '#', // TODO: Replace
+    twitter: '#', // TODO: Replace
+    youtube: '#', // TODO: Replace
   },
-  heroImageUrl: '/background_rest.jpg',
-  heroImageHint: 'restaurant interior dining',
-  bookingTimeSlots: [ // Example: ensure these are reasonable and cover potential opening hours
-    "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-    "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM",
-    "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM", "9:30 PM", "10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM"
+  heroImageUrl: '/background-ferradura-placeholder.jpg', // TODO: Replace with a suitable hero image for La Ferradura
+  heroImageHint: 'muntanyes Alp restaurant rústic', // NOU
+  bookingTimeSlots: [ 
+    "12:00", "12:15", "12:30", "12:45",
+    "13:00", "13:15", "13:30", "13:45",
+    "14:00", "14:15", "14:30", "14:45",
+    "15:00", "15:15", "15:30", "15:45",
+    "16:00", "16:15", "16:30", "16:45",
+    "19:00", "19:15", "19:30", "19:45",
+    "20:00", "20:15", "20:30", "20:45",
+    "21:00", "21:15", "21:30", "21:45",
+    "22:00", "22:15", "22:30", "22:45",
+    "23:00"
   ],
-  bookingSlotDurationMinutes: 120,
-  timeZone: 'Europe/Madrid', // Example, adjust to your restaurant's timezone
+  bookingSlotDurationMinutes: 90, // Ajustat per a una durada de reserva típica
+  timeZone: 'Europe/Madrid',
   theme: {
-    primary: 'hsl(51, 100%, 50%)',
+    primary: 'hsl(205 55% 48%)', // Blau Ferradura (ajustat per ser consistent amb globals.css)
   },
   showMenuItemImages: true,
   showAISommelierSection: false,
   bookingMaxGuestsPerSlot: 8,
-  bookingMethod: 'whatsapp',
-  whatsappBookingNumber: '+34614198740', // Example, replace with actual number
-  googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2987.891622017595!2d2.100059515416829!3d41.50661897925279!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12a4941a5d3c3c7b%3A0x6e26a1a51b08715!2sCarrer%20de%20la%20Font%20Nova%2C%2029%2C%2008202%20Sabadell%2C%20Barcelona%2C%20Spain!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus',
-  googleMapsLink: 'https://maps.google.com/?q=Carrer+Font+Nova,+29,+08202+Sabadell,+Barcelona',
-  googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJrxjmUa-VpBIRenLu0Swg6cM',
-  tripAdvisorReviewUrl: 'YOUR_TRIPADVISOR_REVIEW_URL_HERE', // Remember to update this
-  openingHours: { // String format: "HH:mm - HH:mm" or "CLOSED"
-    tueWed: "08:00 - 17:00",
-    thuSat: "08:00 - 24:00", // "24:00" implies end of the day
-    sun: "08:00 - 19:00",
-    mon: "CLOSED", // Using "CLOSED" keyword
+  // IMPORTANT: Setting bookingMethod to 'calendar' will make live calls to Google Calendar API.
+  // Ensure credentials and API access are correctly configured.
+  bookingMethod: 'whatsapp', // O 'calendar'
+  whatsappBookingNumber: '+34972890018', // NOU - Número de WhatsApp (exemple, hauria de ser el real si és per WhatsApp)
+  googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2932.602183117748!2d1.8875868154670866!3d42.37263747918573!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12a58f8f0b17d63f%3A0x5e9f7f9e4e7e6f84!2sRestaurante%20La%20Ferradura!5e0!3m2!1ses!2ses!4v1620000000000!5m2!1ses!2ses', // URL d'exemple per a La Ferradura a Alp, cal verificar-la o actualitzar-la
+  googleMapsLink: 'https://maps.google.com/?q=Restaurante+La+Ferradura+Plaça+Major+5+Alp+Girona', // URL d'exemple
+  googleReviewUrl: 'TODO: YOUR_LA_FERRADURA_GOOGLE_REVIEW_URL', // TODO: Get and replace Place ID
+  tripAdvisorReviewUrl: 'TODO: YOUR_LA_FERRADURA_TRIPADVISOR_REVIEW_URL_HERE',
+  openingHours: { // NOUS HORARIS
+    mon: "13:00 – 16:00",
+    tue: "13:00 – 16:00",
+    wed: "13:00 – 16:00",
+    thu: "13:00 – 16:00",
+    fri: "13:00 – 16:00 / 20:00 – 23:00",
+    sat: "13:00 – 16:00 / 20:00 – 23:30",
+    sun: "12:00 – 17:00",
   },
   menuDelDia: {
-    price: "14,50€", // This is now a FALLBACK price
+    price: "18,00€", // TODO: Actualitzar amb el preu real del menú del dia de La Ferradura
     priceDescriptionKey: "menu:menuDelDia.priceIncludes",
     notesKey: "menu:menuDelDia.notes",
   },
   allergenConfig: {
-    showAsText: false, // Changed to false to prioritize icons
+    showAsText: false, 
   },
 };
 

@@ -9,101 +9,97 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-cinzel), serif; /* Changed from --font-playfair-display to --font-cinzel */
+  font-family: var(--font-anton), sans-serif; /* Anton per a títols */
 }
 
 @layer base {
   :root {
-    --background: 30 30% 96%; /* Light earthy beige */
-    --foreground: 25 25% 20%; /* Dark muted brown */
+    /* Tema Clar Rústic Blau/Fusta/Ocre */
+    --background: 35 50% 96%; /* Beix molt clar, gairebé blanc trencat */
+    --foreground: 30 45% 25%; /* Marró fusta fosc per al text principal */
 
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 25 25% 20%;
+    --card: 35 40% 92%; /* Beix una mica més fosc per a targetes, com fusta clara o pedra */
+    --card-foreground: var(--foreground);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 25 25% 20%;
+    --popover: 30 30% 98%; /* Blanc trencat càlid per a popovers */
+    --popover-foreground: var(--foreground);
 
-    --primary: 51 100% 50%; /* Gold */
-    --primary-foreground: 30 40% 10%; /* Dark brown for text on gold */
+    --primary: 205 55% 48%; /* Blau Ferradura (ajustat de la foto) */
+    --primary-foreground: 210 30% 95%; /* Text molt clar, gairebé blanc, per sobre del blau */
 
-    --secondary: 30 25% 90%; /* Lighter earthy beige */
-    --secondary-foreground: 25 25% 20%;
+    --secondary: 35 40% 60%; /* Marró fusta mitjà (per a fons secundaris o accents) */
+    --secondary-foreground: 35 20% 95%; /* Text molt clar per sobre del marró secundari */
 
-    --muted: 30 20% 85%; /* Muted beige */
-    --muted-foreground: 25 20% 40%; /* Muted brown text */
+    --muted: 35 30% 88%; /* Beix/gris clar per a text silenciat o fons subtils */
+    --muted-foreground: 30 25% 45%; /* Marró silenciat per al text */
 
-    --accent: 30 30% 88%; /* Accent beige */
-    --accent-foreground: 25 25% 15%;
+    --accent: 40 70% 60%; /* Ocre/Groc daurat (de la façana) */
+    --accent-foreground: 35 40% 15%; /* Marró fosc per al text sobre l'accent */
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 70% 55%; /* Vermell per a destructius, mantenint un toc càlid */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 30 20% 88%; /* Border beige */
-    --input: 30 20% 92%; /* Input background beige */
-    --ring: 51 100% 50%; /* Gold for focus rings */
+    --border: 35 30% 80%; /* Vora de color beix/gris clar */
+    --input: 35 40% 94%; /* Fons d'input una mica més fosc que el fons principal */
+    --ring: 205 50% 55%; /* Blau Ferradura per als anells de focus, una mica més clar */
 
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 205 50% 48%; /* Blau Ferradura */
+    --chart-2: 40 70% 60%;  /* Ocre */
+    --chart-3: 30 35% 50%;  /* Marró mitjà */
+    --chart-4: 195 40% 60%; /* Blau cel més clar */
+    --chart-5: 35 45% 70%;  /* Beix/Marró clar */
     --radius: 0.5rem;
 
-    /* Sidebar variables - can be kept or updated if sidebar is used differently */
-    --sidebar-background: 30 20% 98%;
-    --sidebar-foreground: 25 25% 20%;
-    --sidebar-primary: 51 100% 50%;
-    --sidebar-primary-foreground: 30 40% 10%;
-    --sidebar-accent: 30 25% 90%;
-    --sidebar-accent-foreground: 25 25% 15%;
-    --sidebar-border: 30 20% 88%;
-    --sidebar-ring: 51 100% 50%;
+    /* Variables del Sidebar (es poden ajustar si es fa servir un sidebar) */
+    --sidebar-background: 30 30% 20%; /* Marró fusta fosc per al sidebar */
+    --sidebar-foreground: 35 30% 90%; /* Text clar per al sidebar */
+    --sidebar-primary: var(--accent); /* Ocre per a elements primaris del sidebar */
+    --sidebar-primary-foreground: var(--accent-foreground);
+    --sidebar-accent: 30 30% 30%; /* Marró una mica més clar per a accents del sidebar */
+    --sidebar-accent-foreground: 35 30% 85%;
+    --sidebar-border: 30 30% 25%;
+    --sidebar-ring: var(--accent);
   }
 
   .dark {
-    --background: 30 10% 12%; /* Dark earthy brown */
-    --foreground: 30 15% 88%; /* Light beige/off-white */
+    /* Tema Fosc Rústic Blau/Fusta/Ocre */
+    --background: 30 25% 18%; /* Marró fusta molt fosc, gairebé negre */
+    --foreground: 35 30% 88%; /* Beix clar per al text */
 
-    --card: 30 10% 18%; /* Darker brown for cards */
-    --card-foreground: 30 15% 88%;
+    --card: 30 25% 24%; /* Marró fusta fosc per a targetes */
+    --card-foreground: var(--foreground);
 
-    --popover: 30 10% 18%;
-    --popover-foreground: 30 15% 88%;
+    --popover: 30 20% 15%; /* El més fosc per a popovers */
+    --popover-foreground: var(--foreground);
 
-    --primary: 51 100% 50%; /* Gold */
-    --primary-foreground: 30 40% 10%; /* Dark brown for text on gold */
+    --primary: 205 50% 55%; /* Blau Ferradura, una mica més brillant per a mode fosc */
+    --primary-foreground: 210 25% 96%; /* Text molt clar */
 
-    --secondary: 30 10% 25%; /* Darker secondary brown */
-    --secondary-foreground: 30 15% 88%;
+    --secondary: 40 65% 55%; /* Ocre/Groc daurat com a secundari, destaca en fosc */
+    --secondary-foreground: 35 40% 15%; /* Text fosc per a l'ocre */
 
-    --muted: 30 10% 22%; /* Dark muted brown */
-    --muted-foreground: 30 15% 65%; /* Light muted text */
+    --muted: 30 20% 30%; /* Marró fosc silenciat */
+    --muted-foreground: 35 25% 65%; /* Text clar silenciat */
 
-    --accent: 30 10% 28%; /* Dark accent brown */
-    --accent-foreground: 30 15% 90%;
+    --accent: 205 45% 65%; /* Blau Ferradura més clar per a accents */
+    --accent-foreground: 210 20% 10%; /* Text fosc per a l'accent blau clar */
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 30 10% 30%; /* Dark border */
-    --input: 30 10% 25%; /* Dark input background */
-    --ring: 51 100% 50%;
-
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 30 20% 35%; /* Vora marró fosc */
+    --input: 30 20% 28%; /* Fons d'input marró fosc */
+    --ring: 205 50% 60%; /* Blau Ferradura per a anells de focus */
     
-    /* Dark Sidebar variables */
-    --sidebar-background: 30 10% 10%;
-    --sidebar-foreground: 30 15% 85%;
-    --sidebar-primary: 51 100% 50%;
-    --sidebar-primary-foreground: 30 40% 10%;
-    --sidebar-accent: 30 10% 20%;
-    --sidebar-accent-foreground: 30 15% 88%;
-    --sidebar-border: 30 10% 25%;
-    --sidebar-ring: 51 100% 50%;
+    /* Variables del Sidebar Fosc */
+    --sidebar-background: 30 20% 12%; /* Marró encara més fosc per al sidebar */
+    --sidebar-foreground: 35 30% 85%;
+    --sidebar-primary: var(--accent);
+    --sidebar-primary-foreground: var(--accent-foreground); /* Aquest hauria de ser --accent-foreground del tema fosc, que és clar */
+    --sidebar-accent: 30 20% 22%;
+    --sidebar-accent-foreground: 35 30% 80%;
+    --sidebar-border: 30 20% 20%;
+    --sidebar-ring: var(--accent);
   }
 }
 

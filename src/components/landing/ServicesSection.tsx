@@ -3,24 +3,23 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import ServiceCard from './ServiceCard';
-import { Coffee, ClipboardList, ChefHat } from 'lucide-react';
-// Removed Image import as it's no longer used for background
+import { Utensils, Fish, Cake } from 'lucide-react'; // Canvieu les icones si cal
 
 const servicesList = [
   {
-    icon: Coffee,
-    titleKey: "landing:services.breakfasts.title",
-    descriptionKey: "landing:services.breakfasts.description"
+    icon: Utensils, // Per a Paelles i Tapes
+    titleKey: "landing:services.paellasTapas.title",
+    descriptionKey: "landing:services.paellasTapas.description"
   },
   {
-    icon: ChefHat, 
-    titleKey: "landing:services.traditionalAndGrilled.title",
-    descriptionKey: "landing:services.traditionalAndGrilled.description"
+    icon: Fish, // Per a Peix Fresc i Carns a la Brasa (Flame podria ser una altra opció)
+    titleKey: "landing:services.pescadoBrasa.title",
+    descriptionKey: "landing:services.pescadoBrasa.description"
   },
   {
-    icon: ClipboardList, 
-    titleKey: "landing:services.setMenus.title",
-    descriptionKey: "landing:services.setMenus.description"
+    icon: Cake, // Per a Postres Casolanes i Vins
+    titleKey: "landing:services.postresVinos.title",
+    descriptionKey: "landing:services.postresVinos.description"
   }
 ];
 
@@ -29,20 +28,7 @@ export default function ServicesSection() {
 
   return (
     <section id="services" className="py-16 sm:py-24 bg-background">
-      {/* Background Image and Overlay Removed */}
-      {/* <Image
-        src="/carnebrasa.jpg"
-        alt={t('landing:services.backgroundImageAlt', {restaurantName: t('common:restaurantName')})}
-        data-ai-hint="grilled meat barbecue"
-        fill
-        style={{ objectFit: 'cover' }}
-        className="absolute inset-0 z-0"
-        quality={70}
-        priority={false}
-      />
-      <div className="absolute inset-0 bg-background/60 dark:bg-background/75 z-0"></div> */}
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8"> {/* Removed relative z-10 */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4">
             {t('landing:services.sectionTitle')}
