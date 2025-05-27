@@ -14,33 +14,37 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    /* Dark Theme: Deep Wood, Rustic Blue, Warm Cream - NEW "La Ferradura" Dark Theme */
+    /* Dark Theme: Deep Wood, Rustic Blue, Warm Cream - "La Bodega de la Ferradura" Dark Theme */
     --background: 25 30% 15%;        /* Deep dark brown (wood imitation) hsl(25, 30%, 15%) */
     --foreground: 35 40% 85%;        /* Light warm cream/beige for text hsl(35, 40%, 85%) */
 
     --card: 25 25% 22%;             /* Darker wood brown for cards hsl(25, 25%, 22%) */
-    --card-foreground: var(--foreground);
+    --card-foreground: var(--foreground); /* Light cream text on dark wood cards */
 
     --popover: 25 20% 18%;          /* Even darker popover hsl(25, 20%, 18%) */
     --popover-foreground: var(--foreground);
 
-    --primary: 205 55% 48%;         /* Blue: #5096CB (HSL 205 55% 48%) */
+    --primary: 205 55% 48%;         /* Blue: #5096CB (HSL 205 55% 48%) - slightly darker blue */
     --primary-foreground: 205 100% 97%;/* Very light, almost white, for text on primary blue */
 
-    --secondary: 30 35% 60%;        /* Light Wood Brown Accent (e.g. Quiche crust color) hsl(30, 35%, 60%) */
-    --secondary-foreground: 30 25% 25%; /* Darker brown for text on secondary light wood */
+    /* Ocre/Wood background */
+    --secondary: 30 35% 60%;        /* Light Wood Brown Accent / Ocre (hsl(30, 35%, 60%)) */
+    /* Text on Ocre/Wood background - CHANGED FOR BETTER CONTRAST */
+    --secondary-foreground: 35 40% 95%; /* Very light cream, almost white, for text on ocre/secondary */
 
-    --muted: 25 15% 40%;            /* Dark muted brown/gray hsl(25, 15%, 40%) */
-    --muted-foreground: 35 30% 65%;   /* Muted lighter cream/gray for text */
+    /* Muted background */
+    --muted: 25 15% 40%;            /* Dark muted brown/gray (hsl(25, 15%, 40%)) */
+    /* Text on Muted background - CHANGED FOR BETTER CONTRAST */
+    --muted-foreground: 35 40% 92%;   /* Lighter cream for text on muted background */
 
-    --accent: 205 45% 40%;          /* Darker, slightly desaturated blue for accents hsl(205, 45%, 40%) */
+    --accent: 205 45% 40%;          /* Darker, slightly desaturated blue for accents (hsl(205, 45%, 40%)) */
     --accent-foreground: 35 100% 97%; /* Light cream text on dark blue accent */
 
     --destructive: 0 60% 50%;       /* A warm red for destructive actions */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 25 20% 35%;           /* Dark wood/charcoal border hsl(25, 20%, 35%) */
-    --input: 25 20% 28%;            /* Input background, dark wood hsl(25, 20%, 28%) */
+    --border: 25 20% 35%;           /* Dark wood/charcoal border (hsl(25, 20%, 35%)) */
+    --input: 25 20% 28%;            /* Input background, dark wood (hsl(25, 20%, 28%)) */
     --ring: 205 50% 53%;            /* Lighter blue for focus rings */
 
     --chart-1: 205 55% 48%;         /* Primary Blue */
@@ -74,20 +78,24 @@ h1, h2, h3, h4, h5, h6 {
     --primary: 205 55% 48%;         /* Blue: #5096CB (HSL 205 55% 48%) */
     --primary-foreground: 205 100% 97%;/* Very light, almost white, for text on primary blue */
 
-    --secondary: 30 35% 80%;        /* Light Wood Brown (e.g. for some secondary elements) hsl(30, 35%, 80%) */
-    --secondary-foreground: 30 25% 35%; /* Darker brown for text on light wood */
+    /* Ocre/Wood background in light theme */
+    --secondary: 30 35% 80%;        /* Light Wood Brown (hsl(30, 35%, 80%)) */
+    /* Text on ocre/wood background in light theme - ensure it's dark enough */
+    --secondary-foreground: 30 25% 25%; /* Darker brown for text on light wood (was 35%) */
 
-    --muted: 35 40% 85%;            /* Muted light cream/beige hsl(35, 40%, 85%) */
-    --muted-foreground: 25 30% 50%;   /* Muted darker brown/gray for text */
+    /* Muted background in light theme */
+    --muted: 35 40% 85%;            /* Muted light cream/beige (hsl(35, 40%, 85%)) */
+    /* Text on muted background in light theme - ensure it's dark enough */
+    --muted-foreground: 25 30% 40%;   /* Muted darker brown/gray for text (was 50%) */
 
-    --accent: 30 40% 70%;         /* Medium Light Wood Brown for accents hsl(30, 40%, 70%) */
+    --accent: 30 40% 70%;         /* Medium Light Wood Brown for accents (hsl(30, 40%, 70%)) */
     --accent-foreground: 30 30% 30%; /* Darker brown text on light wood accent */
 
     --destructive: 0 60% 50%;       /* A warm red for destructive actions */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 30 30% 75%;           /* Light wood/beige border hsl(30, 30%, 75%) */
-    --input: 35 50% 92%;            /* Input background, light cream hsl(35, 50%, 92%) */
+    --border: 30 30% 75%;           /* Light wood/beige border (hsl(30, 30%, 75%)) */
+    --input: 35 50% 92%;            /* Input background, light cream (hsl(35, 50%, 92%)) */
     --ring: 205 50% 53%;            /* Lighter blue for focus rings */
     
     /* Sidebar Variables - Light theme for sidebar when .dark is active */
