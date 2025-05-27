@@ -36,14 +36,12 @@
     "mainKeywords": "Restaurant a Alp, La Bodega de la Ferradura, cuina de muntanya, brasa",
     "pageContext": "Restaurant a Alp",
     "defaultDescription": "Descobreix La Bodega de la Ferradura a Alp, especialitzat en cuina tradicional de muntanya, carns a la brasa i productes de proximitat. Reserva la teva taula!",
-    "defaultTitleSuffix": "Restaurant a Alp de Cuina de Muntanya i Brasa"
+    "defaultTitleSuffix": "La Bodega de la Ferradura | Restaurant a Alp de Cuina de Muntanya i Brasa"
   },
-  "cookieConsent.ariaLabel": "Avís de galetes",
   "cookieConsent.text": "Aquest lloc web utilitza galetes per proporcionar la funcionalitat necessària del lloc i per millorar la teva experiència. En utilitzar aquest lloc web, acceptes el nostre ús de galetes.",
   "cookieConsent.acceptButton": "Acceptar",
   "cookieConsent.rejectButton": "Rebutjar",
   "cookieConsent.privacyPolicyLink": "Política de Privacitat",
+  "cookieConsent.ariaLabel": "Avís de galetes",
   "calendar.serviceUnavailable": "El servei de reserves no està disponible temporalment. Si us plau, intenta-ho més tard o contacta amb nosaltres."
 }
-
-    

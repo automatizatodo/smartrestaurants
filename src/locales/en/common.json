@@ -36,14 +36,12 @@
     "mainKeywords": "Restaurant in Alp, La Bodega de la Ferradura, mountain cuisine, grill",
     "pageContext": "Restaurant in Alp",
     "defaultDescription": "Discover La Bodega de la Ferradura in Alp, specializing in traditional mountain cuisine, grilled meats, and local products. Book your table!",
-    "defaultTitleSuffix": "Restaurant in Alp for Mountain Cuisine and Grill"
+    "defaultTitleSuffix": "La Bodega de la Ferradura | Restaurant in Alp for Mountain Cuisine and Grill"
   },
-  "cookieConsent.ariaLabel": "Cookie Notice",
   "cookieConsent.text": "This website uses cookies to provide necessary site functionality and to improve your experience. By using this website, you agree to our use of cookies.",
   "cookieConsent.acceptButton": "Accept",
   "cookieConsent.rejectButton": "Reject",
   "cookieConsent.privacyPolicyLink": "Privacy Policy",
+  "cookieConsent.ariaLabel": "Cookie Notice",
   "calendar.serviceUnavailable": "The booking service is temporarily unavailable. Please try again later or contact us."
 }
-
-    
