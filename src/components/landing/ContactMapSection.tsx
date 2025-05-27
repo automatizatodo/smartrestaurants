@@ -3,7 +3,7 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import restaurantConfig from '@/config/restaurant.config';
-import type { OpeningHours } from '@/config/restaurant.config'; // Import type
+import type { OpeningHours } from '@/config/restaurant.config';
 import { MapPin, Phone, Mail, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
 
@@ -37,7 +37,7 @@ export default function ContactMapSection() {
                   <div>
                     <p className="font-medium">{t('landing:contactMap.addressLabel')}</p>
                     <p>{restaurantConfig.address}</p>
-                    {restaurantConfig.googleMapsLink && (
+                    {restaurantConfig.googleMapsLink && !restaurantConfig.googleMapsLink.includes("TODO_") && (
                         <Link href={restaurantConfig.googleMapsLink} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline inline-flex items-center mt-1">
                         {t('landing:contactMap.getDirections')} <ExternalLink className="h-4 w-4 ml-1" />
                         </Link>
@@ -53,7 +53,16 @@ export default function ContactMapSection() {
                     </div>
                     </div>
                 )}
-                {restaurantConfig.email && (
+                {restaurantConfig.phone2 && restaurantConfig.phoneHref2 && (
+                     <div className="flex items-center">
+                    <Phone className="h-6 w-6 mr-3 text-primary shrink-0" />
+                    <div>
+                        <p className="font-medium">{t('landing:contactMap.phoneLabel2')}</p>
+                        <a href={restaurantConfig.phoneHref2} className="hover:text-primary transition-colors">{restaurantConfig.phone2}</a>
+                    </div>
+                    </div>
+                )}
+                {restaurantConfig.email && !restaurantConfig.email.includes("TODO_") && (
                     <div className="flex items-center">
                     <Mail className="h-6 w-6 mr-3 text-primary shrink-0" />
                     <div>
@@ -90,7 +99,7 @@ export default function ContactMapSection() {
 
           {/* Google Maps Embed Column */}
           <div className="h-[400px] md:h-full w-full rounded-lg overflow-hidden shadow-xl border border-border">
-            {restaurantConfig.googleMapsEmbedUrl && !restaurantConfig.googleMapsEmbedUrl.includes("YOUR_") ? (
+            {restaurantConfig.googleMapsEmbedUrl && !restaurantConfig.googleMapsEmbedUrl.includes("TODO_") ? (
               <iframe
                 src={restaurantConfig.googleMapsEmbedUrl}
                 width="100%"

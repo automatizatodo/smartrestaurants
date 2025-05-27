@@ -1,16 +1,16 @@
 
 import MenuPageClientContent from './MenuPageClientContent';
-import { fetchMenuDataWithPrice } from '@/services/menuService';
-import type { PriceSummary } from '@/app/api/menu/route';
+import { fetchMenuData } from '@/services/menuService'; // Updated function name
+// import type { PriceSummary } from '@/app/api/menu/route'; // No longer needed
 import type { Metadata } from 'next';
-import restaurantConfig from '@/config/restaurant.config';
+// import restaurantConfig from '@/config/restaurant.config'; // No longer needed for price key
 
 import caCommon from '@/locales/ca/common.json';
 import caMenuPage from '@/locales/ca/page-specific/menu.json';
 
 // Construct title for metadata
-const menuPageTitle = caMenuPage.titleWithoutBrand || 'Menú del Dia i Carta';
-const restaurantContext = caCommon.seo.pageContext || 'Restaurant a Sabadell';
+const menuPageTitle = caMenuPage.titleWithoutBrand || 'La Nostra Carta';
+const restaurantContext = caCommon.seo.pageContext || 'Restaurant a Alp';
 
 export const metadata: Metadata = {
   title: `${menuPageTitle} | ${caCommon.restaurantName} - ${restaurantContext}`,
@@ -33,15 +33,14 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function MenuPage() {
-  const { menuItems, currentMenuPrice, priceSummary } = await fetchMenuDataWithPrice();
-  const menuDelDiaPriceDescriptionKey = restaurantConfig.menuDelDia?.priceDescriptionKey;
+  // const { menuItems, currentMenuPrice, priceSummary } = await fetchMenuDataWithPrice(); // Old call
+  const menuItems = await fetchMenuData(); // New call
+  // const menuDelDiaPriceDescriptionKey = restaurantConfig.menuDelDia?.priceDescriptionKey; // Removed
 
   return (
     <MenuPageClientContent
       menuItems={menuItems}
-      currentMenuPrice={currentMenuPrice}
-      menuDelDiaPriceDescriptionKey={menuDelDiaPriceDescriptionKey}
-      priceSummary={priceSummary} 
+      // currentMenuPrice, menuDelDiaPriceDescriptionKey, priceSummary props removed
     />
   );
 }

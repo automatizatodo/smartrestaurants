@@ -10,9 +10,9 @@ import { useLanguage } from '@/context/LanguageContext';
 import type { MenuItemData } from '@/data/menu';
 import { Button } from '@/components/ui/button';
 import restaurantConfig from '@/config/restaurant.config';
-import { Star as GoogleIcon } from 'lucide-react';
+import { Star as GoogleIcon } from 'lucide-react'; // Assuming this is still the Google Icon
 import { cn } from '@/lib/utils';
-import type { PriceSummary } from '@/app/api/menu/route';
+// import type { PriceSummary } from '@/app/api/menu/route'; // No longer needed for price display here
 
 const TripAdvisorIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5">
@@ -27,29 +27,24 @@ const TripAdvisorIcon = () => (
 
 interface MenuPageClientContentProps {
   menuItems: MenuItemData[];
-  currentMenuPrice?: string | null;
-  menuDelDiaPriceDescriptionKey?: string;
-  priceSummary: PriceSummary;
+  // currentMenuPrice and priceSummary removed as per new requirements
 }
 
 export default function MenuPageClientContent({
   menuItems,
-  currentMenuPrice,
-  menuDelDiaPriceDescriptionKey,
-  priceSummary,
 }: MenuPageClientContentProps) {
   const { t, language, setLanguage, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
 
   useEffect(() => {
-    document.title = t('common:page.menu.title') + " | " + restaurantName;
-  }, [t, restaurantName, language]);
+    document.title = t('page-specific:menu:title'); // Adjusted title to use new key structure
+  }, [t, language]); // Removed restaurantName as it's already in page-specific:menu:title
 
-  const menuDelDiaPriceDescription = menuDelDiaPriceDescriptionKey
-    ? t(menuDelDiaPriceDescriptionKey)
-    : "";
+  // const menuDelDiaPriceDescription = menuDelDiaPriceDescriptionKey // Removed
+  //   ? t(menuDelDiaPriceDescriptionKey)
+  //   : "";
 
-  const menuPageDescription = t('common:page.menu.description', { restaurantName });
+  const menuPageDescription = t('page-specific:menu:description').trim();
 
   const languageButtons = [
     { code: 'ca', name: 'Català' },
@@ -63,36 +58,13 @@ export default function MenuPageClientContent({
       <main className="flex-grow pt-24 sm:pt-32 pb-16 sm:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-10 pt-0 lg:pt-12">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4" suppressHydrationWarning>
-               {t('common:page.menu.title')}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-anton font-bold text-foreground mb-4" suppressHydrationWarning>
+               {t('page-specific:menu:titleWithoutBrand')}
             </h1>
 
-            {priceSummary && (priceSummary.weekdayPrice || priceSummary.weekendPrice) && (
-              <div className="mb-2 text-md text-foreground/80">
-                {priceSummary.weekdayPrice && priceSummary.weekdayLabelKey && (
-                  <span className="mr-3" suppressHydrationWarning>
-                    {t(priceSummary.weekdayLabelKey)}: <span className="font-semibold">{priceSummary.weekdayPrice}</span>
-                  </span>
-                )}
-                {priceSummary.weekendPrice && priceSummary.weekendLabelKey && (
-                  <span suppressHydrationWarning>
-                    {t(priceSummary.weekendLabelKey)}: <span className="font-semibold">{priceSummary.weekendPrice}</span>
-                  </span>
-                )}
-              </div>
-            )}
+            {/* Removed Price Summary and Current Menu Price display */}
 
-            {currentMenuPrice && (
-              <div className="mb-2">
-                <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
-                {menuDelDiaPriceDescription && (
-                  <p className="text-sm text-muted-foreground mt-1" suppressHydrationWarning>
-                    {menuDelDiaPriceDescription}
-                  </p>
-                )}
-              </div>
-            )}
-            {menuPageDescription && menuPageDescription.trim() !== '' && (
+            {menuPageDescription && (
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto" suppressHydrationWarning>
                 {menuPageDescription}
               </p>
@@ -121,7 +93,7 @@ export default function MenuPageClientContent({
 
           {(restaurantConfig.googleReviewUrl || restaurantConfig.tripAdvisorReviewUrl) && (
             <div className="mt-12 sm:mt-16 text-center flex flex-col items-center space-y-3 sm:flex-row sm:space-y-0 sm:justify-center sm:space-x-6">
-              {restaurantConfig.googleReviewUrl && (
+              {restaurantConfig.googleReviewUrl && restaurantConfig.googleReviewUrl !== 'TODO_YOUR_LA_FERRADURA_GOOGLE_REVIEW_URL' && (
                 <Link href={restaurantConfig.googleReviewUrl} target="_blank" rel="noopener noreferrer" passHref className="w-full sm:w-auto">
                   <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto" suppressHydrationWarning>
                     <GoogleIcon className="mr-2 h-5 w-5" />
@@ -129,7 +101,7 @@ export default function MenuPageClientContent({
                   </Button>
                 </Link>
               )}
-              {restaurantConfig.tripAdvisorReviewUrl && (
+              {restaurantConfig.tripAdvisorReviewUrl && restaurantConfig.tripAdvisorReviewUrl !== 'TODO_YOUR_LA_FERRADURA_TRIPADVISOR_REVIEW_URL_HERE' && (
                 <Link href={restaurantConfig.tripAdvisorReviewUrl} target="_blank" rel="noopener noreferrer" passHref className="w-full sm:w-auto">
                   <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto" suppressHydrationWarning>
                     <TripAdvisorIcon />
@@ -145,4 +117,3 @@ export default function MenuPageClientContent({
     </div>
   );
 }
-

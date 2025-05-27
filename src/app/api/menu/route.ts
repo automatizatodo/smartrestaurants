@@ -3,14 +3,14 @@
 
 import { NextResponse } from 'next/server';
 import type { MenuItemData } from '@/data/menu';
-import restaurantConfig from '@/config/restaurant.config';
-import { parse as parseTime, isValid as isValidDate, format as formatDate, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday, isSunday } from 'date-fns';
+// import restaurantConfig from '@/config/restaurant.config'; // No longer needed for prices
+// import { parse as parseTime, isValid as isValidDate, format as formatDate, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday, isSunday } from 'date-fns'; // No longer needed for prices
 
 // URL for the MAIN MENU sheet
-let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
+let GOOGLE_SHEET_CSV_URL = process.env.GOOGLE_SHEET_MENU_CSV_URL || 'REPLACE_WITH_YOUR_MAIN_MENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
 
-// URL for the "preciosmenu" sheet
-let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
+// URL for the "preciosmenu" sheet - This logic will be removed/commented out
+// let PRICES_SHEET_CSV_URL = process.env.GOOGLE_SHEET_PRICES_CSV_URL || 'REPLACE_WITH_YOUR_PRICES_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
 
 
 // Column names from the Google Sheet structure
@@ -39,21 +39,21 @@ const EXPECTED_MENU_HEADERS = [
   LINK_IMAGEN_COL, SUGERENCIA_CHEF_COL, ALERGENOS_COL
 ];
 
-// Column Names for PRICES Sheet
-const DIA_COL_PRICE = "Día";
-const FRANJA_HORARIA_COL_PRICE = "Franja horaria";
-const PRECIO_MENU_COL_PRICE = "Precio (€)";
+// Column Names for PRICES Sheet - This logic will be removed/commented out
+// const DIA_COL_PRICE = "Día";
+// const FRANJA_HORARIA_COL_PRICE = "Franja horaria";
+// const PRECIO_MENU_COL_PRICE = "Precio (€)";
 
-const EXPECTED_PRICE_HEADERS = [
-  DIA_COL_PRICE, FRANJA_HORARIA_COL_PRICE, PRECIO_MENU_COL_PRICE
-];
+// const EXPECTED_PRICE_HEADERS = [
+//   DIA_COL_PRICE, FRANJA_HORARIA_COL_PRICE, PRECIO_MENU_COL_PRICE
+// ];
 
-interface PriceEntry {
-  dia: string; // Kept as original case for display, converted toLower for logic
-  franjaStart: string;
-  franjaEnd: string;
-  precio: string;
-}
+// interface PriceEntry {
+//   dia: string;
+//   franjaStart: string;
+//   franjaEnd: string;
+//   precio: string;
+// }
 
 export interface PriceSummary {
   weekdayPrice?: string;
@@ -68,50 +68,50 @@ function mapCategoryToKey(categoryEN: string): string {
   const lowerCategory = categoryEN.toLowerCase().trim();
   switch (lowerCategory) {
     case 'starters': return 'starters';
-    case 'main courses': return 'mainCourses'; // Primers Plats
-    case 'second courses': return 'secondCourses'; // Segon Plat
-    case 'grilled garnish': return 'grilledGarnish'; // Guarnició Brasa
-    case 'sauces': return 'sauces'; // Salses
+    case 'main courses': return 'mainCourses'; // For "Primers Plats"
+    case 'second courses': return 'secondCourses'; // For "Segon Plat"
+    case 'grilled garnish': return 'grilledGarnish';
+    case 'sauces': return 'sauces';
     case 'desserts': return 'desserts';
-    case 'breads': return 'breads'; // Pans
+    case 'breads': return 'breads';
     case 'beverages': return 'beverages';
-    case 'wines': return 'wines'; // Vins
+    case 'wines': return 'wines';
     default:
-      // console.warn("API_ROUTE_MAP_CATEGORY: Unmapped category EN: " + categoryEN + " - using direct key: " + lowerCategory.replace(/\s+/g, ''));
+      // console.warn(`API_ROUTE_MAP_CATEGORY: Unmapped category EN: "${categoryEN}" - using direct key: "${lowerCategory.replace(/\s+/g, '')}"`);
       return lowerCategory.replace(/\s+/g, '') || 'other';
   }
 }
 
 function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string = "PARSE_CSV"): Record<string, string>[] {
   const lines = csvText.trim().split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
-  // console.log(logPrefix + ": Received CSV text length: " + csvText.length);
+  // console.log(`${logPrefix}: Received CSV text length: ${csvText.length}`);
 
   if (lines.length < 2) {
-    // console.warn(logPrefix + ": CSV content is too short (less than 2 lines) or headers are missing. Lines found: " + lines.length);
-    // if (lines.length === 1) console.warn(logPrefix + ": Headers received: " + lines[0]);
+    // console.warn(`${logPrefix}: CSV content is too short (less than 2 lines) or headers are missing. Lines found: ${lines.length}`);
+    // if (lines.length === 1) console.warn(`${logPrefix}: Headers received: ${lines[0]}`);
     return [];
   }
 
   const headersFromSheet = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''));
-  // console.log(logPrefix + ": Headers found in sheet: [" + headersFromSheet.join(", ") + "]");
-  // console.log(logPrefix + ": Expected headers: [" + expectedHeaders.join(", ") + "]");
+  // console.log(`${logPrefix}: Headers found in sheet: [${headersFromSheet.join(", ")}]`);
+  // console.log(`${logPrefix}: Expected headers: [${expectedHeaders.join(", ")}]`);
 
 
   const missingHeaders = expectedHeaders.filter(eh => !headersFromSheet.includes(eh));
   if (missingHeaders.length > 0) {
-    console.error(logPrefix + ": Critical header mismatch. Missing expected headers: [" + missingHeaders.join(", ") + "]. Sheet headers: [" + headersFromSheet.join(", ") + "]. Cannot process sheet.");
+    console.error(`${logPrefix}: Critical header mismatch. Missing expected headers: [${missingHeaders.join(", ")}]. Sheet headers: [${headersFromSheet.join(", ")}]. Cannot process sheet.`);
     return [];
   }
 
   const extraHeaders = headersFromSheet.filter(sh => !expectedHeaders.includes(sh));
   if (extraHeaders.length > 0) {
-    // console.warn(logPrefix + ": Warning: Sheet contains extra headers not in expected_headers: [" + extraHeaders.join(", ") + "]. These will be ignored.");
+    // console.warn(`${logPrefix}: Warning: Sheet contains extra headers not in expected_headers: [${extraHeaders.join(", ")}]. These will be ignored.`);
   }
 
   const jsonData = [];
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) {
-      // console.warn(logPrefix + ": Skipping empty CSV line " + (i + 1));
+      // console.warn(`${logPrefix}: Skipping empty CSV line ${i + 1}`);
       continue;
     }
     const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(value => value.trim().replace(/^"|"$/g, ''));
@@ -125,10 +125,10 @@ function parseCSV(csvText: string, expectedHeaders: string[], logPrefix: string 
       });
       jsonData.push(entry);
     } else {
-      // console.warn(logPrefix + ": Skipping malformed CSV line " + (i + 1) + ". Expected at least " + headersFromSheet.length + " values, got " + values.length + ". Line content: "" + lines[i] + """);
+      // console.warn(`${logPrefix}: Skipping malformed CSV line ${i + 1}. Expected at least ${headersFromSheet.length} values, got ${values.length}. Line content: "${lines[i]}"`);
     }
   }
-  // console.log(logPrefix + ": Parsed " + jsonData.length + " data rows.");
+  // console.log(`${logPrefix}: Parsed ${jsonData.length} data rows.`);
   return jsonData;
 }
 
@@ -142,211 +142,82 @@ function isValidHttpUrl(urlStr: string): boolean {
     const url = new URL(urlToParse);
     const isValid = url.protocol === "http:" || url.protocol === "https:";
     // if (!isValid) {
-    //   console.warn("API_ROUTE_LOGIC_IS_VALID_URL: URL '" + urlStr + "' (parsed as '" + urlToParse + "') is NOT valid (protocol: " + url.protocol + "). Expected 'http:' or 'https:'.");
+    //   console.warn(`API_ROUTE_LOGIC_IS_VALID_URL: URL '${urlStr}' (parsed as '${urlToParse}') is NOT valid (protocol: ${url.protocol}). Expected 'http:' or 'https:'.`);
     // }
     return isValid;
   } catch (e: any) {
-    // console.warn("API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '" + urlStr + "' (attempted as '" + urlToParse + "'). Error: " + e.message);
+    // console.warn(`API_ROUTE_LOGIC_IS_VALID_URL: Failed to parse URL '${urlStr}' (attempted as '${urlToParse}'). Error: ${e.message}`);
     return false;
   }
 }
 
 
 async function fetchRawCsvData(url: string, logPrefix: string): Promise<string | null> {
-  if (!url || url.includes('YOUR_') || url.includes('REPLACE_WITH_')) {
-    console.error(logPrefix + ": CRITICAL - URL is not configured correctly: " + url + ". Please update it in src/app/api/menu/route.ts");
+  if (!url || url.includes('REPLACE_WITH_YOUR_') || url.includes('URL_HERE')) {
+    console.error(`${logPrefix}: CRITICAL - URL is not configured correctly: ${url}. Please update it in environment variables or src/app/api/menu/route.ts`);
     return null;
   }
 
-  const fetchUrl = url.includes('?') ? url + '&timestamp=' + new Date().getTime() : url + '?timestamp=' + new Date().getTime();
+  const fetchUrl = url.includes('?') ? `${url}&timestamp=${new Date().getTime()}` : `${url}?timestamp=${new Date().getTime()}`;
 
   try {
-    const response = await fetch(fetchUrl, { cache: 'no-store' });
-    // console.log(logPrefix + ": Response status from Google Sheets: " + response.status + " " + response.statusText);
+    const response = await fetch(fetchUrl, { cache: 'no-store' }); // Always fetch fresh for GSheets
+    // console.log(`${logPrefix}: Response status from Google Sheets: ${response.status} ${response.statusText} for URL: ${fetchUrl}`);
 
     if (!response.ok) {
       const errorText = await response.text();
-      let errorMessage = logPrefix + ": Failed to fetch CSV. Status: " + response.status + ". URL: " + fetchUrl + ". Response: " + errorText.substring(0, 500) + "...";
+      let errorMessage = `${logPrefix}: Failed to fetch CSV. Status: ${response.status}. URL: ${fetchUrl}. Response: ${errorText.substring(0, 500)}...`;
       if (response.status === 401 || response.status === 403) {
-        errorMessage += " This often means the Google Sheet is not published correctly or access is restricted. Please check 'File > Share > Publish to web' settings for the sheet and ensure it's public.";
+        errorMessage += ` This often means the Google Sheet is not published correctly or access is restricted. Please check "File > Share > Publish to web" settings for the sheet and ensure it's public.`;
       } else if (response.status === 400 && errorText.toLowerCase().includes('page not found')) {
-        errorMessage += " This 'Page Not Found' error from Google Sheets usually means the specific published CSV link is incorrect, has changed, or the sheet/document is no longer published as expected. Verify the 'Publish to web' CSV link for the specific sheet.";
+        errorMessage += ` This "Page Not Found" error from Google Sheets usually means the specific published CSV link is incorrect, has changed, or the sheet/document is no longer published as expected. Verify the 'Publish to web' CSV link for the specific sheet.`;
       }
       console.error(errorMessage);
       return null;
     }
 
     const csvText = await response.text();
-    // console.log(logPrefix + ": Successfully fetched CSV. Length: " + csvText.length + ". Preview (first 500 chars): " + csvText.substring(0, 500));
+    // console.log(`${logPrefix}: Successfully fetched CSV. Length: ${csvText.length}. Preview (first 500 chars): ${csvText.substring(0, 500)}`);
 
     if (!csvText.trim()) {
-      // console.warn(logPrefix + ": Fetched CSV is empty. URL: " + fetchUrl + ". Ensure sheet is published and has content.");
+      // console.warn(`${logPrefix}: Fetched CSV is empty. URL: ${fetchUrl}. Ensure sheet is published and has content.`);
       return null;
     }
     return csvText;
   } catch (error: any) {
-    console.error(logPrefix + ": Unhandled error fetching CSV from " + fetchUrl + ": " + error.message, error.stack);
+    console.error(`${logPrefix}: Unhandled error fetching CSV from ${fetchUrl}: ${error.message}`, error.stack);
     return null;
   }
 }
 
+// Commenting out price fetching logic as it's no longer used
+/*
 async function getCurrentMenuPrice(): Promise<string | null> {
-  const csvText = await fetchRawCsvData(PRICES_SHEET_CSV_URL, "PRICE_SHEET_FETCH");
-  if (!csvText) {
-    // console.warn("API_ROUTE_GET_PRICE: Failed to fetch price sheet CSV. Using fallback price.");
-    return restaurantConfig.menuDelDia?.price || null;
-  }
-
-  const parsedPriceData = parseCSV(csvText, EXPECTED_PRICE_HEADERS, "PRICE_SHEET_PARSE");
-  if (parsedPriceData.length === 0) {
-    // console.warn("API_ROUTE_GET_PRICE: No data rows parsed from price sheet. Using fallback price.");
-    return restaurantConfig.menuDelDia?.price || null;
-  }
-
-  const priceEntries: PriceEntry[] = parsedPriceData
-    .map(row => {
-      const diaRaw = row[DIA_COL_PRICE] || "";
-      const franjaHorariaRaw = row[FRANJA_HORARIA_COL_PRICE] || "";
-      const precioRaw = row[PRECIO_MENU_COL_PRICE] || "";
-
-      if (!diaRaw.trim() || !precioRaw.trim() || !franjaHorariaRaw.trim() || !franjaHorariaRaw.includes('-')) {
-        return null; 
-      }
-      const [start, end] = franjaHorariaRaw.split(/\s*-\s*/);
-      return {
-        dia: diaRaw.trim(), 
-        franjaStart: start.trim(),
-        franjaEnd: end.trim(),
-        precio: precioRaw.trim()
-      };
-    })
-    .filter(entry => entry !== null) as PriceEntry[];
-
-
-  const timeZone = restaurantConfig.timeZone;
-  const nowUtc = new Date();
-
-  let currentDayNameInSpain;
-  try {
-    const dayFormatter = new Intl.DateTimeFormat('es-ES', { weekday: 'long', timeZone });
-    const dayNameLower = dayFormatter.format(nowUtc);
-    currentDayNameInSpain = dayNameLower.charAt(0).toUpperCase() + dayNameLower.slice(1);
-  } catch (e) {
-    // console.warn("API_ROUTE_GET_PRICE: Error formatting day for timezone", timeZone, e);
-    currentDayNameInSpain = new Date().toLocaleDateString('es-ES', { weekday: 'long' }); // Fallback
-    currentDayNameInSpain = currentDayNameInSpain.charAt(0).toUpperCase() + currentDayNameInSpain.slice(1);
-  }
-
-  let currentTimeFormattedInSpain;
-  try {
-    const timeFormatter = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone });
-    currentTimeFormattedInSpain = timeFormatter.format(nowUtc);
-  } catch (e) {
-    // console.warn("API_ROUTE_GET_PRICE: Error formatting time for timezone", timeZone, e);
-    const localNow = new Date(); // Fallback
-    currentTimeFormattedInSpain = String(localNow.getHours()).padStart(2, '0') + ':' + String(localNow.getMinutes()).padStart(2, '0');
-  }
-
-
-  for (const entry of priceEntries) {
-    if (entry.dia.toLowerCase() === currentDayNameInSpain.toLowerCase()) { // Compare in lower case
-      try {
-        const baseDateStr = formatDate(nowUtc, 'yyyy-MM-dd');
-        const entryStartTime = parseTime(baseDateStr + " " + entry.franjaStart, 'yyyy-MM-dd HH:mm', new Date());
-        const entryEndTime = parseTime(baseDateStr + " " + entry.franjaEnd, 'yyyy-MM-dd HH:mm', new Date());
-        const currentTime = parseTime(baseDateStr + " " + currentTimeFormattedInSpain, 'yyyy-MM-dd HH:mm', new Date());
-
-        if (isValidDate(entryStartTime) && isValidDate(entryEndTime) && isValidDate(currentTime)) {
-            if (currentTime >= entryStartTime && currentTime <= entryEndTime) {
-              // console.log("API_ROUTE_GET_PRICE: Matched price entry for " + entry.dia + " " + entry.franjaStart + "-" + entry.franjaEnd + ": " + entry.precio);
-              return entry.precio;
-            }
-        } else {
-            // console.warn("API_ROUTE_GET_PRICE: Invalid date parsed for entry time comparison: " + JSON.stringify(entry) + ", currentTime: " + currentTimeFormattedInSpain);
-        }
-      } catch (e) {
-        // console.warn("API_ROUTE_GET_PRICE: Could not parse time range for entry: " + JSON.stringify(entry), e);
-      }
-    }
-  }
-  // console.log("API_ROUTE_GET_PRICE: No matching price entry found for " + currentDayNameInSpain + " " + currentTimeFormattedInSpain + ". Using fallback price.");
-  return restaurantConfig.menuDelDia?.price || null;
+  // ... (previous logic for fetching and determining price from PRICES_SHEET_CSV_URL)
+  return restaurantConfig.menuDelDia?.price || null; // Fallback if dynamic price is removed
 }
 
 async function generatePriceSummary(): Promise<PriceSummary> {
-  const csvText = await fetchRawCsvData(PRICES_SHEET_CSV_URL, "PRICE_SUMMARY_FETCH");
-  const priceSummary: PriceSummary = {};
-
-  if (!csvText) {
-    // console.warn("API_ROUTE_GENERATE_PRICE_SUMMARY: Failed to fetch price sheet CSV for summary.");
-    return priceSummary; // Return empty summary
-  }
-
-  const parsedPriceData = parseCSV(csvText, EXPECTED_PRICE_HEADERS, "PRICE_SUMMARY_PARSE");
-  if (parsedPriceData.length === 0) {
-    // console.warn("API_ROUTE_GENERATE_PRICE_SUMMARY: No data rows parsed from price sheet for summary.");
-    return priceSummary;
-  }
-
-  const priceEntries: PriceEntry[] = parsedPriceData
-    .map(row => {
-      const diaRaw = row[DIA_COL_PRICE] || "";
-      const franjaHorariaRaw = row[FRANJA_HORARIA_COL_PRICE] || "";
-      const precioRaw = row[PRECIO_MENU_COL_PRICE] || "";
-
-      if (!diaRaw.trim() || !precioRaw.trim() || !franjaHorariaRaw.trim() || !franjaHorariaRaw.includes('-')) {
-        return null;
-      }
-      const [start, end] = franjaHorariaRaw.split(/\s*-\s*/);
-      return {
-        dia: diaRaw.trim().toLowerCase(),
-        franjaStart: start.trim(),
-        franjaEnd: end.trim(),
-        precio: precioRaw.trim()
-      };
-    })
-    .filter(entry => entry !== null) as PriceEntry[];
-
-  const weekdaysSpanish = ["lunes", "martes", "miércoles", "jueves", "viernes"];
-  const weekendsSpanish = ["sábado", "domingo"];
-
-  // Find weekday price and determine label
-  for (const entry of priceEntries) {
-    if (!priceSummary.weekdayPrice && weekdaysSpanish.includes(entry.dia)) {
-      priceSummary.weekdayPrice = entry.precio;
-      // Check if Monday has a price
-      const mondayHasPrice = priceEntries.some(pe => pe.dia === "lunes");
-      if (mondayHasPrice) {
-        priceSummary.weekdayLabelKey = "menu:weekdaysPriceLabel"; // Lunes-Viernes
-      } else {
-        priceSummary.weekdayLabelKey = "menu:tuesdayToFridayPriceLabel"; // Martes-Viernes
-      }
-    }
-    if (priceSummary.weekdayPrice) break; // Found a weekday price and label, no need to continue for weekdays
-  }
-  
-  // Find weekend price
-  for (const entry of priceEntries) {
-    if (!priceSummary.weekendPrice && weekendsSpanish.includes(entry.dia)) {
-      priceSummary.weekendPrice = entry.precio;
-      priceSummary.weekendLabelKey = "menu:weekendsPriceLabel";
-    }
-    if (priceSummary.weekendPrice) break; // Found a weekend price, no need to continue for weekends
-  }
-
-  if (priceSummary.weekdayPrice && !priceSummary.weekdayLabelKey) {
-    // Fallback if a weekday price was found but Monday specific check failed (should not happen with current logic)
-    priceSummary.weekdayLabelKey = "menu:weekdaysPriceLabel";
-  }
-
-
-  // console.log("API_ROUTE_GENERATE_PRICE_SUMMARY: Generated summary:", priceSummary);
-  return priceSummary;
+  // ... (previous logic for fetching and determining price summary from PRICES_SHEET_CSV_URL)
+  return {}; // Return empty summary if dynamic price is removed
 }
-
+*/
 
 export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemData[], currentMenuPrice: string | null, priceSummary: PriceSummary }> {
   // console.log("API_ROUTE_LOGIC_MENU: fetchAndProcessMenuData called.");
+
+  // Ensure GOOGLE_SHEET_CSV_URL is updated with the correct value
+  if (GOOGLE_SHEET_CSV_URL === 'REPLACE_WITH_YOUR_MAIN_MENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE') {
+      console.error("API_ROUTE_LOGIC_MENU: CRITICAL - GOOGLE_SHEET_CSV_URL is still set to the placeholder. Update it in src/app/api/menu/route.ts or environment variables.");
+      return { menuItems: [], currentMenuPrice: null, priceSummary: {} };
+  }
+  if (process.env.GOOGLE_SHEET_MENU_CSV_URL && process.env.GOOGLE_SHEET_MENU_CSV_URL !== 'YOUR_ENV_VARIABLE_FOR_MENU_SHEET_URL') {
+    GOOGLE_SHEET_CSV_URL = process.env.GOOGLE_SHEET_MENU_CSV_URL;
+  } else if (!process.env.GOOGLE_SHEET_MENU_CSV_URL && GOOGLE_SHEET_CSV_URL.includes('REPLACE_WITH_YOUR_MAIN_MENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE')) {
+    console.error("API_ROUTE_LOGIC_MENU: CRITICAL - GOOGLE_SHEET_MENU_CSV_URL env var not set and code placeholder is active.");
+    return { menuItems: [], currentMenuPrice: null, priceSummary: {} };
+  }
+  // console.log(`API_ROUTE_LOGIC_MENU: Using menu sheet URL: ${GOOGLE_SHEET_CSV_URL}`);
 
   const menuCsvText = await fetchRawCsvData(GOOGLE_SHEET_CSV_URL, "MENU_SHEET_FETCH");
   let allMenuItems: MenuItemData[] = [];
@@ -359,17 +230,17 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
 
     // let visibleItemsCount = 0;
     allMenuItems = parsedMenuData.map((item: Record<string, string>, index: number) => {
-      // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Row " + (index + 2) + " RAW: " + JSON.stringify(item));
+      // console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Row ${index + 2} RAW: ${JSON.stringify(item)}`);
 
-      const visibleString = (item[VISIBLE_COL] || "TRUE").trim(); 
+      const visibleString = (item[VISIBLE_COL] || "TRUE").trim();
       const isVisible = ["TRUE", "VERDADERO", "SÍ", "SI", "1"].includes(visibleString.toUpperCase());
 
 
       if (!isVisible) {
-        // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " is marked as NOT VISIBLE ('" + visibleString + "'). Skipping.");
+        // console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${(item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed")}' at row ${index + 2} is marked as NOT VISIBLE ('${visibleString}'). Skipping.`);
         return null;
       }
-      // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + (item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed") + "' at row " + (index + 2) + " IS VISIBLE.");
+      // console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${(item[NAME_EN_COL] || item[NOMBRE_ES_COL] || "Unnamed")}' at row ${index + 2} IS VISIBLE.`);
       // visibleItemsCount++;
 
       const nameCA = item[NOM_CA_COL];
@@ -387,30 +258,30 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
       const alergenosString = item[ALERGENOS_COL] || "";
 
       if (!nameCA && !nameES && !nameEN) {
-        // console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row " + (index + 2) + " (Visible) is MISSING ALL NAME DATA. Skipping. Data: " + JSON.stringify(item));
+        // console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row ${index + 2} (Visible) is MISSING ALL NAME DATA. Skipping. Data: ${JSON.stringify(item)}`);
         return null;
       }
-      const primaryCategoryEN = categoryEN || categoryES || categoryCA;
+      const primaryCategoryEN = categoryEN || categoryES || categoryCA; // Prefer English for key mapping
       if (!primaryCategoryEN) {
-         // console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row " + (index + 2) + " (Visible) has NO CATEGORY AT ALL. Skipping. Data: " + JSON.stringify(item));
+         // console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item at row ${index + 2} (Visible) has NO CATEGORY AT ALL. Skipping. Data: ${JSON.stringify(item)}`);
         return null;
       }
       const categoryKey = mapCategoryToKey(primaryCategoryEN);
 
       const primaryNameEN = nameEN || nameES || nameCA || "Unnamed Dish";
 
-      let finalImageUrl = 'https://placehold.co/400x300.png';
-      // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has image link from sheet: '" + linkImagenFromSheet + "'");
+      let finalImageUrl = 'https://placehold.co/400x300.png'; // Default placeholder
+      // console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${primaryNameEN}' has image link from sheet: '${linkImagenFromSheet}'`);
 
       if (linkImagenFromSheet && linkImagenFromSheet.toUpperCase() !== "FALSE" && linkImagenFromSheet.trim() !== "") {
         if (isValidHttpUrl(linkImagenFromSheet)) {
           finalImageUrl = linkImagenFromSheet;
-          // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' using valid image URL from sheet: '" + finalImageUrl + "'");
+          // console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${primaryNameEN}' using valid image URL from sheet: '${finalImageUrl}'`);
         } else {
-            // console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has an invalid or unusable image URL from sheet: '" + linkImagenFromSheet + "'. Using placeholder.");
+            // console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${primaryNameEN}' has an invalid or unusable image URL from sheet: '${linkImagenFromSheet}'. Using placeholder.`);
         }
       } else {
-        // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' has no image link or is marked FALSE. Using placeholder.");
+        // console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${primaryNameEN}' has no image link or is marked FALSE. Using placeholder.`);
       }
 
       let imageHint = (nameEN || nameES || nameCA || "food item").toLowerCase().split(' ').slice(0, 2).join(' ');
@@ -424,7 +295,7 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         if (!isNaN(numericPrice)) {
           formattedPrice = '€' + numericPrice.toFixed(2);
         } else {
-          // console.warn("API_ROUTE_LOGIC_ITEM_PROCESSING: Could not parse price '" + priceFromSheet + "' for item '" + primaryNameEN + "' into a number.");
+          // console.warn(`API_ROUTE_LOGIC_ITEM_PROCESSING: Could not parse price '${priceFromSheet}' for item '${primaryNameEN}' into a number.`);
         }
       }
 
@@ -433,10 +304,10 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         .filter(a => a.length > 0 && a !== "false" && a !== "n/a");
 
       const isChefSuggestion = ['true', 'verdadero', 'sí', 'si', '1', 'TRUE', 'VERDADERO', 'SÍ', 'SI'].includes(sugerenciaChefString.toLowerCase().trim());
-      // if (isChefSuggestion) console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Item '" + primaryNameEN + "' IS a chef suggestion.");
+      // if (isChefSuggestion) console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Item '${primaryNameEN}' IS a chef suggestion.`);
 
       const menuItem: MenuItemData = {
-        id: categoryKey + '-' + index + '-' + Date.now(),
+        id: `${categoryKey}-${index}-${Date.now()}`, // More unique ID
         name: {
           ca: (nameCA || nameES || nameEN || "").trim(),
           es: (nameES || nameCA || nameEN || "").trim(),
@@ -454,12 +325,12 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
         allergens: allergens.length > 0 ? allergens : undefined,
         isChefSuggestion: isChefSuggestion,
       };
-      // console.log("API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item: " + JSON.stringify(menuItem));
+      // console.log(`API_ROUTE_LOGIC_ITEM_PROCESSING: Successfully processed item: ${JSON.stringify(menuItem)}`);
       return menuItem;
     }).filter(item => item !== null) as MenuItemData[];
 
-    // console.log("API_ROUTE_LOGIC_MENU: Total items marked as visible: " + visibleItemsCount);
-    // console.log("API_ROUTE_LOGIC_MENU: Mapped to " + allMenuItems.length + " valid MenuItemData objects after filtering invisible and invalid items.");
+    // console.log(`API_ROUTE_LOGIC_MENU: Total items marked as visible: ${visibleItemsCount}`);
+    // console.log(`API_ROUTE_LOGIC_MENU: Mapped to ${allMenuItems.length} valid MenuItemData objects after filtering invisible and invalid items.`);
 
   } else {
     // console.warn("API_ROUTE_LOGIC_MENU: Menu CSV text was null. No menu items processed.");
@@ -471,13 +342,15 @@ export async function fetchAndProcessMenuData(): Promise<{ menuItems: MenuItemDa
     // console.warn("API_ROUTE_LOGIC_MENU: No menu items were successfully processed. Check GID, sheet publishing status (File > Share > Publish to web > CSV), header names, and data content in your Google Sheet.");
   // }
 
-  const currentMenuPrice = await getCurrentMenuPrice();
-  const priceSummaryData = await generatePriceSummary();
-  // console.log("API_ROUTE_LOGIC_MENU: Current menu price determined: " + currentMenuPrice);
-  // console.log("API_ROUTE_LOGIC_MENU: Price summary determined: " + JSON.stringify(priceSummaryData));
+  // Removed dynamic price fetching
+  const currentMenuPrice = null; // restaurantConfig.menuDelDia?.price || null;
+  const priceSummaryData = {}; // Removed call to generatePriceSummary()
+
+  // console.log(`API_ROUTE_LOGIC_MENU: Current menu price (fallback): ${currentMenuPrice}`);
+  // console.log(`API_ROUTE_LOGIC_MENU: Price summary (empty): ${JSON.stringify(priceSummaryData)}`);
 
   const result = { menuItems: allMenuItems, currentMenuPrice, priceSummary: priceSummaryData };
-  // console.log("API_ROUTE_LOGIC_MENU: Final result before NextResponse.json. Items count: " + (result.menuItems ? result.menuItems.length : 0) + ". Price: " + result.currentMenuPrice + ". Summary: " + JSON.stringify(result.priceSummary));
+  // console.log(`API_ROUTE_LOGIC_MENU: Final result before NextResponse.json. Items count: ${result.menuItems ? result.menuItems.length : 0}. Price: ${result.currentMenuPrice}. Summary: ${JSON.stringify(result.priceSummary)}`);
   return result;
 }
 
@@ -487,8 +360,8 @@ export async function GET() {
   const { menuItems, currentMenuPrice, priceSummary } = await fetchAndProcessMenuData();
 
   const headers = new Headers();
-  headers.append('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
+  headers.append('Cache-Control', 's-maxage=60, stale-while-revalidate=300'); // Cache for 1 min, stale for 5 min
 
-  // console.log("API_ROUTE_GET_MENU: Total menu items processed: " + (menuItems ? menuItems.length : 0) + ". Current price: " + currentMenuPrice + ". Sending response with price summary: " + JSON.stringify(priceSummary));
+  // console.log(`API_ROUTE_GET_MENU: Total menu items processed: ${menuItems ? menuItems.length : 0}. Current price: ${currentMenuPrice}. Sending response with price summary: ${JSON.stringify(priceSummary)}`);
   return NextResponse.json({ menuItems, currentMenuPrice, priceSummary }, { status: 200, headers });
 }

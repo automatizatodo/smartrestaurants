@@ -9,16 +9,19 @@ import BookingSection from '@/components/landing/BookingSection';
 import ContactMapSection from '@/components/landing/ContactMapSection';
 import TestimonialCarousel from '@/components/landing/TestimonialCarousel';
 import Footer from '@/components/landing/Footer';
-import { fetchMenuDataWithPrice } from '@/services/menuService';
+import { fetchMenuData } from '@/services/menuService'; // Updated function name
 import type { MenuItemData } from '@/data/menu';
-import restaurantConfig from '@/config/restaurant.config'; // Import config
+import restaurantConfig from '@/config/restaurant.config';
 import { Suspense } from 'react';
-import type { PriceSummary } from '@/app/api/menu/route';
+// import type { PriceSummary } from '@/app/api/menu/route'; // No longer needed
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const { menuItems, currentMenuPrice, priceSummary } = await fetchMenuDataWithPrice();
+  // const { menuItems, currentMenuPrice, priceSummary } = await fetchMenuDataWithPrice(); // Old call
+  const menuItems = await fetchMenuData(); // New call, only gets menuItems
+
+  // console.log("HOMEPAGE_LOG: Received menuItems in HomePage:", JSON.stringify(menuItems, null, 2));
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -27,7 +30,8 @@ export default async function HomePage() {
         <HeroSection />
         <ServicesSection />
         <Suspense fallback={<div className="text-center py-10">Loading menu...</div>}>
-          <InteractiveMenu menuItems={menuItems} currentMenuPrice={currentMenuPrice} priceSummary={priceSummary} />
+          {/* InteractiveMenu no longer needs currentMenuPrice or priceSummary as props */}
+          <InteractiveMenu menuItems={menuItems} />
         </Suspense>
         <AboutUsSection />
         {restaurantConfig.showAISommelierSection && <AISommelierSection />}

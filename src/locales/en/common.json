@@ -1,8 +1,8 @@
 
 {
-  "restaurantName": "La Bodega de la Ferradura",
-  "tagline": "Traditional mountain cuisine in the heart of Alp",
-  "nav.menuDelDia": "Menu of the Day",
+  "restaurantName": "La Ferradura",
+  "tagline": "Charming Mediterranean cuisine in the heart of Alp",
+  "nav.menuDelDia": "Suggestions",
   "nav.carta": "À la Carte",
   "nav.aiSommelier": "AI Sommelier",
   "nav.testimonials": "Reviews",
@@ -11,7 +11,7 @@
   "nav.contact": "Contact & Location",
   "nav.mobileMenuTitle": "Navigation Menu",
   "button.bookNow": "Book a Table",
-  "button.viewFullMenu": "View Full À la Carte",
+  "button.viewFullMenu": "View Full Menu",
   "footer.quickLinks": "Quick Links",
   "footer.home": "Home",
   "footer.contactUs": "Contact Us",
@@ -20,7 +20,7 @@
   "footer.copyright": "© {year} {restaurantName}. All rights reserved.",
   "footer.managedByText": "Website managed by",
   "footer.managedByBrand": "automatizatodo.com",
-  "footer.seoText": "{restaurantName} - Your mountain cuisine restaurant in Alp.",
+  "footer.seoText": "{restaurantName} - Your Mediterranean restaurant in Alp.",
   "form.error.generic": "An unexpected error occurred. Please try again later.",
   "form.error.invalidInput": "Invalid input. Please check your details.",
   "languageSelector.label": "Select language",
@@ -33,10 +33,10 @@
   "guestsPlural": "guests",
   "allCategories": "All",
   "seo": {
-    "mainKeywords": "Restaurant in Alp, La Bodega de la Ferradura, mountain cuisine, grill",
+    "mainKeywords": "Restaurant in Alp, La Ferradura, Mediterranean cuisine, fresh pasta, pizza, Alp",
     "pageContext": "Restaurant in Alp",
-    "defaultDescription": "Discover La Bodega de la Ferradura in Alp, specializing in traditional mountain cuisine, grilled meats, and local products. Book your table!",
-    "defaultTitleSuffix": "La Bodega de la Ferradura | Restaurant in Alp for Mountain Cuisine and Grill"
+    "defaultDescription": "Discover La Ferradura in Alp, specializing in Mediterranean cuisine, fresh pasta, artisan pizzas, and organic products. Book your table!",
+    "defaultTitleSuffix": "La Ferradura | Mediterranean Restaurant in Alp"
   },
   "cookieConsent.text": "This website uses cookies to provide necessary site functionality and to improve your experience. By using this website, you agree to our use of cookies.",
   "cookieConsent.acceptButton": "Accept",

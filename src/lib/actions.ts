@@ -7,11 +7,15 @@ config();
 import { aiSommelier, type AISommelierInput, type AISommelierOutput } from "@/ai/flows/ai-sommelier";
 import { checkCalendarAvailability, type CheckCalendarAvailabilityInput, type CheckCalendarAvailabilityOutput } from "@/ai/flows/check-calendar-availability-flow";
 import { createCalendarEvent, type CreateCalendarEventInput, type CreateCalendarEventOutput } from "@/ai/flows/create-calendar-event-flow";
-import { fetchMenuDataWithPrice } from '@/services/menuService';
+import { fetchMenuData } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import { z } from "zod";
 import restaurantConfig from "@/config/restaurant.config";
 import { format, parseISO } from "date-fns";
+// Remove unused locale imports if not used elsewhere in this file, or ensure they are used correctly.
+// For example, if you need locales for date formatting within this file:
+// import { ca, es, enUS as en } from 'date-fns/locale';
+
 
 const SommelierRequestSchema = z.object({
   tastePreferences: z.string().min(10, "landing:aiSommelier.error.preferencesRequired").max(500, "landing:aiSommelier.error.preferencesTooLong"),
@@ -41,7 +45,7 @@ const formatMenuForAI = (menuItems: MenuItemData[]): string => {
 
 
 export async function getAISommelierRecommendations(
-  prevState: SommelierFormState | null,
+  initialState: SommelierFormState,
   formData: FormData
 ): Promise<SommelierFormState> {
   // console.log("ACTIONS_AISOMMELIER: getAISommelierRecommendations called.");
@@ -62,7 +66,7 @@ export async function getAISommelierRecommendations(
   let menuInformationString = "Menu information is currently unavailable.";
   try {
     // console.log("ACTIONS_AISOMMELIER: Fetching menu for AI Sommelier...");
-    const { menuItems } = await fetchMenuDataWithPrice(); 
+    const menuItems = await fetchMenuData(); 
     if (menuItems && menuItems.length > 0) {
       menuInformationString = formatMenuForAI(menuItems);
       // console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted for AI.");
@@ -85,21 +89,21 @@ export async function getAISommelierRecommendations(
     // console.log("ACTIONS_AISOMMELIER: aiSommelier flow result:", result);
     if (result.dishRecommendations) {
       return {
-        messageKey: "landing:aiSommelier.toast.successDescriptionKey",
+        messageKey: "landing:aiSommelier.toast.successDescriptionKey", 
         recommendations: result.dishRecommendations,
         errors: null,
         messageParams: null,
       };
     } else {
       return {
-        messageKey: "landing:aiSommelier.toast.errorDescriptionKey",
+        messageKey: "landing:aiSommelier.error.couldNotGenerate", 
         recommendations: null,
         errors: null,
         messageParams: null,
       };
     }
   } catch (error) {
-    console.error("ACTIONS_AISOMMELIER: AI Sommelier Flow Error:", error);
+    // console.error("ACTIONS_AISOMMELIER: AI Sommelier Flow Error:", error);
     let errorMessageKey = "common:form.error.generic";
     if (error instanceof Error && (error.message.includes("NO_RESPONSE") || error.message.includes("generation error"))) {
         errorMessageKey = "landing:aiSommelier.error.couldNotGenerate";
@@ -107,23 +111,21 @@ export async function getAISommelierRecommendations(
     return {
       messageKey: errorMessageKey,
       recommendations: null,
-      errors: null,
+      errors: null, 
       messageParams: null,
     };
   }
 }
 
-// Define a type for the raw form data to be included in the state
 type BookingFormData = z.infer<typeof BookingSchema>;
 
-// Allow guests to be a number up to 99 to handle the "many guests" special value
 const BookingSchema = z.object({
   name: z.string().min(1, "landing:booking.error.nameRequired"),
   email: z.string().email("landing:booking.error.emailInvalid"),
   phone: z.string().min(1, "landing:booking.error.phoneRequired"),
-  date: z.string().min(1, "landing:booking.error.dateRequired"),
+  date: z.string().min(1, "landing:booking.error.dateRequired"), 
   time: z.string().min(1, "landing:booking.error.timeRequired"),
-  guests: z.coerce.number().int().min(1, "landing:booking.error.guestsRequired").max(99, "landing:booking.error.guestsTooManySystem"), // Allow up to 99 for the special case
+  guests: z.coerce.number().int().min(1, "landing:booking.error.guestsRequired").max(99, "landing:booking.error.guestsTooManySystem"),
   notes: z.string().optional(),
 });
 
@@ -149,7 +151,7 @@ export interface BookingFormState {
 }
 
 export async function submitBooking(
-  prevState: BookingFormState, 
+  initialState: BookingFormState,
   formData: FormData
 ): Promise<BookingFormState> {
   // console.log("ACTIONS_BOOKING: submitBooking action initiated.");
@@ -157,9 +159,9 @@ export async function submitBooking(
     name: formData.get("name") as string || '',
     email: formData.get("email") as string || '',
     phone: formData.get("phone") as string || '',
-    date: formData.get("date") as string || '',
+    date: formData.get("date") as string || '', 
     time: formData.get("time") as string || '',
-    guests: formData.get("guests") as string || '', 
+    guests: formData.get("guests") as string || '0', 
     notes: formData.get("notes") as string || undefined,
   };
   // console.log("ACTIONS_BOOKING: Raw form data:", rawFormData);
@@ -181,14 +183,14 @@ export async function submitBooking(
 
   const { name, email, phone, date, time, guests, notes } = validatedFields.data;
   const maxConfigGuests = restaurantConfig.bookingMaxGuestsPerSlot || 8;
-  const manyGuestsValue = 99; // Special value for "more than X"
+  const manyGuestsValue = 99; 
 
   if (restaurantConfig.bookingMethod === 'whatsapp') {
     // console.log("ACTIONS_BOOKING: Processing booking via WhatsApp method.");
     if (!restaurantConfig.whatsappBookingNumber) {
       console.error("ACTIONS_BOOKING: WhatsApp booking number is not configured in restaurantConfig.");
       return {
-        messageKey: "landing:booking.error.whatsappConfigError",
+        messageKey: "landing:booking.error.whatsappConfigError", 
         success: false,
         errors: { general: ["landing:booking.error.whatsappConfigError"] },
         messageParams: null,
@@ -198,16 +200,24 @@ export async function submitBooking(
 
     let formattedDate = date; 
     try {
-        const parsedDateObj = parseISO(date);
-        formattedDate = format(parsedDateObj, "PPP"); 
+        const parsedDateObj = parseISO(date); 
+        // Dynamically import locales for date-fns to avoid making them direct dependencies of this server action file
+        const dateLocales = {
+            ca: (await import('date-fns/locale/ca')).default,
+            es: (await import('date-fns/locale/es')).default,
+            en: (await import('date-fns/locale/en-US')).default,
+        };
+        const currentLocale = restaurantConfig.defaultLocale || 'ca';
+        formattedDate = format(parsedDateObj, "PPP", { locale: dateLocales[currentLocale as keyof typeof dateLocales] || dateLocales.ca }); 
     } catch (e) {
-        // console.warn("ACTIONS_BOOKING_WHATSAPP: Could not parse date " + date + " with parseISO. Using original string.");
+        // console.warn("ACTIONS_BOOKING_WHATSAPP: Could not parse date " + date + " with parseISO for WhatsApp. Using original string.");
     }
 
     const restaurantNameForMsg = restaurantConfig.restaurantDisplayName || 'el restaurante';
     let guestText = guests.toString();
     if (guests === manyGuestsValue) {
-        guestText = "Més de " + maxConfigGuests; // This should be localized if possible
+        // This should be localized if possible, or use a generic term
+        guestText = "Més de " + maxConfigGuests + " (grup gran)"; 
     }
 
 
@@ -217,7 +227,7 @@ export async function submitBooking(
       "- Nombre: " + name,
       "- Email: " + email,
       "- Teléfono: " + phone,
-      "- Fecha: " + formattedDate,
+      "- Fecha: " + formattedDate, 
       "- Hora: " + time,
       "- Comensales: " + guestText,
     ];
@@ -232,20 +242,19 @@ export async function submitBooking(
       messageKey: "landing:booking.successMessageWhatsapp",
       success: true,
       errors: null,
-      messageParams: { name },
+      messageParams: { name }, 
       bookingMethod: 'whatsapp',
-      whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''),
+      whatsappNumber: restaurantConfig.whatsappBookingNumber.replace(/\D/g, ''), 
       whatsappMessage: whatsappMessage,
       submittedData: null, 
     };
 
   } else if (restaurantConfig.bookingMethod === 'calendar') {
     // console.log("ACTIONS_BOOKING: Processing booking via Google Calendar method.");
-
     if (guests === manyGuestsValue || guests > maxConfigGuests) {
         // console.warn("ACTIONS_BOOKING: Too many guests (" + guests + ") for calendar booking. Max allowed: " + maxConfigGuests + ".");
         return {
-            messageKey: "landing:booking.error.guestsTooManyForCalendar",
+            messageKey: "landing:booking.error.guestsTooManyForCalendar", 
             success: false,
             errors: { general: ["landing:booking.error.guestsTooManyForCalendar"], guests: ["landing:booking.error.guestsTooManyForCalendar"] },
             messageParams: { count: maxConfigGuests },
@@ -255,24 +264,30 @@ export async function submitBooking(
 
     let availabilityResult: CheckCalendarAvailabilityOutput | undefined;
     try {
-      // console.log("ACTIONS_BOOKING: Calling checkCalendarAvailability flow...");
+      // console.log("ACTIONS_BOOKING: Calling checkCalendarAvailability flow with input:", { date, time, guests });
       const availabilityInput: CheckCalendarAvailabilityInput = { date, time, guests };
       availabilityResult = await checkCalendarAvailability(availabilityInput);
       // console.log("ACTIONS_BOOKING: checkCalendarAvailability flow response:", availabilityResult);
 
       if (!availabilityResult || typeof availabilityResult.isAvailable === 'undefined') {
-          console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
+          // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from checkCalendarAvailability flow.", availabilityResult);
           return {
-              messageKey: "landing:booking.error.calendarServiceUnavailable", // More generic error
+              messageKey: "common:calendar.serviceUnavailable", 
               success: false,
-              errors: { general: ["landing:booking.error.calendarServiceUnavailable"] },
+              errors: { general: ["common:calendar.serviceUnavailable"] },
               messageParams: null,
               submittedData: validatedFields.data,
           };
       }
 
       if (!availabilityResult.isAvailable) {
-        const messageParams: Record<string, string | number> = { time, date: format(parseISO(date), "PPP") };
+        const dateLocales = {
+          ca: (await import('date-fns/locale/ca')).default,
+          es: (await import('date-fns/locale/es')).default,
+          en: (await import('date-fns/locale/en-US')).default,
+        };
+        const currentLocale = restaurantConfig.defaultLocale || 'ca';
+        const messageParams: Record<string, string | number> = { time, date: format(parseISO(date), "PPP", { locale: dateLocales[currentLocale as keyof typeof dateLocales] || dateLocales.ca }) };
          if (availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests') {
             messageParams.guests = String(guests);
             messageParams.maxGuestsForSlot = String(availabilityResult.maxGuestsForSlot || 0);
@@ -287,12 +302,11 @@ export async function submitBooking(
         };
       }
     } catch (error: any) {
-      console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
-      if (error.cause) console.error("SUBMIT_BOOKING_ACTION_ERROR_CAUSE_CHECK:", error.cause);
+      // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during checkCalendarAvailability EXECUTION:", error.message, error.stack);
       return {
-        messageKey: "landing:booking.error.calendarServiceUnavailable",
+        messageKey: "common:calendar.serviceUnavailable",
         success: false,
-        errors: { general: ["landing:booking.error.calendarServiceUnavailable"] },
+        errors: { general: ["common:calendar.serviceUnavailable"] },
         messageParams: null,
         submittedData: validatedFields.data,
       };
@@ -306,11 +320,11 @@ export async function submitBooking(
       // console.log("ACTIONS_BOOKING: createCalendarEvent flow response:", eventResult);
 
       if (!eventResult || typeof eventResult.success === 'undefined') {
-          console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
+          // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Invalid or undefined response from createCalendarEvent flow.", eventResult);
           return {
-              messageKey: "landing:booking.error.calendarServiceUnavailable", // More generic error
+              messageKey: "common:calendar.serviceUnavailable", 
               success: false,
-              errors: { general: ["landing:booking.error.calendarServiceUnavailable"] },
+              errors: { general: ["common:calendar.serviceUnavailable"] },
               messageParams: null,
               submittedData: validatedFields.data,
           };
@@ -319,7 +333,7 @@ export async function submitBooking(
       if (!eventResult.success) {
         // console.warn("ACTIONS_BOOKING: Failed to create calendar event according to createCalendarEvent flow.", eventResult);
         return {
-          messageKey: eventResult.errorKey || "landing:booking.error.calendarError", // Keep specific error if provided by flow
+          messageKey: eventResult.errorKey || "landing:booking.error.calendarError", 
           success: false,
           errors: { general: [eventResult.errorKey || "landing:booking.error.calendarError"] },
           messageParams: null,
@@ -329,7 +343,13 @@ export async function submitBooking(
       let formattedSuccessDate = date;
         try {
             const parsedDateObj = parseISO(date);
-            formattedSuccessDate = format(parsedDateObj, "PPP");
+            const dateLocales = {
+                ca: (await import('date-fns/locale/ca')).default,
+                es: (await import('date-fns/locale/es')).default,
+                en: (await import('date-fns/locale/en-US')).default,
+            };
+            const currentLocale = restaurantConfig.defaultLocale || 'ca';
+            formattedSuccessDate = format(parsedDateObj, "PPP", { locale: dateLocales[currentLocale as keyof typeof dateLocales] || dateLocales.ca });
         } catch (e) {
             // console.warn("ACTIONS_BOOKING_CALENDAR_SUCCESS: Could not parse date " + date + " with parseISO for success message. Using original string.");
         }
@@ -350,20 +370,19 @@ export async function submitBooking(
       };
 
     } catch (error: any) {
-      console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
-      if (error.cause) console.error("SUBMIT_BOOKING_ACTION_ERROR_CAUSE_CREATE:", error.cause);
+      // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
       return {
-        messageKey: "landing:booking.error.calendarServiceUnavailable",
+        messageKey: "common:calendar.serviceUnavailable",
         success: false,
-        errors: { general: ["landing:booking.error.calendarServiceUnavailable"] },
+        errors: { general: ["common:calendar.serviceUnavailable"] },
         messageParams: null,
         submittedData: validatedFields.data,
       };
     }
   } else {
-    console.error("ACTIONS_BOOKING: Unknown booking method configured:", restaurantConfig.bookingMethod);
+    // console.error("ACTIONS_BOOKING: Unknown booking method configured:", restaurantConfig.bookingMethod);
     return {
-      messageKey: "landing:booking.error.unknownMethod",
+      messageKey: "landing:booking.error.unknownMethod", 
       success: false,
       errors: { general: ["landing:booking.error.unknownMethod"] },
       messageParams: null,

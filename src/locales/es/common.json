@@ -1,8 +1,8 @@
 
 {
-  "restaurantName": "La Bodega de la Ferradura",
-  "tagline": "Cocina tradicional de montaña en el corazón de Alp",
-  "nav.menuDelDia": "Menú del Día",
+  "restaurantName": "La Ferradura",
+  "tagline": "Cocina mediterránea con encanto en el corazón de Alp",
+  "nav.menuDelDia": "Sugerencias",
   "nav.carta": "Carta",
   "nav.aiSommelier": "Sommelier IA",
   "nav.testimonials": "Opiniones",
@@ -20,7 +20,7 @@
   "footer.copyright": "© {year} {restaurantName}. Todos los derechos reservados.",
   "footer.managedByText": "Sitio web gestionado por",
   "footer.managedByBrand": "automatizatodo.com",
-  "footer.seoText": "{restaurantName} - Tu restaurante de cocina de montaña en Alp.",
+  "footer.seoText": "{restaurantName} - Tu restaurante de cocina mediterránea en Alp.",
   "form.error.generic": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.",
   "form.error.invalidInput": "Entrada inválida. Por favor, revisa tus datos.",
   "languageSelector.label": "Seleccionar idioma",
@@ -33,10 +33,10 @@
   "guestsPlural": "comensales",
   "allCategories": "Todas",
   "seo": {
-    "mainKeywords": "Restaurante en Alp, La Bodega de la Ferradura, cocina de montaña, brasa",
+    "mainKeywords": "Restaurante en Alp, La Ferradura, cocina mediterránea, pasta fresca, pizza, Alp",
     "pageContext": "Restaurante en Alp",
-    "defaultDescription": "Descubre La Bodega de la Ferradura en Alp, especializado en cocina tradicional de montaña, carnes a la brasa y productos de proximidad. ¡Reserva tu mesa!",
-    "defaultTitleSuffix": "La Bodega de la Ferradura | Restaurante en Alp de Cocina de Montaña y Brasa"
+    "defaultDescription": "Descubre La Ferradura en Alp, especialista en cocina mediterránea, pasta fresca, pizzas artesanas y productos ecológicos. ¡Reserva tu mesa!",
+    "defaultTitleSuffix": "La Ferradura | Restaurante Mediterráneo en Alp"
   },
   "cookieConsent.text": "Este sitio web utiliza cookies para proporcionar la funcionalidad necesaria del sitio y para mejorar tu experiencia. Al utilizar este sitio web, aceptas nuestro uso de cookies.",
   "cookieConsent.acceptButton": "Aceptar",

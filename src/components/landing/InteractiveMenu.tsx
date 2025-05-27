@@ -10,16 +10,15 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { UtensilsCrossed, AlertTriangle } from 'lucide-react';
-import restaurantConfig from '@/config/restaurant.config';
-import type { PriceSummary } from '@/app/api/menu/route';
+// import restaurantConfig from '@/config/restaurant.config'; // No longer needed for price here
+// import type { PriceSummary } from '@/app/api/menu/route'; // No longer needed for price here
 
 interface InteractiveMenuProps {
   menuItems: MenuItemData[];
-  currentMenuPrice?: string | null;
-  priceSummary: PriceSummary;
+  // currentMenuPrice and priceSummary removed as per new requirements
 }
 
-export default function InteractiveMenu({ menuItems, currentMenuPrice, priceSummary }: InteractiveMenuProps) {
+export default function InteractiveMenu({ menuItems }: InteractiveMenuProps) {
   const { t } = useLanguage();
 
   const availableCategoryKeys = Array.from(new Set(menuItems.map(item => item.categoryKey).filter(Boolean)));
@@ -31,33 +30,21 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice, priceSumm
   const defaultCategory = sortedCategories.length > 0 ? sortedCategories[0].key : 'all';
   const [activeTab, setActiveTab] = useState<string>(defaultCategory);
 
-  const menuDelDiaPriceDescription = restaurantConfig.menuDelDia?.priceDescriptionKey
-    ? t(restaurantConfig.menuDelDia.priceDescriptionKey)
-    : "";
+  // const menuDelDiaPriceDescription = restaurantConfig.menuDelDia?.priceDescriptionKey
+  //   ? t(restaurantConfig.menuDelDia.priceDescriptionKey)
+  //   : "";
 
   if (!menuItems || menuItems.length === 0) {
-    return ( // Ensure parentheses for multi-line JSX
+    return (
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2
-            className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4"
+            className="text-4xl sm:text-5xl font-anton font-bold text-foreground mb-3 sm:mb-4"
             suppressHydrationWarning
           >
             {t('landing:menu.sectionTitle')}
           </h2>
-           {currentMenuPrice && (
-            <div className="mb-6">
-              <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
-              {menuDelDiaPriceDescription && (
-                <p
-                  className="text-sm text-muted-foreground mt-1"
-                  suppressHydrationWarning
-                >
-                  {menuDelDiaPriceDescription}
-                </p>
-              )}
-            </div>
-          )}
+           {/* Removed currentMenuPrice and priceDescription display */}
            <div className="flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
             <AlertTriangle className="w-12 h-12 mb-4 text-destructive" />
             <p className="text-lg mb-2">{t('landing:menu.loadingErrorTitle')}</p>
@@ -81,28 +68,16 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice, priceSumm
   }
 
   if (sortedCategories.length === 0) {
-    return ( // Ensure parentheses for multi-line JSX
+    return (
       <section id="menu" className="py-16 sm:py-24 bg-secondary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2
-            className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-4"
+            className="text-4xl sm:text-5xl font-anton font-bold text-foreground mb-4"
             suppressHydrationWarning
           >
             {t('landing:menu.sectionTitle')}
           </h2>
-          {currentMenuPrice && (
-            <div className="mb-8">
-              <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
-              {menuDelDiaPriceDescription && (
-                <p
-                  className="text-sm text-muted-foreground mt-1"
-                  suppressHydrationWarning
-                >
-                  {menuDelDiaPriceDescription}
-                </p>
-              )}
-            </div>
-          )}
+          {/* Removed currentMenuPrice and priceDescription display */}
            <div className="flex flex-col items-center justify-center text-muted-foreground bg-card p-8 rounded-lg shadow-md">
             <AlertTriangle className="w-16 h-16 mb-6 text-primary" />
             <p className="text-lg mb-2">{t('landing:menu.noCategoriesTitle')}</p>
@@ -126,43 +101,16 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice, priceSumm
   }
 
 
-  return ( // Ensure parentheses for multi-line JSX
+  return (
     <section id="menu" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8"> {/* Reduced mb from 12/16 to 8 */}
-          <h2 className="text-4xl sm:text-5xl font-serif font-bold text-foreground mb-3 sm:mb-4" suppressHydrationWarning>
+        <div className="text-center mb-8">
+          <h2 className="text-4xl sm:text-5xl font-anton font-bold text-foreground mb-3 sm:mb-4" suppressHydrationWarning>
             {t('landing:menu.sectionTitle')}
           </h2>
 
-          {/* Price Summary Display - Copied from MenuPageClientContent */}
-          {priceSummary && (priceSummary.weekdayPrice || priceSummary.weekendPrice) && (
-              <div className="mb-2 text-md text-foreground/80">
-                {priceSummary.weekdayPrice && priceSummary.weekdayLabelKey && (
-                  <span className="mr-3" suppressHydrationWarning>
-                    {t(priceSummary.weekdayLabelKey)}: <span className="font-semibold">{priceSummary.weekdayPrice}</span>
-                  </span>
-                )}
-                {priceSummary.weekendPrice && priceSummary.weekendLabelKey && (
-                  <span suppressHydrationWarning>
-                    {t(priceSummary.weekendLabelKey)}: <span className="font-semibold">{priceSummary.weekendPrice}</span>
-                  </span>
-                )}
-              </div>
-            )}
+          {/* Removed Price Summary Display and currentMenuPrice display */}
 
-          {currentMenuPrice && (
-            <div className="mb-6">
-              <p className="text-3xl sm:text-4xl font-bold text-primary">{currentMenuPrice}</p>
-               {menuDelDiaPriceDescription && (
-                <p
-                  className="text-sm text-muted-foreground mt-1"
-                  suppressHydrationWarning
-                >
-                  {menuDelDiaPriceDescription}
-                </p>
-              )}
-            </div>
-          )}
           {t('landing:menu.sectionDescription').trim() && (
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12" suppressHydrationWarning>
               {t('landing:menu.sectionDescription')}
@@ -216,5 +164,3 @@ export default function InteractiveMenu({ menuItems, currentMenuPrice, priceSumm
     </section>
   );
 }
-
-    

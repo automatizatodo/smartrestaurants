@@ -1,8 +1,8 @@
 
 {
-  "restaurantName": "La Bodega de la Ferradura",
-  "tagline": "Cuina tradicional de muntanya al cor d'Alp",
-  "nav.menuDelDia": "Menú del Dia",
+  "restaurantName": "La Ferradura",
+  "tagline": "Cuina mediterrània amb encant al cor d'Alp",
+  "nav.menuDelDia": "Suggeriments",
   "nav.carta": "Carta",
   "nav.aiSommelier": "Sommelier IA",
   "nav.testimonials": "Opinions",
@@ -20,7 +20,7 @@
   "footer.copyright": "© {year} {restaurantName}. Tots els drets reservats.",
   "footer.managedByText": "Lloc web gestionat per",
   "footer.managedByBrand": "automatizatodo.com",
-  "footer.seoText": "{restaurantName} - El teu restaurant de cuina de muntanya a Alp.",
+  "footer.seoText": "{restaurantName} - El teu restaurant de cuina mediterrània a Alp.",
   "form.error.generic": "S'ha produït un error inesperat. Si us plau, torna-ho a provar més tard.",
   "form.error.invalidInput": "Entrada invàlida. Si us plau, revisa les teves dades.",
   "languageSelector.label": "Selecciona idioma",
@@ -33,10 +33,10 @@
   "guestsPlural": "comensals",
   "allCategories": "Totes",
   "seo": {
-    "mainKeywords": "Restaurant a Alp, La Bodega de la Ferradura, cuina de muntanya, brasa",
+    "mainKeywords": "Restaurant a Alp, La Ferradura, cuina mediterrània, pasta fresca, pizza, Alp",
     "pageContext": "Restaurant a Alp",
-    "defaultDescription": "Descobreix La Bodega de la Ferradura a Alp, especialitzat en cuina tradicional de muntanya, carns a la brasa i productes de proximitat. Reserva la teva taula!",
-    "defaultTitleSuffix": "La Bodega de la Ferradura | Restaurant a Alp de Cuina de Muntanya i Brasa"
+    "defaultDescription": "Descobreix La Ferradura a Alp, especialista en cuina mediterrània, pasta fresca, pizzes artesanes i productes ecològics. Reserva la teva taula!",
+    "defaultTitleSuffix": "La Ferradura | Restaurant Mediterrani a Alp"
   },
   "cookieConsent.text": "Aquest lloc web utilitza galetes per proporcionar la funcionalitat necessària del lloc i per millorar la teva experiència. En utilitzar aquest lloc web, acceptes el nostre ús de galetes.",
   "cookieConsent.acceptButton": "Acceptar",
