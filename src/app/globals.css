@@ -14,42 +14,43 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    /* Dark Theme: Deep Wood, Dark Olive, Warm Cream - "La Bodega de la Ferradura" Dark Theme */
-    --background: 25 30% 15%;        /* Deep dark brown (wood imitation) hsl(25, 30%, 15%) */
+    /* Dark Theme: "La Bodega de la Ferradura" Dark Rustic Theme */
+    /* Deep dark wood/charcoal for background, light cream/beige for text */
+    --background: 25 30% 10%;        /* Very Deep dark brown (wood/charcoal imitation) hsl(25, 30%, 10%) */
     --foreground: 35 40% 85%;        /* Light warm cream/beige for text hsl(35, 40%, 85%) */
 
-    --card: 25 25% 22%;             /* Darker wood brown for cards hsl(25, 25%, 22%) */
+    --card: 25 25% 18%;             /* Darker wood brown for cards hsl(25, 25%, 18%) */
     --card-foreground: var(--foreground); /* Light cream text on dark wood cards */
 
-    --popover: 25 20% 18%;          /* Even darker popover hsl(25, 20%, 18%) */
+    --popover: 25 20% 15%;          /* Even darker popover hsl(25, 20%, 15%) */
     --popover-foreground: var(--foreground);
 
-    /* New Primary: Dark Olive (#1C2304) - HSL: 74 79% 8% */
-    --primary: 74 79% 8%;
-    --primary-foreground: 74 25% 95%; /* Very light, almost white/cream, for text on primary */
+    /* New Primary: Blue (#3980b8) - HSL: 206 53% 47% */
+    --primary: 206 53% 47%;
+    --primary-foreground: 206 30% 97%; /* Very light, slightly desaturated blue/white for text on primary */
 
-    /* Ocre/Wood background (Secondary) - Warm medium wood tone */
-    --secondary: 30 40% 45%;        /* Warm medium wood brown (hsl(30, 40%, 45%)) */
+    /* Ocre/Wood background (Secondary) - Darker, richer wood tone */
+    --secondary: 30 40% 30%;        /* Darker, richer wood brown (hsl(30, 40%, 30%)) */
     /* Text on Ocre/Wood background - ensure good contrast */
-    --secondary-foreground: 35 40% 90%; /* Light cream for text on ocre/secondary */
+    --secondary-foreground: 35 40% 90%; /* Light cream for text on dark ocre/secondary */
 
     /* Muted background - Dark muted brown/gray */
-    --muted: 25 15% 30%;            /* Dark muted brown/gray (hsl(25, 15%, 30%)) */
+    --muted: 25 15% 25%;            /* Dark muted brown/gray (hsl(25, 15%, 25%)) */
     /* Text on Muted background - ensure good contrast */
     --muted-foreground: 35 40% 88%;   /* Lighter cream for text on muted background */
 
-    /* Accent - A lighter, earthy tone to complement the dark olive and wood */
+    /* Accent - A lighter, earthy tone to complement the blue and dark wood */
     --accent: 40 30% 50%;  /* Muted earthy beige/light brown */
     --accent-foreground: 40 100% 98%; /* Very light text on accent */
 
     --destructive: 0 60% 50%;       /* A warm red for destructive actions */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 25 20% 35%;           /* Dark wood/charcoal border (hsl(25, 20%, 35%)) */
-    --input: 25 20% 28%;            /* Input background, dark wood (hsl(25, 20%, 28%)) */
-    --ring: 74 79% 15%;            /* Dark Olive for focus rings, slightly lighter */
+    --border: 25 20% 30%;           /* Dark wood/charcoal border (hsl(25, 20%, 30%)) */
+    --input: 25 20% 22%;            /* Input background, dark wood (hsl(25, 20%, 22%)) */
+    --ring: 206 53% 55%;            /* Lighter Blue for focus rings */
 
-    --chart-1: 74 79% 8%;           /* New Primary Dark Olive */
+    --chart-1: 206 53% 47%;           /* New Primary Blue */
     --chart-2: 30 40% 45%;          /* Warm Medium Wood Brown Accent */
     --chart-3: 40 30% 50%;          /* Muted Earthy Beige/Light Brown */
     --chart-4: 35 40% 85%;          /* Light Cream/Beige (for contrast) */
@@ -57,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
     --radius: 0.5rem;
 
     /* Sidebar Variables - Dark theme for sidebar by default */
-    --sidebar-background: 25 25% 18%; /* Slightly darker than card */
+    --sidebar-background: 25 25% 15%; /* Slightly darker than card, matching main bg */
     --sidebar-foreground: var(--foreground); /* Light warm cream/beige */
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
@@ -67,7 +68,8 @@ h1, h2, h3, h4, h5, h6 {
     --sidebar-ring: var(--ring);
   }
 
-  .dark { /* Light Theme: Light Cream, Dark Olive, Wood Tones */
+  .dark { /* Light Theme: Light Cream, Blue, Wood Tones */
+    /* This class will define the light theme, overriding :root when applied */
     --background: 40 70% 96%;        /* Very light cream/off-white hsl(40, 70%, 96%) */
     --foreground: 25 35% 30%;        /* Dark warm brown for text hsl(25, 35%, 30%) */
 
@@ -77,10 +79,9 @@ h1, h2, h3, h4, h5, h6 {
     --popover: 35 60% 94%;          /* Lighter popover hsl(35, 60%, 94%) */
     --popover-foreground: var(--foreground);
 
-    /* New Primary: Dark Olive (#1C2304) - HSL: 74 79% 8% */
-    /* For light theme, we might use a slightly less intense or a complementary color */
-    --primary: 74 70% 15%;          /* A slightly lighter/desaturated olive for light theme primary */
-    --primary-foreground: 74 25% 95%;/* Very light, almost white/cream, for text on primary */
+    /* Primary: Blue (#3980b8) - HSL: 206 53% 47% */
+    --primary: 206 53% 47%;
+    --primary-foreground: 206 30% 97%;/* Very light, slightly desaturated blue/white for text on primary */
 
     /* Ocre/Wood background in light theme */
     --secondary: 30 35% 80%;        /* Light Wood Brown (hsl(30, 35%, 80%)) */
@@ -101,7 +102,7 @@ h1, h2, h3, h4, h5, h6 {
 
     --border: 30 30% 75%;           /* Light wood/beige border (hsl(30, 30%, 75%)) */
     --input: 35 50% 92%;            /* Input background, light cream (hsl(35, 50%, 92%)) */
-    --ring: 74 70% 25%;            /* Olive for focus rings, slightly lighter for light theme */
+    --ring: 206 53% 40%;            /* Darker Blue for focus rings on light backgrounds */
     
     /* Sidebar Variables - Light theme for sidebar when .dark is active */
     --sidebar-background: 35 45% 88%; /* Light beige/cream for light theme sidebar */
@@ -164,4 +165,3 @@ h1, h2, h3, h4, h5, h6 {
     scrollbar-width: none;  /* Firefox */
   }
 }
-
