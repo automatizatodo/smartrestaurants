@@ -9,7 +9,7 @@ import BookingSection from '@/components/landing/BookingSection';
 import ContactMapSection from '@/components/landing/ContactMapSection';
 import TestimonialCarousel from '@/components/landing/TestimonialCarousel';
 import Footer from '@/components/landing/Footer';
-import { fetchMenuDetails } from '@/services/menuService'; // Updated function name
+import { fetchMenuDetails } from '@/services/menuService';
 import type { MenuItemData } from '@/data/menu';
 import restaurantConfig from '@/config/restaurant.config';
 import { Suspense } from 'react';
@@ -23,8 +23,8 @@ export default async function HomePage() {
   // Filter for "Menú del Dia" items
   const menuDelDiaItems = allMenuItems.filter(item => item.isMenuDelDia && item.isVisible);
 
-  // console.log("HOMEPAGE_LOG: Received allMenuItems in HomePage:", JSON.stringify(allMenuItems.length, null, 2));
-  // console.log("HOMEPAGE_LOG: Filtered menuDelDiaItems:", JSON.stringify(menuDelDiaItems.length, null, 2));
+  console.log("HOMEPAGE_LOG: Received allMenuItems count:", allMenuItems.length);
+  console.log("HOMEPAGE_LOG: Filtered menuDelDiaItems count:", menuDelDiaItems.length);
   // console.log("HOMEPAGE_LOG: Current Menu Price:", currentMenuPrice);
   // console.log("HOMEPAGE_LOG: Price Summary:", JSON.stringify(priceSummary, null, 2));
 
@@ -35,8 +35,8 @@ export default async function HomePage() {
         <HeroSection />
         <ServicesSection />
         <Suspense fallback={<div className="text-center py-10">Loading menu...</div>}>
-          <InteractiveMenu 
-            menuItems={menuDelDiaItems} 
+          <InteractiveMenu
+            menuItems={menuDelDiaItems}
             currentMenuPrice={currentMenuPrice}
             priceSummary={priceSummary}
           />
