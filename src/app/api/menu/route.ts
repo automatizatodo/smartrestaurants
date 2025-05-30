@@ -8,10 +8,10 @@ import { parse as parseTime, isValid as isValidDate, format as formatDate, getDa
 import { ca as caLocale, es as esLocale, enUS as enLocale } from 'date-fns/locale';
 
 // URL for the MAIN MENU sheet
-let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=0&single=true&output=csv';
+let GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qXfoypzWxtmNfJMhVWkoeqH9iLg7_Qzf-QSoBCzeaAL0hJRcyBTDzfyuqLx3pmK37l6iyINlRCeP/pub?gid=0&single=true&output=csv';
 
 // URL for the "preciosmenu" sheet
-let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaa24KcQUVl_kLjJHeG9F-2JYbsA_2JfCcVnF3LEZTGzqe_11Fv4u6VLec7BSpCQGSo27w8qhgckQ0/pub?gid=1458714483&single=true&output=csv';
+let PRICES_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qXfoypzWxtmNfJMhVWkoeqH9iLg7_Qzf-QSoBCzeaAL0hJRcyBTDzfyuqLx3pmK37l6iyINlRCeP/pub?gid=1458714483&single=true&output=csv';
 
 
 // Column names from the Google Sheet structure
