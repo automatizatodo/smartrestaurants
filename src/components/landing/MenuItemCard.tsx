@@ -20,8 +20,8 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
   
   const imageUrl = item.imageUrl; 
 
-  const displayName = item.name[language] || item.name.en || item.name.ca || item.name.es || "";
-  const displayDescription = item.description[language] || item.description.en || item.description.ca || item.description.es || "";
+  const displayName = item.name[language] || item.name.ca || item.name.es || item.name.en || "";
+  const displayDescription = item.description[language] || item.description.ca || item.description.es || item.description.en || "";
 
   const shouldShowImage = restaurantConfig.showMenuItemImages && item.imageUrl && !item.imageUrl.includes('placehold.co');
 
@@ -74,23 +74,32 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
             > 
               {displayName}
             </CardTitle>
+            {/* Display "Precio (€)" if available, for "Carta" items */}
             {item.price && (
               <span className="text-xs sm:text-sm text-primary font-semibold ml-2 whitespace-nowrap">
-                + {item.price}
+                {item.price} 
               </span>
             )}
           </div>
         </CardHeader>
         <CardContent className="flex flex-col justify-between flex-1 px-3 sm:px-4 pb-3 pt-0"> 
-          {displayDescription && (
-            <CardDescription suppressHydrationWarning className="text-xs text-muted-foreground mb-2 line-clamp-3"> 
-              {displayDescription}
-            </CardDescription>
-          )}
+          <div>
+            {displayDescription && (
+              <CardDescription suppressHydrationWarning className="text-xs text-muted-foreground mb-2 line-clamp-3"> 
+                {displayDescription}
+              </CardDescription>
+            )}
+            {/* Display "Suplemento (€)" if available, always with a "+" */}
+            {item.suplemento && (
+              <p className="text-xs text-accent-foreground/80 font-medium mt-1 mb-2">
+                + {item.suplemento} <span className="text-muted-foreground/70">({t('menu:suplemento') || 'Supl.'})</span>
+              </p>
+            )}
+          </div>
           
           {item.allergens && item.allergens.length > 0 && (
             <TooltipProvider delayDuration={300}>
-              <div className="mt-auto pt-1.5 mb-0.5 flex items-center flex-wrap gap-2"> {/* Changed gap-1 to gap-2 for a bit more space */}
+              <div className="mt-auto pt-1.5 mb-0.5 flex items-center flex-wrap gap-1.5">
                 {item.allergens.map(allergen => {
                   const allergenKeyForIcon = allergen
                     .toLowerCase()
@@ -98,14 +107,14 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
                     .replace(/\s+/g, '-') 
                     .replace(/[^a-z0-9-]/g, '');
                   
-                  const translatedAllergenName = t(`menu:allergen.${allergenKeyForIcon}`);
+                  const translatedAllergenName = t("menu:allergen." + allergenKeyForIcon);
 
                   return (
                     <Tooltip key={allergenKeyForIcon}>
                       <TooltipTrigger asChild>
                         <div className="relative h-6 w-6 cursor-pointer">
                           <Image
-                            src={`/alergenos/${allergenKeyForIcon}.svg`}
+                            src={"/alergenos/" + allergenKeyForIcon + ".svg"}
                             alt={translatedAllergenName}
                             fill
                             style={{ objectFit: 'contain' }}
@@ -127,4 +136,3 @@ export default function MenuItemCard({ item }: { item: MenuItemData }) {
     </div>
   );
 }
-    

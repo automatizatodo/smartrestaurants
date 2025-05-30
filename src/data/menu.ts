@@ -9,12 +9,15 @@ export interface MenuItemData {
   id: string;
   name: MenuItemText;
   description: MenuItemText;
-  price?: string;
-  categoryKey: string; // e.g., "starters", "mainCourses", "secondCourses", "desserts"
+  price?: string; // Provindrà de la columna "Precio (€)"
+  suplemento?: string; // Nova propietat per a "Suplemento (€)"
+  categoryKey: string;
   imageUrl: string;
   imageHint: string;
   allergens?: string[];
   isChefSuggestion?: boolean;
+  isVisible?: boolean; // Per filtrar a la carta
+  isMenuDelDia?: boolean; // Nova propietat per filtrar al menú del dia
 }
 
 export interface MenuCategory {
@@ -23,16 +26,13 @@ export interface MenuCategory {
 }
 
 // Define category keys and their display order for top-level accordions
-// "Guarnició Brasa" (grilledGarnish) and "Salses" (sauces) will be nested
-// within "Segon Plat" (secondCourses) and won't appear as top-level items here.
 export const menuCategories: MenuCategory[] = [
-  { key: 'starters', order: 1 },        // Entrants
-  { key: 'mainCourses', order: 2 },     // Primers Plats
-  { key: 'secondCourses', order: 3 },   // Segon Plat
-  { key: 'desserts', order: 4 },       // Postres
-  { key: 'breads', order: 5 },         // Pans
-  { key: 'beverages', order: 6 },     // Begudes
-  { key: 'wines', order: 7 },           // Vins
-  // Note: 'grilledGarnish' and 'sauces' are intentionally omitted here for top-level accordion
-  // They will be handled as sub-categories within 'secondCourses'.
+  { key: 'starters', order: 1 },
+  { key: 'mainCourses', order: 2 },
+  { key: 'secondCourses', order: 3 },
+  { key: 'desserts', order: 4 },
+  { key: 'breads', order: 5 },
+  { key: 'beverages', order: 6 },
+  { key: 'wines', order: 7 },
+  // Note: 'grilledGarnish' and 'sauces' are handled as sub-categories within 'secondCourses'.
 ];

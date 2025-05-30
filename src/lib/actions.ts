@@ -7,14 +7,12 @@ config();
 import { aiSommelier, type AISommelierInput, type AISommelierOutput } from "@/ai/flows/ai-sommelier";
 import { checkCalendarAvailability, type CheckCalendarAvailabilityInput, type CheckCalendarAvailabilityOutput } from "@/ai/flows/check-calendar-availability-flow";
 import { createCalendarEvent, type CreateCalendarEventInput, type CreateCalendarEventOutput } from "@/ai/flows/create-calendar-event-flow";
-import { fetchMenuData } from '@/services/menuService';
+import { fetchMenuDetails } from '@/services/menuService'; // Corrected import
 import type { MenuItemData } from '@/data/menu';
 import { z } from "zod";
 import restaurantConfig from "@/config/restaurant.config";
-import { format, parseISO } from "date-fns";
-// Remove unused locale imports if not used elsewhere in this file, or ensure they are used correctly.
-// For example, if you need locales for date formatting within this file:
-// import { ca, es, enUS as en } from 'date-fns/locale';
+import { format, parseISO, parse as parseTime, addMinutes } from "date-fns";
+import { ca, es, enUS as en } from 'date-fns/locale';
 
 
 const SommelierRequestSchema = z.object({
@@ -39,13 +37,14 @@ const formatMenuForAI = (menuItems: MenuItemData[]): string => {
     "Dish: " + (item.name.en || item.name.es || item.name.ca) +
     "\nDescription: " + (item.description.en || item.description.es || item.description.ca || 'N/A') + 
     "\nPrice: " + (item.price || 'N/A') +
+    (item.suplemento ? "\nSupplement: " + item.suplemento : "") +
     "\nCategory: " + item.categoryKey
   ).join("\n\n");
 };
 
 
 export async function getAISommelierRecommendations(
-  initialState: SommelierFormState,
+  _prevState: SommelierFormState, // Renamed to avoid confusion, not used directly for initial state
   formData: FormData
 ): Promise<SommelierFormState> {
   // console.log("ACTIONS_AISOMMELIER: getAISommelierRecommendations called.");
@@ -66,7 +65,7 @@ export async function getAISommelierRecommendations(
   let menuInformationString = "Menu information is currently unavailable.";
   try {
     // console.log("ACTIONS_AISOMMELIER: Fetching menu for AI Sommelier...");
-    const menuItems = await fetchMenuData(); 
+    const { menuItems } = await fetchMenuDetails(); // Corrected: Use fetchMenuDetails and destructure menuItems
     if (menuItems && menuItems.length > 0) {
       menuInformationString = formatMenuForAI(menuItems);
       // console.log("ACTIONS_AISOMMELIER: Menu fetched and formatted for AI.");
@@ -125,7 +124,7 @@ const BookingSchema = z.object({
   phone: z.string().min(1, "landing:booking.error.phoneRequired"),
   date: z.string().min(1, "landing:booking.error.dateRequired"), 
   time: z.string().min(1, "landing:booking.error.timeRequired"),
-  guests: z.coerce.number().int().min(1, "landing:booking.error.guestsRequired").max(99, "landing:booking.error.guestsTooManySystem"),
+  guests: z.coerce.number().int().min(1, "landing:booking.error.guestsRequired").max(99, "landing:booking.error.guestsTooManySystem"), // Max 99 to allow for "more than X"
   notes: z.string().optional(),
 });
 
@@ -151,7 +150,7 @@ export interface BookingFormState {
 }
 
 export async function submitBooking(
-  initialState: BookingFormState,
+  _prevState: BookingFormState, // Renamed to avoid confusion
   formData: FormData
 ): Promise<BookingFormState> {
   // console.log("ACTIONS_BOOKING: submitBooking action initiated.");
@@ -199,16 +198,13 @@ export async function submitBooking(
     }
 
     let formattedDate = date; 
+    let dateLocale: Locale = ca; // Default to Catalan
+    if (restaurantConfig.defaultLocale === 'es') dateLocale = es;
+    else if (restaurantConfig.defaultLocale === 'en') dateLocale = en;
+    
     try {
         const parsedDateObj = parseISO(date); 
-        // Dynamically import locales for date-fns to avoid making them direct dependencies of this server action file
-        const dateLocales = {
-            ca: (await import('date-fns/locale/ca')).default,
-            es: (await import('date-fns/locale/es')).default,
-            en: (await import('date-fns/locale/en-US')).default,
-        };
-        const currentLocale = restaurantConfig.defaultLocale || 'ca';
-        formattedDate = format(parsedDateObj, "PPP", { locale: dateLocales[currentLocale as keyof typeof dateLocales] || dateLocales.ca }); 
+        formattedDate = format(parsedDateObj, "PPP", { locale: dateLocale }); 
     } catch (e) {
         // console.warn("ACTIONS_BOOKING_WHATSAPP: Could not parse date " + date + " with parseISO for WhatsApp. Using original string.");
     }
@@ -217,6 +213,7 @@ export async function submitBooking(
     let guestText = guests.toString();
     if (guests === manyGuestsValue) {
         // This should be localized if possible, or use a generic term
+        // For simplicity, using a hardcoded "More than X" for now
         guestText = "Més de " + maxConfigGuests + " (grup gran)"; 
     }
 
@@ -281,13 +278,14 @@ export async function submitBooking(
       }
 
       if (!availabilityResult.isAvailable) {
-        const dateLocales = {
-          ca: (await import('date-fns/locale/ca')).default,
-          es: (await import('date-fns/locale/es')).default,
-          en: (await import('date-fns/locale/en-US')).default,
+        let dateLocale: Locale = ca;
+        if (restaurantConfig.defaultLocale === 'es') dateLocale = es;
+        else if (restaurantConfig.defaultLocale === 'en') dateLocale = en;
+
+        const messageParams: Record<string, string | number> = { 
+          time, 
+          date: format(parseISO(date), "PPP", { locale: dateLocale }) 
         };
-        const currentLocale = restaurantConfig.defaultLocale || 'ca';
-        const messageParams: Record<string, string | number> = { time, date: format(parseISO(date), "PPP", { locale: dateLocales[currentLocale as keyof typeof dateLocales] || dateLocales.ca }) };
          if (availabilityResult.reasonKey === 'landing:booking.error.slotUnavailable.tooManyGuests') {
             messageParams.guests = String(guests);
             messageParams.maxGuestsForSlot = String(availabilityResult.maxGuestsForSlot || 0);
@@ -341,15 +339,12 @@ export async function submitBooking(
         };
       }
       let formattedSuccessDate = date;
+      let dateLocale: Locale = ca;
+      if (restaurantConfig.defaultLocale === 'es') dateLocale = es;
+      else if (restaurantConfig.defaultLocale === 'en') dateLocale = en;
         try {
             const parsedDateObj = parseISO(date);
-            const dateLocales = {
-                ca: (await import('date-fns/locale/ca')).default,
-                es: (await import('date-fns/locale/es')).default,
-                en: (await import('date-fns/locale/en-US')).default,
-            };
-            const currentLocale = restaurantConfig.defaultLocale || 'ca';
-            formattedSuccessDate = format(parsedDateObj, "PPP", { locale: dateLocales[currentLocale as keyof typeof dateLocales] || dateLocales.ca });
+            formattedSuccessDate = format(parsedDateObj, "PPP", { locale: dateLocale });
         } catch (e) {
             // console.warn("ACTIONS_BOOKING_CALENDAR_SUCCESS: Could not parse date " + date + " with parseISO for success message. Using original string.");
         }
@@ -371,8 +366,9 @@ export async function submitBooking(
 
     } catch (error: any) {
       // console.error("SUBMIT_BOOKING_ACTION: CRITICAL - Error during createCalendarEvent EXECUTION:", error.message, error.stack);
+      // console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       return {
-        messageKey: "common:calendar.serviceUnavailable",
+        messageKey: "common:calendar.serviceUnavailable", // Use a more generic key here.
         success: false,
         errors: { general: ["common:calendar.serviceUnavailable"] },
         messageParams: null,

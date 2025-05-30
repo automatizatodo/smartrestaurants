@@ -9,19 +9,24 @@ import BookingSection from '@/components/landing/BookingSection';
 import ContactMapSection from '@/components/landing/ContactMapSection';
 import TestimonialCarousel from '@/components/landing/TestimonialCarousel';
 import Footer from '@/components/landing/Footer';
-import { fetchMenuData } from '@/services/menuService'; // Updated function name
+import { fetchMenuDetails } from '@/services/menuService'; // Updated function name
 import type { MenuItemData } from '@/data/menu';
 import restaurantConfig from '@/config/restaurant.config';
 import { Suspense } from 'react';
-// import type { PriceSummary } from '@/app/api/menu/route'; // No longer needed
+import type { PriceSummary } from '@/app/api/menu/route';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  // const { menuItems, currentMenuPrice, priceSummary } = await fetchMenuDataWithPrice(); // Old call
-  const menuItems = await fetchMenuData(); // New call, only gets menuItems
+  const { menuItems: allMenuItems, currentMenuPrice, priceSummary } = await fetchMenuDetails();
 
-  // console.log("HOMEPAGE_LOG: Received menuItems in HomePage:", JSON.stringify(menuItems, null, 2));
+  // Filter for "Menú del Dia" items
+  const menuDelDiaItems = allMenuItems.filter(item => item.isMenuDelDia && item.isVisible);
+
+  // console.log("HOMEPAGE_LOG: Received allMenuItems in HomePage:", JSON.stringify(allMenuItems.length, null, 2));
+  // console.log("HOMEPAGE_LOG: Filtered menuDelDiaItems:", JSON.stringify(menuDelDiaItems.length, null, 2));
+  // console.log("HOMEPAGE_LOG: Current Menu Price:", currentMenuPrice);
+  // console.log("HOMEPAGE_LOG: Price Summary:", JSON.stringify(priceSummary, null, 2));
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -30,8 +35,11 @@ export default async function HomePage() {
         <HeroSection />
         <ServicesSection />
         <Suspense fallback={<div className="text-center py-10">Loading menu...</div>}>
-          {/* InteractiveMenu no longer needs currentMenuPrice or priceSummary as props */}
-          <InteractiveMenu menuItems={menuItems} />
+          <InteractiveMenu 
+            menuItems={menuDelDiaItems} 
+            currentMenuPrice={currentMenuPrice}
+            priceSummary={priceSummary}
+          />
         </Suspense>
         <AboutUsSection />
         {restaurantConfig.showAISommelierSection && <AISommelierSection />}
