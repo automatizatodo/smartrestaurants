@@ -48,7 +48,6 @@ export default function MenuPageClientContent({
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const generatingToastIdRef = useRef<string | null>(null);
   
-  // Aquesta referència ja no s'utilitza per html2canvas, però la deixem per si es necessita per a una altra cosa
   const menuContentRef = useRef<HTMLDivElement>(null);
 
 
@@ -59,8 +58,6 @@ export default function MenuPageClientContent({
   const menuDelDiaPriceDescription = menuDelDiaPriceDescriptionKey
     ? t(menuDelDiaPriceDescriptionKey)
     : "";
-
-  const menuPageDescription = t('common:page.menu.description', { restaurantName });
 
   const languageButtons = [
     { code: 'ca', name: 'Català' },
@@ -81,27 +78,26 @@ export default function MenuPageClientContent({
       const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
       const pageHeight = doc.internal.pageSize.getHeight();
       const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 10; // Reduït marge
+      const margin = 10; 
       const contentWidth = pageWidth - 2 * margin;
-      let yPosition = margin + 2; // Reduït marge superior inicial
+      let yPosition = margin + 2;
 
-      // Mides de font i alçades de línia ajustades per a més compactació
-      const mainTitleFontSize = 18; // Reduït
-      const priceTextFontSize = 11; // Reduït
-      const descriptionFontSize = 9; // Reduït
-      const categoryTitleFontSize = 14; // Reduït
-      const dishNameFontSize = 10; // Mantingut
-      const dishDescriptionFontSize = 8; // Reduït
-      const dishPriceFontSize = 9; // Mantingut
-      const subCategoryTitleFontSize = 12; // Reduït
-      const subDishNameFontSize = 9; // Reduït
-      const subDishDescriptionFontSize = 7; // Reduït
+      const menuTitleFontSize = 16; 
+      const priceTextFontSize = 12; 
+      const descriptionFontSize = 9; 
+      const categoryTitleFontSize = 13; 
+      const dishNameFontSize = 10; 
+      const dishDescriptionFontSize = 8; 
+      const dishPriceFontSize = 9; 
+      const subCategoryTitleFontSize = 11; 
+      const subDishNameFontSize = 9;
+      const subDishDescriptionFontSize = 7; 
 
-      const mainTitleLineHeight = 7; // Reduït
-      const regularLineHeight = 5; // Reduït
-      const smallLineHeight = 3.5; // Reduït
-      const itemSpacing = 1.5; // Reduït
-      const sectionSpacing = 4; // Reduït
+      const mainTitleLineHeight = 7; 
+      const regularLineHeight = 5; 
+      const smallLineHeight = 3.5; 
+      const itemSpacing = 1.5; 
+      const sectionSpacing = 3; 
 
       const checkAndAddPage = (currentY: number, neededHeight: number = regularLineHeight * 1.5): number => {
         if (currentY + neededHeight > pageHeight - margin) {
@@ -131,23 +127,21 @@ export default function MenuPageClientContent({
         return textBlockHeight; 
       };
 
-      // TÍTOL DEL MENÚ
       yPosition = checkAndAddPage(yPosition, mainTitleLineHeight * 1.5);
-      addTextWithWrap(t('menu:menuDelDia.title'), pageWidth / 2, yPosition, { align: 'center' }, contentWidth, 'bold', mainTitleFontSize);
-      yPosition += mainTitleLineHeight * 1.5;
+      addTextWithWrap(t('menu:menuDelDia.title'), pageWidth / 2, yPosition, { align: 'center' }, contentWidth, 'bold', menuTitleFontSize);
+      yPosition += mainTitleLineHeight * 1.2;
 
-      // PREU ACTUAL DEL MENÚ I DESCRIPCIÓ
       if (currentMenuPrice) {
         yPosition = checkAndAddPage(yPosition, regularLineHeight);
         addTextWithWrap(currentMenuPrice, pageWidth / 2, yPosition, { align: 'center' }, contentWidth, 'normal', priceTextFontSize);
-        yPosition += regularLineHeight;
+        yPosition += regularLineHeight * 0.9;
       }
       if (menuDelDiaPriceDescription) {
            yPosition = checkAndAddPage(yPosition, regularLineHeight);
            const descHeight = addTextWithWrap(menuDelDiaPriceDescription, pageWidth / 2, yPosition, {align: 'center'}, contentWidth, 'italic', descriptionFontSize);
            yPosition += descHeight;
       }
-      yPosition += regularLineHeight * 1.5; // Espai després de la capçalera
+      yPosition += regularLineHeight * 1.2;
 
 
       const groupedMenu: Record<string, MenuItemData[]> = menuItems.reduce((acc, item) => {
@@ -176,11 +170,11 @@ export default function MenuPageClientContent({
       for (const category of sortedCategories) {
         yPosition = checkAndAddPage(yPosition, categoryTitleFontSize + sectionSpacing); 
         addTextWithWrap(t(`menu:${category.key}`), pageWidth / 2, yPosition, { align: 'center' }, contentWidth, 'bold', categoryTitleFontSize);
-        yPosition += regularLineHeight; 
+        yPosition += regularLineHeight * 0.9;
         
         doc.setDrawColor(200); 
         doc.line(margin, yPosition, pageWidth - margin, yPosition); 
-        yPosition += regularLineHeight * 1.2;
+        yPosition += regularLineHeight * 1.0;
 
         const itemsToDisplay = groupedMenu[category.key] || [];
         for (const item of itemsToDisplay) {
@@ -191,7 +185,7 @@ export default function MenuPageClientContent({
 
           let nameYPos = yPosition;
           
-          const itemNameMaxWidth = itemPrice ? contentWidth - doc.getTextWidth(itemPrice) - 5 : contentWidth; // Reduït gap per preu
+          const itemNameMaxWidth = itemPrice ? contentWidth - doc.getTextWidth(itemPrice) - 5 : contentWidth; 
           const nameHeight = addTextWithWrap(itemName, margin, nameYPos, {}, itemNameMaxWidth, 'normal', dishNameFontSize);
           
           if (itemPrice) {
@@ -219,8 +213,8 @@ export default function MenuPageClientContent({
           for (const subCat of subCategories) {
             if (subCat.items && subCat.items.length > 0) {
               yPosition = checkAndAddPage(yPosition, regularLineHeight * 1.2 + sectionSpacing / 2);
-              addTextWithWrap(t(`menu:${subCat.key}`), pageWidth / 2, yPosition, { align: 'center' }, contentWidth, 'bold', subCategoryTitleFontSize); // Centrat
-              yPosition += regularLineHeight * 1.0;
+              addTextWithWrap(t(`menu:${subCat.key}`), pageWidth / 2, yPosition, { align: 'center' }, contentWidth, 'bold', subCategoryTitleFontSize); 
+              yPosition += regularLineHeight * 0.8;
               doc.setTextColor(0);
 
               for (const subItem of subCat.items) {
@@ -231,7 +225,7 @@ export default function MenuPageClientContent({
                 
                 let subNameYPos = yPosition;
                 const subItemNameMaxWidth = subItemPrice ? contentWidth - 5 - doc.getTextWidth(subItemPrice) - 4 : contentWidth -5;
-                const subNameHeight = addTextWithWrap(subItemName, margin, subNameYPos, {}, subItemNameMaxWidth, 'normal', subDishNameFontSize); // Alineat a l'esquerra
+                const subNameHeight = addTextWithWrap(subItemName, margin, subNameYPos, {}, subItemNameMaxWidth, 'normal', subDishNameFontSize);
 
                 if (subItemPrice) {
                     addTextWithWrap(subItemPrice, pageWidth - margin, yPosition, { align: 'right' }, doc.getTextWidth(subItemPrice) + 1, 'normal', dishPriceFontSize);
@@ -317,11 +311,6 @@ export default function MenuPageClientContent({
                   )}
                 </div>
               )}
-              {menuPageDescription && menuPageDescription.trim() !== '' && menuPageDescription !== t('common:page.menu.description', { restaurantName: 'PLACEHOLDER_RESTAURANT_NAME_FOR_COMPARISON' }) && (
-                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto" suppressHydrationWarning>
-                    {menuPageDescription}
-                 </p>
-              )}
             </div>
             
             <div className="flex justify-center items-center space-x-2 my-6 sm:my-8">
@@ -387,3 +376,4 @@ export default function MenuPageClientContent({
     </div>
   );
 }
+
