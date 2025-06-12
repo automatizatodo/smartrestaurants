@@ -8,8 +8,8 @@ import { parse as parseTime, isValid as isValidDate, format as formatDate, getDa
 import { ca as caLocale, es as esLocale, enUS as enLocale } from 'date-fns/locale';
 
 // URLs for Google Sheets - These should be set in environment variables for production
-let GOOGLE_SHEET_MENU_CSV_URL = process.env.GOOGLE_SHEET_MENU_CSV_URL || 'REPLACE_WITH_YOUR_MAIN_MENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
-let PRICES_SHEET_CSV_URL = process.env.GOOGLE_SHEET_PRICES_CSV_URL || 'YOUR_PRECIOSMENU_SHEET_PUBLISH_TO_WEB_CSV_URL_HERE';
+let GOOGLE_SHEET_MENU_CSV_URL = process.env.GOOGLE_SHEET_MENU_CSV_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qXfoypzWxtmNfJMhVWkoeqH9iLg7_Qzf-QSoBCzeaAL0hJRcyBTDzfyuqLx3pmK37l6iyINlRCeP/pub?gid=0&single=true&output=csv';
+let PRICES_SHEET_CSV_URL = process.env.GOOGLE_SHEET_PRICES_CSV_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT1qXfoypzWxtmNfJMhVWkoeqH9iLg7_Qzf-QSoBCzeaAL0hJRcyBTDzfyuqLx3pmK37l6iyINlRCeP/pub?gid=1458714483&single=true&output=csv';
 
 // Column names from the MAIN MENU Google Sheet structure
 const VISIBLE_COL = "Visible";

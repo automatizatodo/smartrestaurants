@@ -59,7 +59,7 @@ interface RestaurantConfig {
 // --- Configuration Object ---
 const restaurantConfig: RestaurantConfig = {
   restaurantDisplayName: 'La Bodega de la Ferradura',
-  logoUrl: '/logo.webp', // Reemplaça amb la ruta real al teu logo a la carpeta public
+  logoUrl: '/logoFerradura.webp', // Reemplaça amb la ruta real al teu logo a la carpeta public
   address: 'Plaça Nova, 2, 17538 Alp, Girona, España',
   phone: '+34 972 89 07 35',
   phoneHref: 'tel:+34972890735',
@@ -73,7 +73,7 @@ const restaurantConfig: RestaurantConfig = {
     twitter: 'TODO_YOUR_LA_BODEGA_FERRADURA_TWITTER_URL',
     youtube: 'TODO_YOUR_LA_BODEGA_FERRADURA_YOUTUBE_URL',
   },
-  heroImageUrl: '/background_rest.jpg', // Reemplaça amb la ruta real a la teva imatge a la carpeta public
+  heroImageUrl: '/backgroundhero.webp', // Reemplaça amb la ruta real a la teva imatge a la carpeta public
   heroImageHint: 'restaurant alp la cerdanya',
   bookingTimeSlots: [
     "13:00", "13:15", "13:30", "13:45",
