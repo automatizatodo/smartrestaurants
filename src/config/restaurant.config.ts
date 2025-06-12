@@ -90,7 +90,7 @@ const restaurantConfig: RestaurantConfig = {
   showAISommelierSection: false,
   bookingMaxGuestsPerSlot: 8,
   bookingMethod: 'whatsapp',
-  whatsappBookingNumber: '+34614198740', // Example, replace with actual number
+  whatsappBookingNumber: '+34614198718', // Example, replace with actual number
   googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2987.891622017595!2d2.100059515416829!3d41.50661897925279!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12a4941a5d3c3c7b%3A0x6e26a1a51b08715!2sCarrer%20de%20la%20Font%20Nova%2C%2029%2C%2008202%20Sabadell%2C%20Barcelona%2C%20Spain!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus',
   googleMapsLink: 'https://maps.google.com/?q=Carrer+Font+Nova,+29,+08202+Sabadell,+Barcelona',
   googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJrxjmUa-VpBIRenLu0Swg6cM',
