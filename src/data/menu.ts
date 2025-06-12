@@ -23,8 +23,6 @@ export interface MenuCategory {
 }
 
 // Define category keys and their display order for top-level accordions
-// "Guarnició Brasa" (grilledGarnish) and "Salses" (sauces) will be nested
-// within "Segon Plat" (secondCourses) and won't appear as top-level items here.
 export const menuCategories: MenuCategory[] = [
   { key: 'starters', order: 1 },        // Entrants
   { key: 'mainCourses', order: 2 },     // Primers Plats
@@ -33,6 +31,9 @@ export const menuCategories: MenuCategory[] = [
   { key: 'breads', order: 5 },         // Pans
   { key: 'beverages', order: 6 },     // Begudes
   { key: 'wines', order: 7 },           // Vins
-  // Note: 'grilledGarnish' and 'sauces' are intentionally omitted here for top-level accordion
-  // They will be handled as sub-categories within 'secondCourses'.
 ];
+
+// Constants for specific category keys, useful for logic
+export const GRILLED_GARNISH_KEY = 'grilledGarnish';
+export const SAUCES_KEY = 'sauces';
+export const SECOND_COURSES_KEY = 'secondCourses';

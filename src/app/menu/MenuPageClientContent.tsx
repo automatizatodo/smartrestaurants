@@ -8,6 +8,7 @@ import Footer from '@/components/landing/Footer';
 import FullMenuDisplay from '@/components/menu/FullMenuDisplay';
 import { useLanguage } from '@/context/LanguageContext';
 import type { MenuItemData } from '@/data/menu';
+import { menuCategories, GRILLED_GARNISH_KEY, SAUCES_KEY, SECOND_COURSES_KEY } from '@/data/menu'; // Import constants
 import { Button } from '@/components/ui/button';
 import restaurantConfig from '@/config/restaurant.config';
 import { Star as GoogleIcon, Download, Loader2 } from 'lucide-react';
@@ -17,7 +18,6 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useToast } from "@/hooks/use-toast";
 import { format as formatDateFns } from 'date-fns';
-
 
 const TripAdvisorIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5">
@@ -45,9 +45,11 @@ export default function MenuPageClientContent({
 }: MenuPageClientContentProps) {
   const { t, language, setLanguage, translations } = useLanguage();
   const restaurantName = translations.common.restaurantName;
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
   const menuContentRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [accordionItemsForPdf, setAccordionItemsForPdf] = useState<string[] | undefined>(undefined);
+  const generatingToastIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     document.title = t('common:page.menu.title') + " | " + restaurantName;
@@ -65,6 +67,79 @@ export default function MenuPageClientContent({
     { code: 'en', name: 'English' },
   ];
 
+  useEffect(() => {
+    const generateAndDownloadPdf = async () => {
+      if (isGeneratingPdf && accordionItemsForPdf && menuContentRef.current) {
+        // Delay slightly to allow React to re-render with accordions open
+        await new Promise(resolve => setTimeout(resolve, 300)); // Adjusted delay
+
+        try {
+          const canvas = await html2canvas(menuContentRef.current!, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+          });
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: 'a4',
+          });
+
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          const imgWidth = canvas.width;
+          const imgHeight = canvas.height;
+          
+          let newImgHeight = (imgHeight * pdfWidth) / imgWidth;
+          let heightLeft = newImgHeight;
+          let position = 0;
+
+          if (heightLeft <= pdfHeight) {
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, newImgHeight);
+          } else {
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, newImgHeight);
+            heightLeft -= pdfHeight;
+            while (heightLeft > 0) {
+              position = heightLeft - newImgHeight;
+              pdf.addPage();
+              pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, newImgHeight);
+              heightLeft -= pdfHeight;
+            }
+          }
+          
+          const today = new Date();
+          const formattedDate = formatDateFns(today, 'yyyy-MM-dd');
+          const safeRestaurantName = restaurantName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+          pdf.save(`${safeRestaurantName}_menu_${formattedDate}.pdf`);
+
+          toast({
+            title: t('common:pdf.successTitle'),
+            description: t('common:pdf.success'),
+          });
+
+        } catch (error) {
+          console.error("Error generating PDF:", error);
+          toast({
+            title: t('common:pdf.errorTitle'),
+            description: t('common:pdf.error'),
+            variant: 'destructive',
+          });
+        } finally {
+          if (generatingToastIdRef.current) {
+            dismiss(generatingToastIdRef.current);
+            generatingToastIdRef.current = null;
+          }
+          setAccordionItemsForPdf(undefined);
+          setIsGeneratingPdf(false);
+        }
+      }
+    };
+
+    generateAndDownloadPdf();
+  }, [isGeneratingPdf, accordionItemsForPdf, t, toast, dismiss, menuItems, restaurantName]);
+
+
   const handleDownloadPdf = async () => {
     if (!menuContentRef.current) {
       toast({
@@ -75,87 +150,33 @@ export default function MenuPageClientContent({
       return;
     }
 
-    setIsGeneratingPdf(true);
-    const generatingToast = toast({
+    const { id: newToastId } = toast({
       title: t('common:pdf.generatingTitle'),
       description: t('common:pdf.generating'),
+      duration: Infinity, 
     });
+    generatingToastIdRef.current = newToastId;
 
-    try {
-      const canvas = await html2canvas(menuContentRef.current, {
-        scale: 2, // Increase scale for better quality
-        useCORS: true, // If you have external images
-        logging: false,
-      });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'p',
-        unit: 'mm',
-        format: 'a4',
-      });
+    setIsGeneratingPdf(true);
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = imgWidth / imgHeight;
+    const allCategoryKeysFromData = Array.from(new Set(menuItems.map(item => item.categoryKey).filter(Boolean)));
 
-      let newImgWidth = pdfWidth;
-      let newImgHeight = newImgWidth / ratio;
-
-      let position = 0;
-      let remainingHeight = imgHeight * (pdfWidth / imgWidth); // total height of the image scaled to pdf width
-
-      if (remainingHeight <= pdfHeight) { // Fits on one page
-        pdf.addImage(imgData, 'PNG', 0, 0, newImgWidth, newImgHeight);
-      } else { // Needs pagination
-        let pageCanvasHeight = pdfHeight * (imgWidth / pdfWidth); // height of canvas section to fit one PDF page
-        let yOffset = 0;
-
-        while (remainingHeight > 0) {
-          const tempCanvas = document.createElement('canvas');
-          tempCanvas.width = imgWidth;
-          tempCanvas.height = Math.min(pageCanvasHeight, imgHeight - yOffset);
-          const tempCtx = tempCanvas.getContext('2d');
-          if (tempCtx) {
-            tempCtx.drawImage(canvas, 0, yOffset, imgWidth, tempCanvas.height, 0, 0, imgWidth, tempCanvas.height);
-            const pageImgData = tempCanvas.toDataURL('image/png');
-            pdf.addImage(pageImgData, 'PNG', 0, 0, pdfWidth, tempCanvas.height * (pdfWidth / imgWidth));
-            remainingHeight -= tempCanvas.height * (pdfWidth / imgWidth);
-            yOffset += pageCanvasHeight;
-            if (remainingHeight > 0.1) { // 0.1 to handle floating point inaccuracies
-              pdf.addPage();
+    const keysToForceOpen = menuCategories
+        .filter(categoryConfig => {
+            const hasDirectItems = allCategoryKeysFromData.includes(categoryConfig.key);
+            
+            if (categoryConfig.key === SECOND_COURSES_KEY) {
+                const hasSubCategoryItems = 
+                    allCategoryKeysFromData.includes(GRILLED_GARNISH_KEY) ||
+                    allCategoryKeysFromData.includes(SAUCES_KEY);
+                return hasDirectItems || hasSubCategoryItems;
             }
-          } else {
-            break; 
-          }
-        }
-      }
-      
-      const today = new Date();
-      const formattedDate = formatDateFns(today, 'yyyy-MM-dd');
-      const safeRestaurantName = restaurantName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      pdf.save(`${safeRestaurantName}_menu_${formattedDate}.pdf`);
+            return hasDirectItems && categoryConfig.key !== GRILLED_GARNISH_KEY && categoryConfig.key !== SAUCES_KEY;
+        })
+        .map(cat => cat.key);
 
-      generatingToast.dismiss();
-      toast({
-        title: t('common:pdf.successTitle'),
-        description: t('common:pdf.success'),
-      });
-
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      generatingToast.dismiss();
-      toast({
-        title: t('common:pdf.errorTitle'),
-        description: t('common:pdf.error'),
-        variant: 'destructive',
-      });
-    } finally {
-      setIsGeneratingPdf(false);
-    }
+    setAccordionItemsForPdf(keysToForceOpen);
   };
-
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -200,24 +221,26 @@ export default function MenuPageClientContent({
               )}
             </div>
             
-            <div className="flex justify-center items-center space-x-2 my-6 sm:my-8">
-              {languageButtons.map((langButton) => (
-                <Button
-                  key={langButton.code}
-                  variant={language === langButton.code ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setLanguage(langButton.code as 'ca' | 'es' | 'en')}
-                  className={cn(
-                    language === langButton.code ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10'
-                  )}
-                  suppressHydrationWarning
-                >
-                  {langButton.name}
-                </Button>
-              ))}
-            </div>
+            {!isGeneratingPdf && (
+              <div className="flex justify-center items-center space-x-2 my-6 sm:my-8">
+                {languageButtons.map((langButton) => (
+                  <Button
+                    key={langButton.code}
+                    variant={language === langButton.code ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setLanguage(langButton.code as 'ca' | 'es' | 'en')}
+                    className={cn(
+                      language === langButton.code ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10'
+                    )}
+                    suppressHydrationWarning
+                  >
+                    {langButton.name}
+                  </Button>
+                ))}
+              </div>
+            )}
             
-            <FullMenuDisplay menuItems={menuItems} />
+            <FullMenuDisplay menuItems={menuItems} forcedOpenAccordionItemKeys={accordionItemsForPdf} />
           </div>
 
           <div className="text-center mb-6 sm:mb-8">
@@ -236,7 +259,6 @@ export default function MenuPageClientContent({
               {t('common:button.viewAsPdf')}
             </Button>
           </div>
-
 
           {(restaurantConfig.googleReviewUrl || restaurantConfig.tripAdvisorReviewUrl) && (
             <div className="mt-12 sm:mt-16 text-center flex flex-col items-center space-y-3 sm:flex-row sm:space-y-0 sm:justify-center sm:space-x-6">

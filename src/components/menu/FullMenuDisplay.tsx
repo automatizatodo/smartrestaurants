@@ -1,25 +1,21 @@
 
 "use client";
 
-import { menuCategories } from '@/data/menu';
+import { menuCategories, GRILLED_GARNISH_KEY, SAUCES_KEY, SECOND_COURSES_KEY } from '@/data/menu';
 import type { MenuItemData } from '@/data/menu';
 import { useLanguage } from '@/context/LanguageContext';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import MenuItemCard from '@/components/landing/MenuItemCard';
-import SubMenuItemDisplay from './SubMenuItemDisplay'; // Import the new component
+import SubMenuItemDisplay from './SubMenuItemDisplay';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FullMenuDisplayProps {
   menuItems: MenuItemData[];
+  forcedOpenAccordionItemKeys?: string[]; // New prop to control open items
 }
 
-// Define constants for subcategory keys for easier reference
-const GRILLED_GARNISH_KEY = 'grilledGarnish';
-const SAUCES_KEY = 'sauces';
-const SECOND_COURSES_KEY = 'secondCourses';
-
-export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
+export default function FullMenuDisplay({ menuItems, forcedOpenAccordionItemKeys }: FullMenuDisplayProps) {
   const { t } = useLanguage();
 
   if (!menuItems || menuItems.length === 0) {
@@ -41,7 +37,6 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
     return acc;
   }, {} as Record<string, MenuItemData[]>);
 
-  // Get top-level categories for accordion, excluding subcategories
   const topLevelCategoryKeys = menuCategories
     .map(cat => cat.key)
     .filter(key => key !== GRILLED_GARNISH_KEY && key !== SAUCES_KEY);
@@ -50,7 +45,13 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
     .filter(cat => topLevelCategoryKeys.includes(cat.key))
     .sort((a, b) => a.order - b.order);
 
-  const defaultOpenValue: string[] = [];
+  let accordionProps: { value: string[] } | { defaultValue: string[] };
+  if (forcedOpenAccordionItemKeys) {
+    accordionProps = { value: forcedOpenAccordionItemKeys };
+  } else {
+    const defaultOpenValue: string[] = []; // By default, all are closed
+    accordionProps = { defaultValue: defaultOpenValue };
+  }
 
   if (sortedTopLevelCategories.length === 0 && !groupedMenu[SECOND_COURSES_KEY]?.length) { 
      return (
@@ -63,7 +64,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
   }
 
   return (
-    <Accordion type="multiple" defaultValue={defaultOpenValue} className="w-full space-y-1 sm:space-y-2">
+    <Accordion type="multiple" {...accordionProps} className="w-full space-y-1 sm:space-y-2">
       {sortedTopLevelCategories.map((category) => {
         const itemsInCategory = groupedMenu[category.key];
         
@@ -79,7 +80,6 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
             return null;
         }
 
-
         const categoryTitleKey = `menu:${category.key}`;
         return (
           <AccordionItem key={category.key} value={category.key} className="border-b-0 rounded-lg overflow-hidden shadow-md bg-card">
@@ -93,7 +93,7 @@ export default function FullMenuDisplay({ menuItems }: FullMenuDisplayProps) {
                     key={item.id}
                     className={cn(
                         "mb-2 sm:mb-3 break-inside-avoid",
-                        item.isChefSuggestion && "pt-3" // Increased padding for chef suggestion items
+                        item.isChefSuggestion && "pt-3"
                     )}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
