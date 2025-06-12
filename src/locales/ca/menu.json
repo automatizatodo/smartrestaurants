@@ -19,7 +19,9 @@
   "weekdaysPriceLabel": "Dilluns-Divendres",
   "tuesdayToFridayPriceLabel": "Dimarts-Divendres",
   "weekendsPriceLabel": "Caps de Setmana i Festius",
-
+  "generatedOn": "Generat el:",
+  "dailyMenuPrices": "Preus Menú del Dia",
+  "currentMenuPrice": "Preu Menú Actual",
   "allergen.gluten": "Gluten",
   "allergen.crustaceos": "Crustacis",
   "allergen.huevos": "Ous",

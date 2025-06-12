@@ -19,7 +19,9 @@
   "weekdaysPriceLabel": "Lunes-Viernes",
   "tuesdayToFridayPriceLabel": "Martes-Viernes",
   "weekendsPriceLabel": "Fines de Semana y Festivos",
-
+  "generatedOn": "Generado el:",
+  "dailyMenuPrices": "Precios Menú del Día",
+  "currentMenuPrice": "Precio Menú Actual",
   "allergen.gluten": "Gluten",
   "allergen.crustaceos": "Crustáceos",
   "allergen.huevos": "Huevos",
