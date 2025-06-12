@@ -9,7 +9,7 @@ import caCommon from '@/locales/ca/common.json';
 import caMenuPage from '@/locales/ca/page-specific/menu.json';
 
 // Construct title for metadata
-const menuPageTitle = caMenuPage.titleWithoutBrand || 'Menú del Dia i Carta';
+const menuPageTitle = caMenuPage.titleWithoutBrand || 'Menú del Dia'; // Updated fallback
 const restaurantContext = caCommon.seo.pageContext || 'Restaurant a Sabadell';
 
 export const metadata: Metadata = {
@@ -33,7 +33,10 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function MenuPage() {
+  console.log("MENU_PAGE_SERVER_COMPONENT: Fetching menu data...");
   const { menuItems, currentMenuPrice, priceSummary } = await fetchMenuDataWithPrice();
+  console.log("MENU_PAGE_SERVER_COMPONENT: Menu items fetched:", menuItems ? menuItems.length : 0, "Current Price:", currentMenuPrice);
+
   const menuDelDiaPriceDescriptionKey = restaurantConfig.menuDelDia?.priceDescriptionKey;
 
   return (
@@ -41,7 +44,7 @@ export default async function MenuPage() {
       menuItems={menuItems}
       currentMenuPrice={currentMenuPrice}
       menuDelDiaPriceDescriptionKey={menuDelDiaPriceDescriptionKey}
-      priceSummary={priceSummary} 
+      priceSummary={priceSummary}
     />
   );
 }
