@@ -11,6 +11,7 @@
   "nav.mobileMenuTitle": "Menú de Navegación",
   "button.bookNow": "Reservar Ahora",
   "button.viewFullMenu": "Ver Menú Completo",
+  "button.viewAsPdf": "Visualizar en PDF",
   "footer.quickLinks": "Enlaces Rápidos",
   "footer.home": "Inicio",
   "footer.menu": "Menú",
@@ -34,8 +35,8 @@
   "goToSlide": "Ir a la diapositiva {number}",
   "guestSingular": "comensal",
   "guestsPlural": "comensales",
-  "page.menu.title": "Menú del Día",
-  "page.menu.description": "",
+  "page.menu.title": "Menú del Día y Carta",
+  "page.menu.description": "Explora las delicias que {restaurantName} tiene para ofrecer. Desde platos tradicionales hasta creaciones innovadoras, todo preparado con los ingredientes más frescos.",
   "allCategories": "Todo",
   "seo": {
     "mainKeywords": "Restaurante en Sabadell - Brasa y Cocina Tradicional",
@@ -46,5 +47,12 @@
   "cookieConsent.acceptButton": "Aceptar",
   "cookieConsent.rejectButton": "Rechazar",
   "cookieConsent.ariaLabel": "Aviso de cookies",
-  "cookieConsent.privacyPolicyLink": "Política de Privacidad"
+  "cookieConsent.privacyPolicyLink": "Política de Privacidad",
+  "pdf.generatingTitle": "Generando PDF",
+  "pdf.generating": "Generando PDF, por favor espera...",
+  "pdf.successTitle": "PDF Generado",
+  "pdf.success": "¡El PDF del menú se ha generado y descargado correctamente!",
+  "pdf.errorTitle": "Error de PDF",
+  "pdf.error": "Hubo un error al generar el PDF del menú.",
+  "pdf.errorNoContent": "No se encontró contenido para generar el PDF."
 }

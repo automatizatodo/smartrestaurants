@@ -11,6 +11,7 @@
   "nav.mobileMenuTitle": "Menú de Navegació",
   "button.bookNow": "Reservar Ara",
   "button.viewFullMenu": "Veure Menú Complet",
+  "button.viewAsPdf": "Visualitzar en PDF",
   "footer.quickLinks": "Enllaços Ràpids",
   "footer.home": "Inici",
   "footer.menu": "Menú",
@@ -34,8 +35,8 @@
   "goToSlide": "Anar a la diapositiva {number}",
   "guestSingular": "comensal",
   "guestsPlural": "comensals",
-  "page.menu.title": "Menú del Dia",
-  "page.menu.description": "",
+  "page.menu.title": "Menú del Dia i Carta",
+  "page.menu.description": "Explora les delícies que {restaurantName} té per oferir. Des de plats tradicionals fins a creacions innovadores, tot preparat amb els ingredients més frescos.",
   "allCategories": "Totes",
   "seo": {
     "mainKeywords": "Restaurant a Sabadell - Brasa i Cuina Tradicional",
@@ -46,5 +47,12 @@
   "cookieConsent.acceptButton": "Acceptar",
   "cookieConsent.rejectButton": "Rebutjar",
   "cookieConsent.ariaLabel": "Avís de galetes",
-  "cookieConsent.privacyPolicyLink": "Política de Privacitat"
+  "cookieConsent.privacyPolicyLink": "Política de Privacitat",
+  "pdf.generatingTitle": "Generant PDF",
+  "pdf.generating": "S'està generant el PDF, si us plau, espera...",
+  "pdf.successTitle": "PDF Generat",
+  "pdf.success": "El PDF del menú s'ha generat i descarregat correctament!",
+  "pdf.errorTitle": "Error de PDF",
+  "pdf.error": "Hi ha hagut un error en generar el PDF del menú.",
+  "pdf.errorNoContent": "No s'ha trobat contingut per generar el PDF."
 }

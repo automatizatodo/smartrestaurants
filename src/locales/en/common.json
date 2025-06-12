@@ -11,6 +11,7 @@
   "nav.mobileMenuTitle": "Navigation Menu",
   "button.bookNow": "Book Now",
   "button.viewFullMenu": "View Full Menu",
+  "button.viewAsPdf": "View as PDF",
   "footer.quickLinks": "Quick Links",
   "footer.home": "Home",
   "footer.menu": "Menu",
@@ -34,8 +35,8 @@
   "goToSlide": "Go to slide {number}",
   "guestSingular": "guest",
   "guestsPlural": "guests",
-  "page.menu.title": "Menu of the Day",
-  "page.menu.description": "",
+  "page.menu.title": "Menu of the Day & A La Carte",
+  "page.menu.description": "Explore the delicacies {restaurantName} has to offer. From traditional dishes to innovative creations, all prepared with the freshest ingredients.",
   "allCategories": "All",
   "seo": {
     "mainKeywords": "Sabadell Restaurant - Grill & Traditional Cuisine",
@@ -46,5 +47,12 @@
   "cookieConsent.acceptButton": "Accept",
   "cookieConsent.rejectButton": "Reject",
   "cookieConsent.ariaLabel": "Cookie Notice",
-  "cookieConsent.privacyPolicyLink": "Privacy Policy"
+  "cookieConsent.privacyPolicyLink": "Privacy Policy",
+  "pdf.generatingTitle": "Generating PDF",
+  "pdf.generating": "Generating PDF, please wait...",
+  "pdf.successTitle": "PDF Generated",
+  "pdf.success": "Menu PDF generated and downloaded successfully!",
+  "pdf.errorTitle": "PDF Error",
+  "pdf.error": "There was an error generating the menu PDF.",
+  "pdf.errorNoContent": "No content found to generate PDF."
 }
